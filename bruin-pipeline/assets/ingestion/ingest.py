@@ -10,13 +10,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GTFS_URL = "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
-GCS_BUCKET = os.environ.get("GCS_BUCJET", "adelaide-metro")
+GCS_BUCKET = os.environ.get("GCS_BUCKET")
 GCS_PREFIX = "gtfs_static/adelaide-metro"
 GCP_PROJECT = os.environ['GCP_PROJECT']
 BQ_dataset = "raw"
 client = storage.Client.from_service_account_json(os.environ['GCP_CREDENTIALS'])
 
-# map necessary file names to table names
+# map necessary file names to Big Query table names
 GTFS_FILES = {
     "routes.txt": "gtfs_routes",
     "stops.txt": "gtfs_stops",
@@ -68,10 +68,10 @@ def uploaded_to_gcs():
     create_bucket(GCS_BUCKET)
     bucket = client.bucket(os.environ.get('GCS_BUCKET'))
     
-    downloadedGTFS = download_gtfs()
+    gtfs_data = download_gtfs()
 
     # extract the zip file directly on memory
-    with zipfile.ZipFile(io.BytesIO(downloadedGTFS)) as zf:
+    with zipfile.ZipFile(io.BytesIO(gtfs_data)) as zf:
         try:
             for filename, tablename in GTFS_FILES.items():
                 if filename not in zf.namelist():

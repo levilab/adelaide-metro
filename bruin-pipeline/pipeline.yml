@@ -1,0 +1,4 @@
+name: adelaide-transit-pipeline
+schedule: "0 22 * * *"   # Daily at 06:00 HKT (UTC+8)
+default_connections:
+  google_cloud_platform: gcp
