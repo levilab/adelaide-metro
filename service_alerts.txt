@@ -1,0 +1,3001 @@
+header {
+  gtfs_realtime_version: "1.0"
+  incrementality: FULL_DATASET
+  timestamp: 1786368640
+}
+entity {
+  id: "A1786368641"
+  alert {
+    active_period {
+      start: 1740688200
+    }
+    informed_entity {
+      route_id: "98C"
+    }
+    informed_entity {
+      route_id: "99C"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-u1-halifax-street-from-friday-28-february"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop U1 Halifax Street - From Friday 28 February"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1477988\"><p>From Friday 28 February until further notice, Stop U1 Halifax St - South side will be relocated 30 metres west due to building works.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368642"
+  alert {
+    active_period {
+      start: 1747855800
+    }
+    informed_entity {
+      route_id: "245"
+    }
+    informed_entity {
+      route_id: "248"
+    }
+    informed_entity {
+      route_id: "AO31"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-2-south-road-west-side-from-thursday-22-may"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 2 Stop 2A and Stop 3 South Road - West side - From Thursday 22 April"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1501405\"><div id=\"component_1501405\"><div id=\"component_1501405\"><div id=\"component_1501405\"><div id=\"component_1501405\"><p>From first bus service Tuesday 22 April 2026, until further notice, Stop 2, Stop 2A and Stop 3 South Road on the western side will be closed due to works associated with the Torrens to Darlington Project.</p><p>Passengers are advised to use either Stop 3A South Rd - West side or Stop 1A Sir Donald Bradman Dr - North side as an alternative during these works.</p></div></div></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368643"
+  alert {
+    active_period {
+      start: 1750620600
+    }
+    informed_entity {
+      route_id: "838"
+    }
+    informed_entity {
+      route_id: "838H"
+    }
+    informed_entity {
+      route_id: "839"
+    }
+    informed_entity {
+      route_id: "839R"
+    }
+    informed_entity {
+      route_id: "852"
+    }
+    informed_entity {
+      route_id: "852L"
+    }
+    informed_entity {
+      route_id: "881"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-77-wellington-road-north-side-from-monday-23-june"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 77 Wellington Road - North side - From Monday 23 June"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1511298\"><div id=\"component_1511298\"><div id=\"component_1511298\"><p>From first bus service Monday 23 June, until further notice, Stop 77 Wellington Rd - North side will be closed due to building works at the Mount Barker Hospital.&nbsp;</p><p>Passengers are advised to use Stop 78 Wellington Rd - North side during the dates listed above.</p><p>&nbsp;</p></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368644"
+  alert {
+    active_period {
+      start: 1753990200
+    }
+    informed_entity {
+      route_id: "263"
+    }
+    informed_entity {
+      route_id: "265"
+    }
+    informed_entity {
+      route_id: "265W"
+    }
+    informed_entity {
+      route_id: "N262"
+    }
+    informed_entity {
+      route_id: "AO31"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-15-anzac-highway-south-east-side-from-friday-1-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 15 Anzac Highway - South East side - From Friday 1 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1526757\"><p>From Friday 1 August until further notice, Stop 15 Anzac Hwy - South East side will be relocated 90 metres north east due to tram grade separation project works.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368645"
+  alert {
+    active_period {
+      start: 1761499800
+    }
+    informed_entity {
+      route_id: "719"
+    }
+    informed_entity {
+      route_id: "720"
+    }
+    informed_entity {
+      route_id: "721"
+    }
+    informed_entity {
+      route_id: "782"
+    }
+    informed_entity {
+      route_id: "783"
+    }
+    informed_entity {
+      route_id: "982"
+    }
+    informed_entity {
+      route_id: "N721"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-south-road-clovelly-park-from-monday-27-october"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour - South Road Clovelly Park - From Monday 27 October 2025"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1550199\"><div id=\"component_1550199\"><div id=\"component_1550199\"><p data-start=\"107\" data-end=\"427\">To support works at the Southern Precinct of the Torrens to Darlington Project and ensure the safety of public transport users, all northbound bus services on South Road (excluding express and limited stop services) will be detoured via Tonsley Boulevard, Selgar Link, Selgar Avenue and York Avenue starting from first service on Monday, 27 October, 2025 until further notice.</p><p data-start=\"429\" data-end=\"515\">As a result, the following bus stops on South Road&nbsp;will be closed:</p><ul data-start=\"516\" data-end=\"549\"><li data-start=\"516\" data-end=\"527\"><p data-start=\"518\" data-end=\"527\">Stop 19 South Rd - West side</p></li><li data-start=\"528\" data-end=\"539\"><p data-start=\"530\" data-end=\"539\">Stop 20 South Rd - West side</p></li><li data-start=\"540\" data-end=\"549\"><p data-start=\"542\" data-end=\"549\">Stop 22 South Rd - West side</p></li></ul><p data-start=\"551\" data-end=\"616\">Two temporary bus stops will be available on York Avenue:</p><ul data-start=\"617\" data-end=\"737\"><li data-start=\"617\" data-end=\"676\"><p data-start=\"619\" data-end=\"676\">Stop 22 York Avenue &ndash; located south of Byron Avenue</p></li><li data-start=\"677\" data-end=\"737\"><p data-start=\"679\" data-end=\"737\">Stop 19 York Avenue &ndash; located south of Scottish Avenue</p></li></ul></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368646"
+  alert {
+    active_period {
+      start: 1761845400
+    }
+    informed_entity {
+      route_id: "202"
+    }
+    informed_entity {
+      route_id: "202F"
+    }
+    informed_entity {
+      route_id: "203"
+    }
+    informed_entity {
+      route_id: "203B"
+    }
+    informed_entity {
+      route_id: "203F"
+    }
+    informed_entity {
+      route_id: "206"
+    }
+    informed_entity {
+      route_id: "208"
+    }
+    informed_entity {
+      route_id: "208N"
+    }
+    informed_entity {
+      route_id: "209F"
+    }
+    informed_entity {
+      route_id: "251"
+    }
+    informed_entity {
+      route_id: "252"
+    }
+    informed_entity {
+      route_id: "253"
+    }
+    informed_entity {
+      route_id: "253X"
+    }
+    informed_entity {
+      route_id: "254"
+    }
+    informed_entity {
+      route_id: "254X"
+    }
+    informed_entity {
+      route_id: "N254"
+    }
+    informed_entity {
+      route_id: "943"
+    }
+    informed_entity {
+      route_id: "951"
+    }
+    informed_entity {
+      route_id: "208B"
+    }
+    informed_entity {
+      route_id: "200"
+    }
+    informed_entity {
+      route_id: "241"
+    }
+    informed_entity {
+      route_id: "245"
+    }
+    informed_entity {
+      route_id: "248"
+    }
+    informed_entity {
+      route_id: "263"
+    }
+    informed_entity {
+      route_id: "265"
+    }
+    informed_entity {
+      route_id: "262"
+    }
+    informed_entity {
+      route_id: "N262"
+    }
+    informed_entity {
+      route_id: "N202"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-z2-king-william-road-from-friday-31-october"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop Z2 King William Road - From Friday 31 October"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1552490\"><p>Due to building works, Stop Z2 King William Road will be closed from first service Friday 31 October until further notice.</p><p>Bus services will use Stop Y2 King William Street as an alternative stop.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368647"
+  alert {
+    active_period {
+      start: 1765128600
+    }
+    informed_entity {
+      route_id: "245"
+    }
+    informed_entity {
+      route_id: "248"
+    }
+    informed_entity {
+      route_id: "248A"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-4-and-4a-south-road-east-side-from-monday-8-december"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 4 and 4A South Road - East side - From Monday 8 December"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1562403\"><p>From first service, Monday 8 December until further notice, Stop 4 and 4A South Rd - East side will be closed due to works associated with the Torrens to Darlington project.&nbsp;</p><p>Passengers are advised to use either Stop 3A or 5 South Rd - East side.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368648"
+  alert {
+    active_period {
+      start: 1765128600
+    }
+    informed_entity {
+      route_id: "719"
+    }
+    informed_entity {
+      route_id: "720"
+    }
+    informed_entity {
+      route_id: "720A"
+    }
+    informed_entity {
+      route_id: "721"
+    }
+    informed_entity {
+      route_id: "721A"
+    }
+    informed_entity {
+      route_id: "N721"
+    }
+    informed_entity {
+      route_id: "782"
+    }
+    informed_entity {
+      route_id: "783"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-12-south-rd-east-side-from-monday-8-december"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 12 South Rd - East side - From Monday 8 December"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1562449\"><p>From first service, Monday 8 December until further notice, Stop 12 South Rd - East side will be relocated 175 metres south due to works associated with the Raglan Avenue, Edward Street and South Road network upgrade.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368649"
+  alert {
+    active_period {
+      start: 1765823400
+    }
+    informed_entity {
+      route_id: "202"
+    }
+    informed_entity {
+      route_id: "203"
+    }
+    informed_entity {
+      route_id: "206"
+    }
+    informed_entity {
+      route_id: "208"
+    }
+    informed_entity {
+      route_id: "208B"
+    }
+    informed_entity {
+      route_id: "208N"
+    }
+    informed_entity {
+      route_id: "271"
+    }
+    informed_entity {
+      route_id: "273"
+    }
+    informed_entity {
+      route_id: "281"
+    }
+    informed_entity {
+      route_id: "281K"
+    }
+    informed_entity {
+      route_id: "N202"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-7-northcote-tce-east-side-and-stop-7-walkerville-tce-north-west-side"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 7 Northcote Tce - East side and Stop 7 Walkerville Tce - North West side"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1566483\"><div id=\"component_1566483\"><p>Due to building works at the intersection of Northcote Terrace and Walkerville Terrace, the following bus stop changes will be implemented from first service, Tuesday 16 December 2025:</p><ul><li>Stop 7 Northcote Tce - East side will be relocated 100 metres north.</li><li>Stop 7 Walkerville Tce - North West side will be relocated 50 metres north east.&nbsp;</li></ul></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368650"
+  alert {
+    active_period {
+      start: 1768068000
+    }
+    informed_entity {
+      route_id: "163"
+    }
+    informed_entity {
+      route_id: "J1"
+    }
+    informed_entity {
+      route_id: "J1A"
+    }
+    informed_entity {
+      route_id: "J2"
+    }
+    informed_entity {
+      route_id: "J2G"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-4-south-rd-east-side-mile-end-from-sunday-11-january"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 4 South Rd - East side - Mile End - From Sunday 11 January"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1572192\"><div id=\"component_1572192\"><p>From Sunday 11 January until late April 2026, Stop 4 South Rd - East side at Mile End will be relocated 135 metres north due to works associated with the Torrens to Darlington project.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368651"
+  alert {
+    active_period {
+      start: 1768152600
+    }
+    informed_entity {
+      route_id: "232"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closures-pedder-crescent-from-monday-12-january"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closures - Pedder Crescent - From Monday 12 January"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1572205\"><div id=\"component_1572205\"><p>From first service, Monday 12 January until April 2026, bus services will be detouring away from a section of Pedder Crescent for travel towards the city.</p><p>Stop 16 Regency Rd - North side will not be serviced, with passengers advised to use Stop 17 Regency Rd - North side.</p><p>Stop 15 Pedder Cres - East side will be relocated 75 metres south.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368652"
+  alert {
+    active_period {
+      start: 1769459400
+    }
+    informed_entity {
+      route_id: "110"
+    }
+    informed_entity {
+      route_id: "112"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-6-south-rd-torrensville-from-tuesday-27-january"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 6 South Rd - West Side - From Tuesday 27 January"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1575874\"><div id=\"component_1575874\"><p>From first service Tuesday 27 January until further notice, Stop 6 South Rd - West Side will be relocated 120 metres south due to works associated with the Torrens to Darlington project.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368653"
+  alert {
+    active_period {
+      start: 1771349400
+    }
+    informed_entity {
+      route_id: "200"
+    }
+    informed_entity {
+      route_id: "200B"
+    }
+    informed_entity {
+      route_id: "200C"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-1-king-william-road-wayville-from-wednesday-18-february"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 1 King William Road Wayville - From Wednesday 18 February"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1585546\"><p>From first service, Wednesday 18 February until July 2026, Stop 1 King William Road at Wayville will be closed in both directions due to Council works.</p><p>Passengers are advised to use Stop 2 King William Road.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368654"
+  alert {
+    active_period {
+      start: 1771790400
+    }
+    informed_entity {
+      route_id: "650"
+    }
+    informed_entity {
+      route_id: "651"
+    }
+    informed_entity {
+      route_id: "652"
+    }
+    informed_entity {
+      route_id: "653"
+    }
+    informed_entity {
+      route_id: "655"
+    }
+    informed_entity {
+      route_id: "657"
+    }
+    informed_entity {
+      route_id: "658"
+    }
+    informed_entity {
+      route_id: "659"
+    }
+    informed_entity {
+      route_id: "660"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-and-detour-lawrie-st-school-stop-from-monday-23-february"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop School St Michaels College Lawrie St - From Monday 23 February "
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1586071\"><div id=\"component_1586071\"><p>From first service Monday 23 February until further notice, Stop School St Michaels College Lawrie St&nbsp;will be closed due to water main works on Lawrie St, Henley Beach.&nbsp;</p><p>Passengers are advised to use Stop 28 Marlborough St (South side)</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368655"
+  alert {
+    active_period {
+      start: 1771781400
+    }
+    informed_entity {
+      route_id: "190"
+    }
+    informed_entity {
+      route_id: "631"
+    }
+    informed_entity {
+      route_id: "633"
+    }
+    informed_entity {
+      route_id: "966"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-14e-edward-st-north-side-from-tuesday-23-february"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 14E Edward St - North side - From Tuesday 23 February"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1586828\"><div id=\"component_1586828\"><p>From first service, Tuesday 23 February until further notice, Stop 14E Edward St - North side will be closed due to works associated with the Torrens to Darlington project.&nbsp;</p><p>Passengers are advised to use Stop 14D&nbsp;<span class=\"markpr5fgx5j0\" data-markjs=\"true\" data-ogac=\"\" data-ogab=\"\" data-ogsc=\"\" data-ogsb=\"\">Edward</span> St &ndash; North side.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368656"
+  alert {
+    active_period {
+      start: 1772303400
+    }
+    informed_entity {
+      route_id: "801"
+    }
+    informed_entity {
+      route_id: "835"
+    }
+    informed_entity {
+      route_id: "835A"
+    }
+    informed_entity {
+      route_id: "837"
+    }
+    informed_entity {
+      route_id: "852L"
+    }
+    informed_entity {
+      route_id: "860F"
+    }
+    informed_entity {
+      route_id: "877"
+    }
+    informed_entity {
+      route_id: "880"
+    }
+    informed_entity {
+      route_id: "881"
+    }
+    informed_entity {
+      route_id: "882"
+    }
+    informed_entity {
+      route_id: "886"
+    }
+    informed_entity {
+      route_id: "887"
+    }
+    informed_entity {
+      route_id: "889"
+    }
+    informed_entity {
+      route_id: "890"
+    }
+    informed_entity {
+      route_id: "HL1"
+    }
+    informed_entity {
+      route_id: "N801"
+    }
+    informed_entity {
+      route_id: "T800"
+    }
+    informed_entity {
+      route_id: "T801"
+    }
+    informed_entity {
+      route_id: "T842"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-62-adelaide-rd-west-side-from-sunday-1-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 62 Adelaide Rd - West side - From Friday 13 March 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1588385\"><div id=\"component_1588385\"><p>From Friday March 13 2026 until Mid 2027, Stop 62 Adelaide Rd - West side at Mount Barker will be temporarily relocated 60 metres south due to works associated with the Mount Barker Interchange Upgrade project.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368657"
+  alert {
+    active_period {
+      start: 1772992800
+    }
+    informed_entity {
+      route_id: "601"
+    }
+    informed_entity {
+      route_id: "601B"
+    }
+    informed_entity {
+      route_id: "605"
+    }
+    informed_entity {
+      route_id: "673"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-35-main-rd-west-side-from-monday-9-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 35 Main Rd - West Side - From Monday 9 March"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1590390\"><div id=\"component_1590390\"><div><p>From first service on Monday 9 March until further notice, Stop 35 Main Road -west side, will be temporarily relocated approximately 180 metres north to allow for upgrade works to the Coromandel Valley Primary School pedestrian crossing.</p></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368658"
+  alert {
+    active_period {
+      start: 1773081000
+    }
+    informed_entity {
+      route_id: "286"
+    }
+    informed_entity {
+      route_id: "287"
+    }
+    informed_entity {
+      route_id: "288"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-south-road-and-west-thebarton-road-from-tuesday-10-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour - South Road and West Thebarton Road - From Tuesday 10 March"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1591246\"><div id=\"component_1591246\"><div id=\"component_1591246\"><div id=\"component_1591246\"><p data-start=\"0\" data-end=\"280\"><span data-teams=\"true\">From the first bus service Tuesday 10 March&nbsp;until further notice, bus services 286, 287 and 288 travelling towards the city will be unable to turn right from South Road onto West Thebarton Road due to a major traffic switch as part of the Torrens to Darlington Project.</span></p><p data-start=\"282\" data-end=\"398\">Buses will instead turn left onto Ashwin Parade and use the roundabout to travel westbound onto West Thebarton Road.</p><p data-start=\"400\" data-end=\"493\" data-is-last-node=\"\" data-is-only-node=\"\">No bus stops will be missed; however a temporary bus stop has been located on the northern side of Ashwin Parade to assist passengers.</p><p>Further information regarding this project can be found here: <a href=\"https://www.t2d.sa.gov.au/\">https://www.t2d.sa.gov.au/</a></p><p>&nbsp;</p></div></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368659"
+  alert {
+    active_period {
+      start: 1773082800
+    }
+    informed_entity {
+      route_id: "461"
+    }
+    informed_entity {
+      route_id: "471"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closures-andrews-road-and-curtis-road-from-tuesday-10-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closures - Andrews Road and Curtis Road - From Tuesday 10 March"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1592728\"><p>From first service, Tuesday 10 March 2026, until Mid-2026, bus services will be detouring away from a section of Andrews Road and Curtis Road due to SA Water works.&nbsp;</p><p>The following bus stops will not be serviced:</p><p><strong>Route 461</strong></p><table border=\"1\"><colgroup><col><col></colgroup><tbody><tr><td style=\"text-align: center;\"><strong>Closed Bus Stop&nbsp;</strong></td><td style=\"text-align: center;\"><strong>Suggested Alternative Bus Stop</strong></td></tr><tr><td style=\"text-align: center;\">Stop 77D Andrews Rd - East side</td><td style=\"text-align: center;\">Stop 77E Andrews Rd - East side</td></tr><tr><td style=\"text-align: center;\">Stop 77C Curtis Rd - North side</td><td style=\"text-align: center;\">Stop 77E Andrews Rd - East side</td></tr><tr><td style=\"text-align: center;\">Stop 77B Curtis Rd - North side</td><td style=\"text-align: center;\">Stop 77J Stebonheath Rd - East side</td></tr><tr><td style=\"text-align: center;\">Stop 77A Curtis Rd - North side</td><td style=\"text-align: center;\">Stop 77J Stebonheath Rd - East side</td></tr><tr><td style=\"text-align: center;\">Stop 77 Curtis Rd - North East side</td><td style=\"text-align: center;\">Stop 77J Stebonheath Rd - East side</td></tr></tbody></table><p><strong>Route 471</strong></p><table border=\"1\"><colgroup><col><col></colgroup><tbody><tr><td style=\"text-align: center;\"><strong>Closed Bus Stop&nbsp;</strong></td><td style=\"text-align: center;\"><strong>Suggested Alternative Bus Stop</strong></td></tr><tr><td style=\"text-align: center;\">Stop 77D Andrews Rd - Both sides</td><td style=\"text-align: center;\">Stop 77E Andrews Rd - Both sides</td></tr><tr><td style=\"text-align: center;\">Stop 77C Curtis Rd - Both sides</td><td style=\"text-align: center;\">Stop 76 President Ave - Both sides</td></tr><tr><td style=\"text-align: center;\">Stop 77B Curtis Rd - Both sides</td><td style=\"text-align: center;\">Stop 76 President Ave - Both sides</td></tr><tr><td style=\"text-align: center;\">Stop 77A Curtis Rd - Both sides</td><td style=\"text-align: center;\">Stop 76 President Ave - Both sides</td></tr></tbody></table><p>Passengers can also Hail and Ride the service along Chellaston Road.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368660"
+  alert {
+    active_period {
+      start: 1773077400
+    }
+    informed_entity {
+      route_id: "110"
+    }
+    informed_entity {
+      route_id: "112"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-8-south-rd-west-side-torrensville-from-tuesday-10-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 8 South Rd - West side - Torrensville - From Tuesday 10 March "
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1595921\"><div id=\"component_1595921\"><div id=\"component_1595921\"><p>From Tuesday 10 March 2026 until further notice, Stop 8 South Rd - West side will be closed due to works associated with the Torrens to Darlington Project.&nbsp;</p><p>Passengers are advised to use either Stop 6 or Stop 10 South Rd - West side.</p></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368661"
+  alert {
+    active_period {
+      start: 1774807200
+    }
+    informed_entity {
+      route_id: "468"
+    }
+    informed_entity {
+      route_id: "500"
+    }
+    informed_entity {
+      route_id: "502"
+    }
+    informed_entity {
+      route_id: "502X"
+    }
+    informed_entity {
+      route_id: "N502"
+    }
+    informed_entity {
+      route_id: "AO5"
+    }
+    informed_entity {
+      route_id: "560"
+    }
+    informed_entity {
+      route_id: "560B"
+    }
+    informed_entity {
+      route_id: "566"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-38b-bridge-rd-east-side-para-hills-from-monday-30-march"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 38B Bridge Rd - East side - Para Hills - From Monday 30 March"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1598403\"><p>From first bus service, Monday 30 March, until further notice, Stop 38B Bridge Rd - East side will be closed due to bus stop upgrade works.</p><p>Passengers are advised to use Stop 38A or Stop 39 Bridge Rd - East side.&nbsp;&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368662"
+  alert {
+    active_period {
+      start: 1775505600
+    }
+    informed_entity {
+      route_id: "141"
+    }
+    informed_entity {
+      route_id: "142"
+    }
+    informed_entity {
+      route_id: "144"
+    }
+    informed_entity {
+      route_id: "144G"
+    }
+    informed_entity {
+      route_id: "117"
+    }
+    informed_entity {
+      route_id: "118"
+    }
+    informed_entity {
+      route_id: "140"
+    }
+    informed_entity {
+      route_id: "150"
+    }
+    informed_entity {
+      route_id: "155"
+    }
+    informed_entity {
+      route_id: "157"
+    }
+    informed_entity {
+      route_id: "157X"
+    }
+    informed_entity {
+      route_id: "500"
+    }
+    informed_entity {
+      route_id: "501"
+    }
+    informed_entity {
+      route_id: "502"
+    }
+    informed_entity {
+      route_id: "502X"
+    }
+    informed_entity {
+      route_id: "N502"
+    }
+    informed_entity {
+      route_id: "281"
+    }
+    informed_entity {
+      route_id: "286"
+    }
+    informed_entity {
+      route_id: "287"
+    }
+    informed_entity {
+      route_id: "288"
+    }
+    informed_entity {
+      route_id: "147"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-1-port-rd-north-side-from-tuesday-7-april"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 1 Port Rd - North side - From Tuesday 7 April"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1599305\"><p>From first bus service Tuesday 7 April, until further notice, Stop 1 Port Rd - North side will be closed due to SA Water works.&nbsp;</p><p>Passengers for the 281, 286, 287 and 288 are advised to use Stop B2 North Tce &ndash; North side.</p><p>All other passengers are advised to use Stop B1 West Tce &ndash; East side.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368663"
+  alert {
+    active_period {
+      start: 1777239000
+    }
+    informed_entity {
+      route_id: "889"
+    }
+    informed_entity {
+      route_id: "881"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-school-stop-wellington-road-mount-barker-from-monday-27-april"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - School Stop Wellington Road Mount Barker - From Monday 27 April"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1603921\"><p>From first bus service, Monday 27 April until further notice, School Stop Mount Barker High Wellington Road (both sides) will be closed due to roundabout upgrade works.&nbsp;</p><p>A temporary bus stop will be located on the northern side of Alexandrian Road opposite the Mount Barker Showgrounds.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368664"
+  alert {
+    active_period {
+      start: 1779917400
+    }
+    informed_entity {
+      route_id: "722"
+    }
+    informed_entity {
+      route_id: "722X"
+    }
+    informed_entity {
+      route_id: "T722"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-collins-parade-hackham-thursday-28-may-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closure - Collins Parade - Hackham - Thursday 28 May 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1613834\"><p class=\"MsoNormal\">From 7:00am to 4:00pm each day, from Thursday 28 May 2026 until further notice, buses will be detouring away from a section of Collins Parade, Hackham due to reconstruction works.</p><p class=\"MsoNormal\">During this time, Stop 56A Collins Pde - both sides &amp; Stop 56B Collins Pde - both sides will be closed.</p><p class=\"MsoNormal\">Passengers are to use the alternative bus stop 56C Collins Pde - both sides.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368665"
+  alert {
+    active_period {
+      start: 1779913800
+    }
+    informed_entity {
+      route_id: "167"
+    }
+    informed_entity {
+      route_id: "168"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-3a-richmond-rd-north-side-richmond-from-thursday-28-may"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 3A Richmond Rd - North side - Richmond - From Thursday 28 May"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1614486\"><p>From first bus service, Thursday 28 May until further notice, Stop 3A Richmond Rd - North side at Richmond will be relocated 200 metres west to works associated with the Torrens to Darlington project.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368666"
+  alert {
+    active_period {
+      start: 1780939800
+    }
+    active_period {
+      end: 1786716000
+    }
+    informed_entity {
+      route_id: "839"
+    }
+    informed_entity {
+      route_id: "839R"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-bollen-rd-mt-barker-from-tuesday-9-june-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closure - Bollen Rd - Mt Barker - From Tuesday 9 June 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1619010\"><div id=\"component_1619010\"><div id=\"component_1619010\"><p>Update:</p><p>From first bus service, Tuesday 9 June 2026 until last service Friday 14 August 2026, buses will be detouring away from a section of Bollen Rd, Mt Barker due to roadworks.&nbsp;</p><p>During this time, passengers will need to use alternative bus stops below:</p><ul><li>Stop 87 Bollen Rd - South Side, go to Stop 85 Hurling Drv - South side.</li><li>Stop 86 Bollen Rd - South Side, go to Stop 85 Hurling Drv - South side.</li><li>Stop 88 and Stop 89 Thiele Ave - North Side, go to Stop 90 Dumas St - North Side</li></ul></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368667"
+  alert {
+    active_period {
+      start: 1781128800
+    }
+    informed_entity {
+      route_id: "722"
+    }
+    informed_entity {
+      route_id: "722X"
+    }
+    informed_entity {
+      route_id: "T722"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-collins-parade-hackham-from-thursday-11-june-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closure - Collins Parade - Hackham - From Thursday 11 June 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1619687\"><div id=\"component_1619687\"><p>Update: From 7:30am to 4:00pm each day, from Thursday 11 June 2026 until further notice, buses will be detouring away from a section of Collins Parade, Hackham due to reconstruction works on weekdays only.</p><p>During this time, Stop 56A &amp; 56B Collins Parade - Both Sides will be missed.</p><p>Passengers are to us alternative bus Stop 56C Collins Parade Both Sides&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368668"
+  alert {
+    active_period {
+      start: 1782667800
+    }
+    informed_entity {
+      route_id: "545"
+    }
+    informed_entity {
+      route_id: "545X"
+    }
+    informed_entity {
+      route_id: "566"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-61-wynn-vale-drv-north-side-wynn-vale-from-monday-29-june-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 61 Wynn Vale Drv - North Side - Wynn Vale - From Monday 29 June 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1623415\"><div id=\"component_1623415\"><p>From first bus service, Monday 29 June 2026 until further notice, Stop 61 Wynn Vale Drv - North side will be closed due to building construction works.</p><p>During this time, passengers are advised to use either Stop 60 Wynn Vale Drv - North side or Stop 62 The Golden Way - West side.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368669"
+  alert {
+    active_period {
+      start: 1782840600
+    }
+    informed_entity {
+      route_id: "225"
+    }
+    informed_entity {
+      route_id: "225F"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-27-port-wakefield-rd-east-side-gepps-cross-from-wednesday-1-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 27 Port Wakefield Rd - East Side - Gepps Cross - From Wednesday 1 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1623991\"><div id=\"component_1623991\"><p>From first bus service, Wednesday 1 July 2026 until further notice, Stop 27 Port Wakefield Rd - East side, Gepps Cross will be closed due to roadworks.&nbsp;</p><p>During this time, passengers are advised to use Stop 27A Port Wakefield Rd - East side.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368670"
+  alert {
+    active_period {
+      start: 1783891800
+    }
+    active_period {
+      end: 1787556600
+    }
+    informed_entity {
+      route_id: "202"
+    }
+    informed_entity {
+      route_id: "202F"
+    }
+    informed_entity {
+      route_id: "203"
+    }
+    informed_entity {
+      route_id: "203B"
+    }
+    informed_entity {
+      route_id: "203F"
+    }
+    informed_entity {
+      route_id: "206"
+    }
+    informed_entity {
+      route_id: "208"
+    }
+    informed_entity {
+      route_id: "208B"
+    }
+    informed_entity {
+      route_id: "208N"
+    }
+    informed_entity {
+      route_id: "271"
+    }
+    informed_entity {
+      route_id: "273"
+    }
+    informed_entity {
+      route_id: "943"
+    }
+    informed_entity {
+      route_id: "N202"
+    }
+    informed_entity {
+      route_id: "AO29"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closures-melbourne-street-from-monday-13-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closures - Melbourne Street - From Monday 13 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1625547\"><div id=\"component_1625547\"><p>From 7:00am Monday 13 July, until 5:00pm Monday 24 August, Melbourne Street will be closed to all traffic, including bus services heading away from the city, due to Council works.&nbsp;</p><p>Stops 2A, 3, 3A, 4 and 5 Melbourne St - North West side will be closed, with passengers advised to use a temporary bus stop on the northern side of MacKinnon Parade, just east of Jerningham Street.</p><p>Services towards the city will not be impacted.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368671"
+  alert {
+    active_period {
+      start: 1782984600
+    }
+    informed_entity {
+      route_id: "200"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-stop-31c-miller-st-both-sides-seacombe-gardens-thursday-2-july-26"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop Closure - Stop 31C Miller St both sides - Seacombe Gardens - Thursday 2 July 26"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1626287\"><p>Until further notice, buses are detouring away from a section of Miller Street, Seacombe Gardens due to fallen power lines.</p><p>Stop 31C Miller Street in both directions of travel will be missed. Passengers will need to go to Stop 31B Miller Street, both sides.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368672"
+  alert {
+    active_period {
+      start: 1783272600
+    }
+    active_period {
+      end: 1788111000
+    }
+    informed_entity {
+      route_id: "451"
+    }
+    informed_entity {
+      route_id: "451A"
+    }
+    informed_entity {
+      route_id: "471"
+    }
+    informed_entity {
+      route_id: "475"
+    }
+    informed_entity {
+      route_id: "490"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-74g-president-ave-south-side-andrews-farm-from-monday-6-july"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 74G President Ave - South side - Andrews Farm - From Monday 6 July "
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1626556\"><p>Between first bus service, Monday 6 July and last bus service, Sunday 30 August 2026, Stop 74G President Ave - South side, Andrews Farm, will be closed due to bus bay maintenance work.&nbsp;</p><p>During this time, passengers are to use the alternative bus Stop 74H President Ave - South side</p><ul><li>Route 451 &amp; 451A - Elizabeth Station and Edgecombe Rd;</li><li>School service - 471 to St Columba College (AM);</li><li>School service - 475 Davoren Park (PM)</li><li>School service - 490 Womma Rd</li></ul><p>School service 471 Black Top Rd (PM) go to Stop 74G President Ave - North side.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368673"
+  alert {
+    active_period {
+      start: 1783400400
+    }
+    informed_entity {
+      route_id: "719"
+    }
+    informed_entity {
+      route_id: "720"
+    }
+    informed_entity {
+      route_id: "721"
+    }
+    informed_entity {
+      route_id: "782"
+    }
+    informed_entity {
+      route_id: "783"
+    }
+    informed_entity {
+      route_id: "721X"
+    }
+    informed_entity {
+      route_id: "722X"
+    }
+    informed_entity {
+      route_id: "723X"
+    }
+    informed_entity {
+      route_id: "724X"
+    }
+    informed_entity {
+      route_id: "T721"
+    }
+    informed_entity {
+      route_id: "T722"
+    }
+    informed_entity {
+      route_id: "T723"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/changes-to-south-road-bus-timetables-from-monday-20-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Changes to South Road Bus Timetables - from Monday 20 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1627339\"><p>From Monday 20 July 2026, there will be temporary bus timetable changes to some weekday regular services along South Road.</p><p>Changes will impact South Road bus services during both peak and off peak times.</p><p>Times will be adjusted to better reflect actual travel times and improve reliability, which will help passengers better plan their journey and minimise delays.</p><p>Adelaide Metro will continue to monitor the performance of these services and adjust them in response to changing conditions.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368674"
+  alert {
+    active_period {
+      start: 1783618200
+    }
+    informed_entity {
+      route_id: "462"
+    }
+    informed_entity {
+      route_id: "462C"
+    }
+    informed_entity {
+      route_id: "487"
+    }
+    informed_entity {
+      route_id: "488"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-harris-rd-angle-vale-from-friday-10-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - Harris Rd - Angle Vale - From Friday 10 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1628094\"><p>Between first bus service, Friday 10 July 2026 until mid-August, buses will be detouring away from Harris Rd, Angle Vale due to road reconstruction works.&nbsp;</p><p>During this time, the Hail and Ride bus area on Bubner Rd, Harris Rd and Chivell Rd will not be serviced.&nbsp;</p><p>Passengers are advised to go to Angle Vale Rd or Short Rd for the Hail and Ride services.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368675"
+  alert {
+    active_period {
+      start: 1784136600
+    }
+    active_period {
+      end: 1789579800
+    }
+    informed_entity {
+      route_id: "475"
+    }
+    informed_entity {
+      route_id: "506"
+    }
+    informed_entity {
+      route_id: "506H"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-44-nelson-rd-both-sides-para-vista-thur-16-july-to-wed-16-september-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 44 - Nelson Rd - both sides - Para Vista - Thur 16 July to Wed 16 September 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1628483\"><div id=\"component_1628483\"><p>From first bus service, Thursday 16 July to last bus service, Thursday 16 September 2026, Stop 44 Nelson Rd - both sides, Para Vista, will be closed due to pedestrian crossing construction.&nbsp;</p><p>During this time, passengers are advised to use Stop 45 Nelson Rd - both sides.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368676"
+  alert {
+    active_period {
+      start: 1784050200
+    }
+    informed_entity {
+      route_id: "174"
+    }
+    informed_entity {
+      route_id: "620"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-21-lower-north-east-rd-east-side-campbelltown-wednesday-15-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 21 Lower North East Rd - East side - Campbelltown - Wednesday 15 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1628953\"><p>Between first bus service, Wednesday 15 July 2026 until further notice, Stop 21 Lower North East Rd - East side, Campbelltown will be closed due to footpath works.&nbsp;</p><p>During this time, passengers are advised to use Stop 22 Lower North East Rd - East side.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368677"
+  alert {
+    active_period {
+      start: 1785519000
+    }
+    informed_entity {
+      route_id: "98C"
+    }
+    informed_entity {
+      route_id: "99C"
+    }
+    informed_entity {
+      route_id: "147"
+    }
+    informed_entity {
+      route_id: "170"
+    }
+    informed_entity {
+      route_id: "171"
+    }
+    informed_entity {
+      route_id: "171A"
+    }
+    informed_entity {
+      route_id: "172"
+    }
+    informed_entity {
+      route_id: "820"
+    }
+    informed_entity {
+      route_id: "821"
+    }
+    informed_entity {
+      route_id: "822"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-h1-hutt-st-east-side-adelaide-from-1-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop H1 Hutt St - East side - Adelaide - From 1 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1630862\"><div id=\"component_1630862\"><p>From first bus service Saturday 1 August 2026 until further notice, Stop H1 Hutt St - East side, Adelaide, will be closed due to construction works.&nbsp;</p><p>During this time, passengers are advised to go the alternative stops below:</p><p>Routes - 98C, 99C go to either F1 Hutt St - East side, or R1 Halifax St - South side</p><p>Route - 147 go to either F1 Hutt St - East side or J1 Hutt St - East side</p><p>Routes - 170, 171, 171A, 172, 820, 821 &amp; 822 go to Stop I1 Wakefield St - North side, or J1 Hutt St - East side.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368678"
+  alert {
+    active_period {
+      start: 1783618200
+    }
+    informed_entity {
+      route_id: "225"
+    }
+    informed_entity {
+      route_id: "225F"
+    }
+    informed_entity {
+      route_id: "225X"
+    }
+    informed_entity {
+      route_id: "502"
+    }
+    informed_entity {
+      route_id: "502X"
+    }
+    informed_entity {
+      route_id: "560"
+    }
+    informed_entity {
+      route_id: "560A"
+    }
+    informed_entity {
+      route_id: "N502"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-49-church-st-west-side-salisbury-from-friday-10-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 49 Church St - West side - Salisbury - From Friday 10 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1631339\"><p class=\"MsoNormal\">From Friday 10 July until further notice, Stop 49 Church St - West side will be closed until further notice due to building works.</p><p class=\"MsoNormal\">During this time, passengers are advised to go the Salisbury Interchange.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368679"
+  alert {
+    active_period {
+      start: 1785367800
+    }
+    active_period {
+      end: 1786685400
+    }
+    informed_entity {
+      route_id: "640"
+    }
+    informed_entity {
+      route_id: "681"
+    }
+    informed_entity {
+      route_id: "720"
+    }
+    informed_entity {
+      route_id: "734"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-42-brighton-rd-east-side-seacliff-thursday-30-july-to-friday-14-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 42 Brighton Rd - East side - Seacliff - Thursday 30 July to Friday 14 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1632899\"><div id=\"component_1632899\"><p>Between 9:00am and 3:00pm, each day, weekdays only, Thursday 30 July to Friday 14 August 2026, Stop 42 Brighton Rd - East side, Seacliff will be closed due to roadworks.</p><p>During this time, passengers are advised to use Stop 41 Brighton Rd - East side.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368680"
+  alert {
+    active_period {
+      start: 1785691800
+    }
+    active_period {
+      end: 1789752600
+    }
+    informed_entity {
+      route_id: "190"
+    }
+    informed_entity {
+      route_id: "195"
+    }
+    informed_entity {
+      route_id: "196"
+    }
+    informed_entity {
+      route_id: "AO24"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-3-unley-rd-east-side-unley-monday-3-august-to-friday-18-september-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 3 Unley Rd - East side - Unley - Monday 3 August to Friday 18 September 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1633711\"><div id=\"component_1633711\"><p>From first bus service, Monday 3 August and last bus service, Friday 18 September 2026, Stop 3 Unley Rd - East side will be closed and temporarily relocated approx. 100 metres south past Marion St.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368681"
+  alert {
+    active_period {
+      start: 1785666600
+    }
+    active_period {
+      end: 1786653000
+    }
+    informed_entity {
+      route_id: "720"
+    }
+    informed_entity {
+      route_id: "721"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-south-rd-everard-park-sun-2-aug-to-thurs-13-aug-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - South Rd - Everard Park - Sun 2 Aug to Thurs 13 Aug 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1633818\"><div id=\"component_1633818\"><div id=\"component_1633818\"><p class=\"MsoNormal\">Between 8:00pm and 6:00am the following morning each day, Sunday 2 August to Thursday 13 August 2026 (excluding Friday and Saturdays), buses will be detouring away from a section of South Rd, Everard Park due to roadworks.&nbsp;</p><p class=\"MsoNormal\">During this time, passengers are advised to use the alternative bus stops in the table below:</p><table class=\"MsoNormalTable\" style=\"width: 545.25pt; background: white; border-collapse: collapse; border: none; mso-border-alt: outset #DEE2E6 .75pt; mso-yfti-tbllook: 1184;\" border=\"1\" width=\"727\" cellspacing=\"0\" cellpadding=\"0\"><tbody><tr style=\"mso-yfti-irow: 0; mso-yfti-firstrow: yes;\"><td style=\"border: 1pt solid windowtext; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><strong><span style=\"color: black; mso-color-alt: windowtext;\">Closed Bus Stops</span></strong></p></td><td style=\"border-width: 1pt 1pt 1pt medium; border-style: solid solid solid none; border-color: windowtext windowtext windowtext currentcolor; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><strong><span style=\"color: black; mso-color-alt: windowtext;\">Alternative Bus Stops</span></strong></p></td></tr><tr style=\"mso-yfti-irow: 1;\"><td style=\"border-width: medium 1pt 1pt; border-style: none solid solid; border-color: currentcolor windowtext windowtext; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 9 South Rd - East side</span></p></td><td style=\"border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: currentcolor windowtext windowtext currentcolor; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 10 South Rd - East side</span></p></td></tr><tr style=\"mso-yfti-irow: 2;\"><td style=\"border-width: medium 1pt 1pt; border-style: none solid solid; border-color: currentcolor windowtext windowtext; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 8 South Rd - East side</span></p></td><td style=\"border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: currentcolor windowtext windowtext currentcolor; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 10 South Rd - East side</span></p></td></tr><tr><td style=\"border-width: medium 1pt 1pt; border-style: none solid solid; border-color: currentcolor windowtext windowtext; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 7 South Rd - East side</span></p></td><td style=\"border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: currentcolor windowtext windowtext currentcolor; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 6 Anzac Hwy - South East side</span></p></td></tr><tr style=\"mso-yfti-irow: 3; mso-yfti-lastrow: yes;\"><td style=\"border-width: medium 1pt 1pt; border-style: none solid solid; border-color: currentcolor windowtext windowtext; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 6 South Rd - East side</span></p></td><td style=\"border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: currentcolor windowtext windowtext currentcolor; padding: 0.75pt; text-align: center;\"><p class=\"MsoNormal\"><span style=\"color: black; mso-color-alt: windowtext;\">Stop 6 Anzac Hwy - South East side</span></p></td></tr></tbody></table></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368682"
+  alert {
+    active_period {
+      start: 1785877200
+    }
+    active_period {
+      end: 1788184800
+    }
+    informed_entity {
+      route_id: "100"
+    }
+    informed_entity {
+      route_id: "100C"
+    }
+    informed_entity {
+      route_id: "989"
+    }
+    informed_entity {
+      route_id: "988"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-change-stop-182-cross-rd-north-side-south-plympton-from-wednesday-5-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop change - Stop 182 Cross Rd - North side South Plympton - From Wednesday 5 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1634441\"><p>From first bus service, Wednesday 5 August until late August 2026, Stop 182 Cross Rd - North side at South Plympton will be relocated 70 metres east due to infrastructure works.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368683"
+  alert {
+    active_period {
+      start: 1785519000
+    }
+    active_period {
+      end: 1787938200
+    }
+    informed_entity {
+      route_id: "252"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-38-st-vincent-st-both-sides-port-adelaide-sat-1-august-to-fri-28-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 38 St Vincent St - both sides - Port Adelaide - Sat 1 August to Fri 28 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1634829\"><p class=\"MsoNormal\">From first bus service, Saturday 1 August to last bus service, Friday 28 August 2026, Stop 38 St Vincent St - both sides, Port Adelaide will be closed due to essential works.</p><p class=\"MsoNormal\">During this time, passengers are to use alternative bus Stop 39 St Vincent St - both sides.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368684"
+  alert {
+    active_period {
+      start: 1783459800
+    }
+    informed_entity {
+      route_id: "461"
+    }
+    informed_entity {
+      route_id: "471"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-andrews-rd-munno-para-west-wednesday-8-july-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - Andrews Rd - Munno Para West -Wednesday 8 July 2026 "
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1634848\"><p class=\"MsoNormal\">From 7:00am and 5:00pm each day, from Wednesday 8 July 2026, buses will be detouring away from a section of Andrews Rd, Munno Para West due to essential service works.</p><p class=\"MsoNormal\">During this time, passengers are advised to use the alternative bus stops below:</p><p class=\"MsoNormal\"><strong>Route 461 - Munno Para Loop:</strong></p><ul style=\"margin-top: 0cm;\" type=\"disc\"><li class=\"MsoNormal\" style=\"mso-list: l0 level1 lfo1; tab-stops: list 36.0pt;\">Stop 77D &amp; 77E Andrews Rd - East side closed, go to Hail &amp; Ride area on Chellaston Rd.</li><li class=\"MsoNormal\" style=\"mso-list: l0 level1 lfo1; tab-stops: list 36.0pt;\">Stop 77F Brandis Rd - South side, go to Stop 77G Brandis Rd - South West side.</li><li class=\"MsoNormal\" style=\"mso-list: l0 level1 lfo1; tab-stops: list 36.0pt;\">Stops 77, 77A, 77B &amp; 77C Curtis Rd - North side, go to either stop 77J Stebonheath Rd - West side or the Hail &amp; Ride area on Chellaston Rd.</li></ul><p class=\"MsoNormal\"><strong>Route 471 - St Columba College:</strong></p><ul style=\"margin-top: 0cm;\" type=\"disc\"><li class=\"MsoNormal\" style=\"mso-list: l1 level1 lfo2; tab-stops: list 36.0pt;\">Stop 77D &amp; 77E Andrews Rd - East side, go to either Stop 77J Stebonheath Rd - West side or the Hail &amp; Ride area on Chellaston Rd.</li><li class=\"MsoNormal\" style=\"mso-list: l1 level1 lfo2; tab-stops: list 36.0pt;\">Stop 77A, 77B &amp; 77C Curtis Rd - Both sides, go to either Stop 77 Curtis Rd - North side or the Hail &amp; Ride area on Chellaston Rd.</li></ul></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368685"
+  alert {
+    active_period {
+      start: 1786357800
+    }
+    active_period {
+      end: 1786555800
+    }
+    informed_entity {
+      route_id: "245"
+    }
+    informed_entity {
+      route_id: "248"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-3-south-rd-east-side-mile-end-south-monday-10-aug-to-wednesday-12-aug-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 3 South Rd - East side - Mile End South - Monday 10 Aug to Wednesday 12 Aug 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635101\"><div id=\"component_1635101\"><p>From 8:00pm to last bus service, each night, Monday 10 August to Wednesday 12 August 2026, Stop 3 South Rd - East side will be closed due to ongoing tunnel works.&nbsp;</p><p>During this time, passengers are advised to go to the temporary stop located near Birmingham St, approx. 150 metres north of the stops\' permanent location.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368686"
+  alert {
+    active_period {
+      start: 1786311000
+    }
+    active_period {
+      end: 1786609800
+    }
+    informed_entity {
+      route_id: "150"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-carnarvon-terrace-largs-north-monday-10-august-to-thursday-13-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - Carnarvon Terrace - Largs North - Monday 10 August to Thursday 13 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635205\"><div id=\"component_1635205\"><p>From 7:00am to 6:00pm, each day, Monday 10 August to Thursday 13 August 2026, bus services will be detouring away from a section of Carnarvon Terrace, Largs North due to essential service works.&nbsp;</p><p>During this time, the below stops will not be serviced, and passengers are advised to go to the alternative stops:</p><ul><li>Stop 49 Carnarvon Tce - both sides, go to Stop 48 Fletcher Rd - both sides</li><li>Stop 50 Carnarvon Tce - both sides, go to either Stop 48 Fletcher Rd - both sides or Stop 51A Victoria Rd - both sides</li><li>Stop 51 Carnarvon Tce - both sides, go to Stop 51A Victoria Rd - both sides.&nbsp;</li></ul></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368687"
+  alert {
+    active_period {
+      start: 1784485800
+    }
+    informed_entity {
+      route_id: "203"
+    }
+    informed_entity {
+      route_id: "203F"
+    }
+    informed_entity {
+      route_id: "209F"
+    }
+    informed_entity {
+      route_id: "271"
+    }
+    informed_entity {
+      route_id: "361"
+    }
+    informed_entity {
+      route_id: "503"
+    }
+    informed_entity {
+      route_id: "506"
+    }
+    informed_entity {
+      route_id: "506H"
+    }
+    informed_entity {
+      route_id: "540"
+    }
+    informed_entity {
+      route_id: "541"
+    }
+    informed_entity {
+      route_id: "AO2"
+    }
+    informed_entity {
+      route_id: "AO1"
+    }
+    informed_entity {
+      route_id: "AO1T"
+    }
+    informed_entity {
+      route_id: "560"
+    }
+    informed_entity {
+      route_id: "543"
+    }
+    informed_entity {
+      route_id: "543G"
+    }
+    informed_entity {
+      route_id: "544"
+    }
+    informed_entity {
+      route_id: "544X"
+    }
+    informed_entity {
+      route_id: "545"
+    }
+    informed_entity {
+      route_id: "545X"
+    }
+    informed_entity {
+      route_id: "M44"
+    }
+    informed_entity {
+      route_id: "M44T"
+    }
+    informed_entity {
+      route_id: "N1"
+    }
+    informed_entity {
+      route_id: "N541"
+    }
+    informed_entity {
+      route_id: "541G"
+    }
+    informed_entity {
+      route_id: "541X"
+    }
+    informed_entity {
+      route_id: "542"
+    }
+    informed_entity {
+      route_id: "542X"
+    }
+    informed_entity {
+      route_id: "546"
+    }
+    informed_entity {
+      route_id: "546X"
+    }
+    informed_entity {
+      route_id: "920"
+    }
+    informed_entity {
+      route_id: "924"
+    }
+    informed_entity {
+      route_id: "933"
+    }
+    informed_entity {
+      route_id: "J1"
+    }
+    informed_entity {
+      route_id: "J1A"
+    }
+    informed_entity {
+      route_id: "J1G"
+    }
+    informed_entity {
+      route_id: "J1T"
+    }
+    informed_entity {
+      route_id: "J2"
+    }
+    informed_entity {
+      route_id: "J2G"
+    }
+    informed_entity {
+      route_id: "507"
+    }
+    informed_entity {
+      route_id: "556"
+    }
+    informed_entity {
+      route_id: "557"
+    }
+    informed_entity {
+      route_id: "559"
+    }
+    informed_entity {
+      route_id: "C1"
+    }
+    informed_entity {
+      route_id: "C1X"
+    }
+    informed_entity {
+      route_id: "C2"
+    }
+    informed_entity {
+      route_id: "C2X"
+    }
+    informed_entity {
+      route_id: "G40X"
+    }
+    informed_entity {
+      route_id: "548"
+    }
+    informed_entity {
+      route_id: "543X"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-tea-tree-plaza-interchange-resurfacing-works-from-monday-20-july-2027"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Tea Tree Plaza Interchange Resurfacing Works - From Monday 20 July 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635322\"><p><img src=\"https://www.adelaidemetro.com.au/\" alt=\"\" width=\"1\" height=\"1\">From first service, Monday 20 July 2026, until further notice, Tea Tree Plaza Interchange will be undergoing resurfacing works.</p><div id=\"component_1630128\"><div id=\"component_1630128\"><div id=\"component_1630128\"><div id=\"component_1630128\"><p data-start=\"138\" data-end=\"225\">During this time, there will be impacts to bus stops and pedestrian access.</p><p data-start=\"266\" data-end=\"321\">The following temporary stop arrangements will apply:</p><p data-start=\"266\" data-end=\"321\"><strong>Zone E Tea Tree Plaza Interchange:</strong></p><ul><li data-start=\"266\" data-end=\"321\">544 and M44 to Golden Grove Interchange</li><li data-start=\"266\" data-end=\"321\">J1 and J2 to Elizabeth Interchange</li><li data-start=\"266\" data-end=\"321\">C2 to Greenwith</li></ul><p data-start=\"266\" data-end=\"321\"><strong>Zone F Tea Tree Plaza Interchange:</strong></p><ul><li data-start=\"266\" data-end=\"321\">541, N541, 541X and 542 to Fairview Park</li><li data-start=\"266\" data-end=\"321\">543 to Surrey Downs</li><li data-start=\"266\" data-end=\"321\">541G, 545 and G40X to Golden Grove Village</li><li data-start=\"266\" data-end=\"321\">548 to Greenwith</li></ul><p data-start=\"266\" data-end=\"321\"><strong>Zone G Tea Tree Plaza Interchange:</strong></p><ul><li data-start=\"266\" data-end=\"321\">203, 209F, 557, 920, 924 and 933</li></ul><p><strong>Zone H Tea Tree Plaza Interchange:</strong></p><ul><li>All O-Bahn services towards the City</li></ul><p><strong>Temp Stop Smart Rd - South side:</strong></p><ul><li>271, 361, 503, 506, 507 and 560 will commence from a temp stop on South Rd just east of Hatherleigh Avenue.</li></ul><p><strong>Stop 43B Smart Rd - North side:</strong></p><ul><li data-section-id=\"1oft8ky\" data-start=\"418\" data-end=\"561\">Routes 556 and 559, along with regional services 1100, 1101, 1102, 1105, 1106 and 1107, will commence at Stop 43B Smart Road.</li></ul><p>Bus Zones A, B, C and D Tea Tree Plaza Interchange will be closed. Temporary Interchange map here&nbsp;<a href=\"https://www.adelaidemetro.com.au/__data/assets/pdf_file/0020/1630136/interchange_tea_tree_841x594_temp_2b_web.pdf\">Temporary TTP Interchange Map</a></p></div></div></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368688"
+  alert {
+    active_period {
+      start: 1785871800
+    }
+    active_period {
+      end: 1786728600
+    }
+    informed_entity {
+      route_id: "320"
+    }
+    informed_entity {
+      route_id: "G20"
+    }
+    informed_entity {
+      route_id: "G20X"
+    }
+    informed_entity {
+      route_id: "G21"
+    }
+    informed_entity {
+      route_id: "G21X"
+    }
+    informed_entity {
+      route_id: "N21"
+    }
+    informed_entity {
+      route_id: "961"
+    }
+    informed_entity {
+      route_id: "977"
+    }
+    informed_entity {
+      route_id: "989"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-40-memford-way-north-side-flagstaff-hill-wednesday-5-aug-to-friday-14-aug-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 40 Memford Way - North side - Flagstaff Hill - Wednesday 5 Aug to Friday 14 Aug 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635412\"><p>From first bus service, Wednesday 5 August to last bus service Friday 14 August 2026, Stop 40 Memford Way - North side, Flagstaff Hill will be closed due to works.&nbsp;</p><p>During this time, passengers are advised to go to Stop 41A Black Rd - North East side or Stop 39 Ridgway Dr - East side.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368689"
+  alert {
+    active_period {
+      start: 1786318200
+    }
+    active_period {
+      end: 1786689000
+    }
+    informed_entity {
+      route_id: "542"
+    }
+    informed_entity {
+      route_id: "542X"
+    }
+    informed_entity {
+      route_id: "557"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-44-smart-rd-both-sides-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 44 Smart Rd - Both sides - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635724\"><div id=\"component_1635724\"><p>Between 9:00am and 4:00pm, Monday 10 August until Friday 14 August, Stop 44 Smart Rd will be closed in both directions due to essential service works.&nbsp;</p><p>Passengers are advised to use Stop 45 Smart Rd - Both sides.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368690"
+  alert {
+    active_period {
+      start: 1786303800
+    }
+    informed_entity {
+      route_id: "174"
+    }
+    informed_entity {
+      route_id: "176"
+    }
+    informed_entity {
+      route_id: "176G"
+    }
+    informed_entity {
+      route_id: "H21"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-19-lower-north-east-rd-north-west-side-from-monday-10-april"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 19 Lower North East Rd - North West side - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635755\"><div id=\"component_1635755\"><p>From first bus service, Monday 10 August until further notice, Stop 19 Lower North East Rd - North West side will be closed due to pedestrian crossing works.</p><p>Passengers are advised to use either Stop 18/18C or Stop 20 Lower North East Rd - North West side.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368691"
+  alert {
+    active_period {
+      start: 1786356000
+    }
+    active_period {
+      end: 1787238000
+    }
+    informed_entity {
+      route_id: "556"
+    }
+    informed_entity {
+      route_id: "557"
+    }
+    informed_entity {
+      route_id: "557S"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-38a-and-39-grand-junction-rd-north-side-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 38A and 39 Grand Junction Rd - North side - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635823\"><p>Between 7:30pm and last bus service, Monday 10 August to Thursday 20 August (except Friday 14 and Saturday 15 August) Stop 38A and 39 Grand Junction Rd - North side will be closed due to essential service works.&nbsp;</p><p>Passengers are advised to use either Stop 37B Valley Rd - West side or Stop Tolley Rd - West side (556) and Stop 39 Barracks Rd - North side (557 and 557S)</p><p>&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368692"
+  alert {
+    active_period {
+      start: 1786318200
+    }
+    active_period {
+      end: 1786689000
+    }
+    informed_entity {
+      route_id: "542"
+    }
+    informed_entity {
+      route_id: "542X"
+    }
+    informed_entity {
+      route_id: "557"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-44-north-east-rd-both-sides-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 44 North East Rd - Both sides - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1635831\"><p>Between 9:00am and 4:00pm, Monday 10 August until Friday 14 August, Stop 44 North East Rd will be closed in both directions due to essential service works.&nbsp;</p><p>Passengers are advised to use Stop 45 North East Rd - Both sides.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368693"
+  alert {
+    active_period {
+      start: 1786696200
+    }
+    active_period {
+      end: 1788458400
+    }
+    informed_entity {
+      route_id: "202"
+    }
+    informed_entity {
+      route_id: "203"
+    }
+    informed_entity {
+      route_id: "203F"
+    }
+    informed_entity {
+      route_id: "209F"
+    }
+    informed_entity {
+      route_id: "271"
+    }
+    informed_entity {
+      route_id: "361"
+    }
+    informed_entity {
+      route_id: "503"
+    }
+    informed_entity {
+      route_id: "506"
+    }
+    informed_entity {
+      route_id: "506H"
+    }
+    informed_entity {
+      route_id: "540"
+    }
+    informed_entity {
+      route_id: "541"
+    }
+    informed_entity {
+      route_id: "541G"
+    }
+    informed_entity {
+      route_id: "541X"
+    }
+    informed_entity {
+      route_id: "N541"
+    }
+    informed_entity {
+      route_id: "542"
+    }
+    informed_entity {
+      route_id: "542X"
+    }
+    informed_entity {
+      route_id: "543"
+    }
+    informed_entity {
+      route_id: "543G"
+    }
+    informed_entity {
+      route_id: "543X"
+    }
+    informed_entity {
+      route_id: "544"
+    }
+    informed_entity {
+      route_id: "544X"
+    }
+    informed_entity {
+      route_id: "545"
+    }
+    informed_entity {
+      route_id: "545X"
+    }
+    informed_entity {
+      route_id: "546"
+    }
+    informed_entity {
+      route_id: "546X"
+    }
+    informed_entity {
+      route_id: "548"
+    }
+    informed_entity {
+      route_id: "556"
+    }
+    informed_entity {
+      route_id: "557"
+    }
+    informed_entity {
+      route_id: "559"
+    }
+    informed_entity {
+      route_id: "560"
+    }
+    informed_entity {
+      route_id: "920"
+    }
+    informed_entity {
+      route_id: "924"
+    }
+    informed_entity {
+      route_id: "933"
+    }
+    informed_entity {
+      route_id: "AO1"
+    }
+    informed_entity {
+      route_id: "AO1T"
+    }
+    informed_entity {
+      route_id: "AO2"
+    }
+    informed_entity {
+      route_id: "C1"
+    }
+    informed_entity {
+      route_id: "C1X"
+    }
+    informed_entity {
+      route_id: "C2"
+    }
+    informed_entity {
+      route_id: "C2X"
+    }
+    informed_entity {
+      route_id: "G40X"
+    }
+    informed_entity {
+      route_id: "J1"
+    }
+    informed_entity {
+      route_id: "J1A"
+    }
+    informed_entity {
+      route_id: "J1G"
+    }
+    informed_entity {
+      route_id: "J1T"
+    }
+    informed_entity {
+      route_id: "J2"
+    }
+    informed_entity {
+      route_id: "J2G"
+    }
+    informed_entity {
+      route_id: "M44"
+    }
+    informed_entity {
+      route_id: "M44T"
+    }
+    informed_entity {
+      route_id: "N1"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/o-bahn-closure-tea-tree-plaza-interchange-resurfacing-works-from-fri-14-aug-to-thurs-3-sep-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "O-Bahn closure - Tea Tree Plaza Interchange Resurfacing Works - From Fri 14 Aug to Thurs 3 Sep 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636059\"><p>From 6:00pm, Friday 14 August 2026 until last service Thursday 3 September 2026, Tea Tree Plaza Interchange will be closed due to works relating to Tea Tree Plaza Interchange resurfacing project.&nbsp;</p><p>During this time, there will be no bus access to Tea Tree Plaza Interchange, with bus services detouring via the road network between Paradise Interchange and Tea Tree Plaza Interchange.</p><p>Bus services that are currently using the Tea Tree Plaza Interchange will use temporary bus stops located on the northern side of Smart Road approximately 200 metres west of the interchange.</p><p data-start=\"266\" data-end=\"321\"><strong>Temp Stop 1 Smart Rd - North side (Buses that currently use Zone G and Zone H Tea Tree Plaza Interchange)</strong></p><p>Opposite Hatherleigh Avenue, see interchange map below.</p><ul><li data-start=\"266\" data-end=\"321\">203, 209F, 557</li><li data-start=\"266\" data-end=\"321\">All O-Bahn services towards the City (except 540, 541 and 541X buses, which will start from a temporary stop on the southern side of Smart Road near Hatherleigh Avenue)</li><li>AOX services</li></ul><p data-start=\"266\" data-end=\"321\"><strong>Temp Stop 2 Smart Rd - North side (Buses that currently use Zone E and Zone F Tea Tree Plaza Interchange)</strong></p><p>Opposite Hatherleigh Avenue, see interchange map below.</p><ul><li data-start=\"266\" data-end=\"321\">544 and M44 to Golden Grove Interchange</li><li data-start=\"266\" data-end=\"321\">J1 and J2 to Elizabeth Interchange</li><li data-start=\"266\" data-end=\"321\">C2 to Greenwith</li><li data-start=\"266\" data-end=\"321\">541, N541, 541X and 542 to Fairview Park</li><li data-start=\"266\" data-end=\"321\">543 to Surrey Downs</li><li data-start=\"266\" data-end=\"321\">541G, 545 and G40X to Golden Grove Village</li><li data-start=\"266\" data-end=\"321\">548 to Greenwith</li></ul><p data-start=\"266\" data-end=\"321\"><strong>The following temporary arrangements below remain unchanged</strong></p><p><strong>Stop 42A Smart Rd:</strong></p><ul><li>271, 361, 503, 506, 507 and 560 will commence and terminate at Stop 42A Smart Road</li></ul><p><strong>Stop 43B Smart Rd:</strong></p><ul><li data-section-id=\"1oft8ky\" data-start=\"418\" data-end=\"561\">Routes 556 and 559, along with regional services 1100, 1101, 1102, 1105, 1106 and 1107, will commence and terminate at Stop 43B Smart Road.</li></ul><p>Stop 43A Golden Grove Road will also be closed, with passengers advised to use the temporary bus stops on the northern side of Smart Road.</p><p>The Park and Ride will remain open during the dates and times listed above.</p><p>Passengers are advised to allow for additional travel time during this closure.</p><p>Click here to view the temporary interchange arrangements: <a href=\"https://adelaidemetro.com.au/__data/assets/pdf_file/0009/1636029/interchange_tea_tree_841x594_temp_1c_web.pdf\">Temporary Interchange Map</a></p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368694"
+  alert {
+    active_period {
+      start: 1786360500
+    }
+    active_period {
+      end: 1786544940
+    }
+    informed_entity {
+      route_id: "BEL"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/rail-closure-partial-belair-rail-line-night-closures-monday-10-wednesday-12-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Rail closure - Partial Belair Rail Line Night Closures Monday 10 - Wednesday 12 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636076\"><div id=\"component_1636076\"><div id=\"component_1636076\"><div id=\"component_1636076\"><p>The Belair will be partially closed be temporarily closed between Adelaide Railway Station and Mitcham Railway Station for multiple nights to allow for works to be undertaken for the New Women\'s and Children\'s Hospital Project.</p><p>During the closure substitute buses will replace train services between Adelaide Railway Station and Mitcham Railway Station, with train services continuing to operate between Mitcham Railway Station and Belair Railway Station.&nbsp;</p><p>The Belair line will be partially closed each night from:&nbsp;</p><ul><li>8:45 pm Monday 10 August to last service&nbsp;</li><li>8:45 pm Tuesday 11 August to last service</li><li>8:45 pm Wednesday 12 August to last service&nbsp;</li></ul><p>Full line services will resume each morning.</p><div><div><p>The following services will be partially cancelled each night:</p></div></div><table id=\"table87553\"><thead><tr><th id=\"table87553r1c1\">Departing Adelaide Railway Station</th><th id=\"table87553r1c2\">Departing Mitcham Railway Station</th></tr></thead><tbody><tr><td headers=\"table87553r1c1\">8:46 pm</td><td headers=\"table87553r1c2\">9:12 pm (departs Belair at 8:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">9:21 pm</td><td headers=\"table87553r1c2\">9:37 pm (departs Belair at 9:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">9:46 pm</td><td headers=\"table87553r1c2\">10:12 pm (departs Belair at 9:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">10:21 pm</td><td headers=\"table87553r1c2\">10:37 pm (departs Belair at 10:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">10:46 pm</td><td headers=\"table87553r1c2\">11:12 pm (departs Belair at 10:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">11:21 pm</td><td headers=\"table87553r1c2\">11:37 pm (departs Belair at 11:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">11:46 pm</td><td headers=\"table87553r1c2\">12:12 am (departs Belair at 11:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">12:21 am</td><td headers=\"table87553r1c2\">12:37 am (departs Belair at 12:13 am)</td></tr><tr><td headers=\"table87553r1c1\">&nbsp;</td><td headers=\"table87553r1c2\">1:12 am (departs Belair at 12:44 am)</td></tr><tr><td headers=\"table87553r1c1\">&nbsp;</td><td headers=\"table87553r1c2\">1:28 am (departs Belair at 1:06 am)</td></tr></tbody></table><p>&nbsp;</p><p>The following railway stations will not be serviced by train services, and passengers can access substitute bus services at the bus stop locations in the table below:</p><table style=\"width: 85.2321%;\" border=\"1\"><tbody><tr><td style=\"width: 17.8439%;\"><strong>Railway station</strong></td><td style=\"width: 42.7509%;\"><strong>Substitute bus stop: Mitcham Railway Station to Adelaide Railway Station</strong></td><td style=\"width: 39.4052%;\"><strong>Substitute bus stop: Adelaide Railway Station to Mitcham Station</strong></td></tr><tr><td style=\"width: 17.8439%;\">Adelaide Railway Station&nbsp;</td><td style=\"width: 82.1561%;\" colspan=\"2\">Stop D North Terrace - north side</td></tr><tr><td style=\"width: 17.8439%;\">Mile End</td><td style=\"width: 82.1561%;\" colspan=\"2\">Not serviced</td></tr><tr><td style=\"width: 17.8439%;\">Adelaide Showground</td><td style=\"width: 42.7509%;\">Stop 2 Goodwood Rd - West side</td><td style=\"width: 39.4052%;\">Stop 2 Goodwood Rd - East side</td></tr><tr><td style=\"width: 17.8439%;\">Goodwood</td><td style=\"width: 42.7509%;\">Stop 4 Goodwood Rd - West side</td><td style=\"width: 39.4052%;\">Stop 4 Goodwood Rd - East side</td></tr><tr><td style=\"width: 17.8439%;\">Millswood</td><td style=\"width: 42.7509%;\">Stop 7 Goodwood Rd - West side</td><td style=\"width: 39.4052%;\">Stop 7 Goodwood Rd - East side</td></tr><tr><td style=\"width: 17.8439%;\">Unley Park</td><td style=\"width: 42.7509%;\">Stop 173 Cross Rd - north side</td><td style=\"width: 39.4052%;\">Stop 173 Cross Rd - south side</td></tr><tr><td style=\"width: 17.8439%;\">Mitcham</td><td style=\"width: 82.1561%;\" colspan=\"2\">Stop 14 Belair Rd - west side</td></tr><tr><td style=\"width: 100%;\" colspan=\"3\"><div style=\"text-align: center;\">Transfer between train services and substitute buses at Mitcham Station</div></td></tr></tbody></table><p>&nbsp;Plan ahead, as rail substitute bus services may take longer than the regular train services and travel time will be increased.</p></div></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368695"
+  alert {
+    active_period {
+      start: 1786878900
+    }
+    active_period {
+      end: 1787236140
+    }
+    informed_entity {
+      route_id: "BEL"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/rail-closure-partial-belair-rail-line-night-closures-sunday-16-thursday-20-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Rail closure - Partial Belair Rail Line Night Closures Sunday 16 - Thursday 20 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636097\"><div id=\"component_1636097\"><p>The Belair will be partially closed be temporarily closed between Adelaide Railway Station and Mitcham Railway Station for multiple nights to allow for works to be undertaken for the New Women\'s and Children\'s Hospital Project.</p><p>The Belair line will be partially closed each night from:&nbsp;</p><ul><li>8:45 pm Sunday 16 August to last service&nbsp;</li><li>8:45 pm Monday 17 to last service</li><li>8:45 pm Tuesday 18 August to last service&nbsp;</li><li>8:45 pm Wednesday 19 August to last service&nbsp;</li><li>8:45 pm Thursday 20 August to last service</li></ul><p>Full line services will resume each morning.&nbsp;</p><div><div><p>The following services will be cancelled each night:</p></div></div><table id=\"table87553\"><thead><tr><th id=\"table87553r1c1\">Departing Adelaide Railway Station</th><th id=\"table87553r1c2\">Departing Mitcham Railway Station</th></tr></thead><tbody><tr><td headers=\"table87553r1c1\">8:46 pm</td><td headers=\"table87553r1c2\">9:12 pm (departs Belair at 8:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">9:21 pm</td><td headers=\"table87553r1c2\">9:37 pm (departs Belair at 9:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">9:46 pm</td><td headers=\"table87553r1c2\">10:12 pm (departs Belair at 9:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">10:21 pm</td><td headers=\"table87553r1c2\">10:37 pm (departs Belair at 10:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">10:46 pm</td><td headers=\"table87553r1c2\">11:12 pm (departs Belair at 10:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">11:21 pm</td><td headers=\"table87553r1c2\">11:37 pm (departs Belair at 11:13 pm)</td></tr><tr><td headers=\"table87553r1c1\">11:46 pm</td><td headers=\"table87553r1c2\">12:12 am (departs Belair at 11:44 pm)</td></tr><tr><td headers=\"table87553r1c1\">12:21 am</td><td headers=\"table87553r1c2\">12:37 am (departs Belair at 12:13 am)</td></tr><tr><td headers=\"table87553r1c1\">&nbsp;</td><td headers=\"table87553r1c2\">1:12 am (departs Belair at 12:44 am)</td></tr><tr><td headers=\"table87553r1c1\">&nbsp;</td><td headers=\"table87553r1c2\">1:28 am (departs Belair at 1:06 am)</td></tr></tbody></table><p>During the closure substitute buses will replace train services between Adelaide Railway Station and Mitcham Railway Station, with train services continuing to operate between Mitcham Railway Station and Belair Railway Station.&nbsp;</p><p>The following railway stations will not be serviced by train services, and passengers can access substitute bus services at the bus stop locations in the table below:</p><table style=\"width: 82.5949%;\" border=\"1\"><tbody><tr><td style=\"width: 25.8312%;\"><strong>Railway station</strong></td><td style=\"width: 35.9395%;\"><strong>Substitute bus stop: Mitcham Railway Station to Adelaide Railway Station</strong></td><td style=\"width: 38.2293%;\"><strong>Substitute bus stop: Adelaide Railway Station to Mitcham Station</strong></td></tr><tr><td style=\"width: 25.8312%;\">Adelaide Railway Station&nbsp;</td><td style=\"width: 74.1688%;\" colspan=\"2\">Stop D North Terrace - north side</td></tr><tr><td style=\"width: 25.8312%;\">Mile End</td><td style=\"width: 74.1688%;\" colspan=\"2\">Not serviced</td></tr><tr><td style=\"width: 25.8312%;\">Adelaide Showground</td><td style=\"width: 35.9395%;\">Stop 2 Goodwood Rd - West side</td><td style=\"width: 38.2293%;\">Stop 2 Goodwood Rd - East side</td></tr><tr><td style=\"width: 25.8312%;\">Goodwood</td><td style=\"width: 35.9395%;\">Stop 4 Goodwood Rd - West side</td><td style=\"width: 38.2293%;\">Stop 4 Goodwood Rd - East side</td></tr><tr><td style=\"width: 25.8312%;\">Millswood</td><td style=\"width: 35.9395%;\">Stop 7 Goodwood Rd - West side</td><td style=\"width: 38.2293%;\">Stop 7 Goodwood Rd - East side</td></tr><tr><td style=\"width: 25.8312%;\">Unley Park</td><td style=\"width: 35.9395%;\">Stop 173 Cross Rd - north side</td><td style=\"width: 38.2293%;\">Stop 173 Cross Rd - south side</td></tr><tr><td style=\"width: 25.8312%;\">Mitcham</td><td style=\"width: 74.1688%;\" colspan=\"2\">Stop 14 Belair Rd - west side</td></tr><tr><td style=\"width: 100%; text-align: center;\" colspan=\"3\">Transfer between train services and substitute buses at Mitcham Station&nbsp;</td></tr></tbody></table><p>&nbsp;Plan ahead, as rail substitute bus services may take longer than the regular train services and travel time will be increased.</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368696"
+  alert {
+    active_period {
+      start: 1787941800
+    }
+    active_period {
+      end: 1788100140
+    }
+    informed_entity {
+      route_id: "BEL"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/rail-closure-partial-belair-rail-line-weekend-closure-saturday-29-august-sunday-30-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Rail closure - Partial Belair Rail Line Weekend Closure Saturday 29 August - Sunday 30 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636103\"><div id=\"component_1636103\"><div id=\"component_1636103\"><p>From first service Saturday, 29 August to last service Sunday, 30 August 2026, the Belair will be partially closed be temporarily closed between Adelaide Railway Station and Mitcham Railway Station to allow for works to be undertaken for the New Women\'s and Children\'s Hospital Project.</p><p>During the closure substitute buses will replace train services between Adelaide Railway Station and Mitcham Railway Station, with train services continuing to operate between Mitcham Railway Station and Belair Railway Station.&nbsp;</p><p>The following railway stations will not be serviced by train services, and passengers can access substitute bus services at the bus stop locations in the table below:</p><table style=\"width: 71.9409%;\" border=\"1\"><tbody><tr><td style=\"width: 24.6702%;\"><strong>Railway station</strong></td><td style=\"width: 38.0332%;\"><strong>Substitute bus stop: Mitcham Railway Station to Adelaide Railway Station</strong></td><td style=\"width: 37.2989%;\"><strong>Substitute bus stop: Adelaide Railway Station to Mitcham Station&nbsp;</strong></td></tr><tr><td style=\"width: 24.6702%;\">Adelaide Railway Station&nbsp;</td><td style=\"width: 75.3321%;\" colspan=\"2\">Stop D North Terrace - north side</td></tr><tr><td style=\"width: 24.6702%;\">Mile End</td><td style=\"width: 75.3321%;\" colspan=\"2\">Not serviced</td></tr><tr><td style=\"width: 24.6702%;\">Adelaide Showground</td><td style=\"width: 38.0332%;\">Stop 2 Goodwood Rd - West side</td><td style=\"width: 37.2989%;\">Stop 2 Goodwood Rd - East side</td></tr><tr><td style=\"width: 24.6702%;\">Goodwood</td><td style=\"width: 38.0332%;\">Stop 4 Goodwood Rd - West side</td><td style=\"width: 37.2989%;\">Stop 4 Goodwood Rd - East side</td></tr><tr><td style=\"width: 24.6702%;\">Millswood</td><td style=\"width: 38.0332%;\">Stop 7 Goodwood Rd - West side</td><td style=\"width: 37.2989%;\">Stop 7 Goodwood Rd - East side</td></tr><tr><td style=\"width: 24.6702%;\">Unley Park</td><td style=\"width: 38.0332%;\">Stop 173 Cross Rd - north side</td><td style=\"width: 37.2989%;\">Stop 173 Cross Rd - south side</td></tr><tr><td style=\"width: 24.6702%;\">Mitcham</td><td style=\"width: 75.3321%;\" colspan=\"2\">Stop 14 Belair Rd - west side</td></tr><tr><td style=\"width: 100.002%;\" colspan=\"3\"><div style=\"text-align: center;\">Transfer between train services and substitute buses at Mitcham Station.</div></td></tr></tbody></table><p>&nbsp;Plan ahead, as rail substitute bus services may take longer than the regular train services and travel time will be increased.</p><p>Full line services will resume Monday, 31 August 2026.</p></div></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368697"
+  alert {
+    active_period {
+      start: 1786303800
+    }
+    active_period {
+      end: 1786716000
+    }
+    informed_entity {
+      route_id: "462"
+    }
+    informed_entity {
+      route_id: "462C"
+    }
+    informed_entity {
+      route_id: "487"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-fradd-rd-angle-vale-from-monday-10-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - Fradd Rd - Angle Vale - From Monday 10 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636178\"><div id=\"component_1636178\"><p>Between first service, Monday 10 August and last service, Friday 14 August 2026, buses will be detouring away from a section of Fradd Rd, Angle Vale due to road works.&nbsp;</p><p>During this time, Stop 79 Fradd Rd - South side (462, 462C and 487 Wednesday service) and Stop 84 Stevens Dr - West side will not be serviced (462, 462C).</p><p>Passengers are advised to use either the temporary bus stop located on Heaslip Rd on the corner of Fradd Rd or hail the bus service along Angle Vale Road near Stevens Drive.&nbsp;</p></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368698"
+  alert {
+    active_period {
+      start: 1786311600
+    }
+    informed_entity {
+      route_id: "BEL"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/delay-belair-line-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Delay - Belair line - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636457\"><p class=\"x_skipProofing\"><span data-olk-copy-source=\"MessageBody\">Until further notice, Belair line services in both directions are experiencing&nbsp;<span class=\"markh8a8bes2c\" data-markjs=\"true\" data-ogac=\"\" data-ogab=\"\" data-ogsc=\"\" data-ogsb=\"\" data-ogsbtc=\"\" data-ogsbrc=\"\" data-ogsbbc=\"\" data-ogsblc=\"\">delay</span>s of 15 to 20 minutes due to heavy rainfall.&nbsp;</span></p><div><span data-olk-copy-source=\"MessageBody\">Passengers are advised to allow for extra travel time, listen to announcements and check the Adelaide Metro website for further updates.</span></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368699"
+  alert {
+    active_period {
+      start: 1786311600
+    }
+    informed_entity {
+      route_id: "225"
+    }
+    informed_entity {
+      route_id: "225F"
+    }
+    informed_entity {
+      route_id: "477"
+    }
+    informed_entity {
+      route_id: "483"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-port-wakefield-rd-and-salisbury-hwy-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour - Port Wakefield Rd and Salisbury Hwy - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636475\"><div id=\"component_1636475\"><p>Until further notice, buses are detouring away from a section of Salisbury Hwy and Port Wakefield Rd due to flooding.&nbsp;</p><p>During this time the following bus stops will be closed and passengers will need to use the alternative bus stops below.&nbsp;</p><table style=\"border-collapse: collapse; width: 99.9654%;\" border=\"1\"><colgroup><col style=\"width: 49.9481%;\"><col style=\"width: 49.9481%;\"></colgroup><tbody><tr><td><strong>Closed stops</strong></td><td><strong>Alternative stops</strong></td></tr><tr><td><p>Stop 31 Port Wakefield Rd - both sides</p><p>Stop 32 Salisbury Hwy - both sides</p><p>Stop 33 Salisbury Hwy - East side</p></td><td><p>Stop 33A - Elder Dr - both sides</p><p>Stop 33 - Elder Dr - North side</p><p>Stop 30 Port Wakefield Rd -both sides</p></td></tr></tbody></table></div></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368700"
+  alert {
+    active_period {
+      start: 1786318200
+    }
+    informed_entity {
+      route_id: "225"
+    }
+    informed_entity {
+      route_id: "502"
+    }
+    informed_entity {
+      route_id: "560"
+    }
+    informed_entity {
+      route_id: "225F"
+    }
+    informed_entity {
+      route_id: "225X"
+    }
+    informed_entity {
+      route_id: "502X"
+    }
+    informed_entity {
+      route_id: "560A"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/detour-and-stop-closure-church-st-and-wiltshire-st-salisbury-monday-10-august-2026"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Detour and Stop closure - Church St and Wiltshire St - Salisbury - Monday 10 August 2026"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636504\"><p>From 9:00am, Monday 10 August 2026 until further notice, bus services will be detouring away from a section of Church St &amp; Wiltshire St, Salisbury due to road works.&nbsp;</p><p>During this time, Stop 48A Church St - West side will not be serviced.</p><p>Passengers are advised to go to the Salisbury Interchange.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368701"
+  alert {
+    active_period {
+      start: 1786399200
+    }
+    active_period {
+      end: 1786523400
+    }
+    informed_entity {
+      route_id: "411"
+    }
+    informed_entity {
+      route_id: "467"
+    }
+    informed_entity {
+      route_id: "470"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/stop-closure-stop-45b-burton-rd-north-east-side-paralowie-tuesday-11-aug-and-wednesday-12-aug-26"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Stop closure - Stop 45B Burton Rd - North East side - Paralowie - Tuesday 11 Aug and Wednesday 12 Aug 26"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636605\"><p>From 7:30am to 6:00pm each day, Tuesday 11 August and Wednesday 12 August 2026, Stop 45B Burton Rd - North East side, Paralowie will be closed due to works.&nbsp;</p><p>During this time, passengers are advised to go to Stop 45A Burton Rd - North East side.</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
+entity {
+  id: "A1786368702"
+  alert {
+    active_period {
+      start: 1786325400
+    }
+    active_period {
+      end: 1786334400
+    }
+    informed_entity {
+      route_id: "FLNDRS"
+    }
+    cause: UNKNOWN_CAUSE
+    effect: UNKNOWN_EFFECT
+    url {
+      translation {
+        text: "https://www.adelaidemetro.com.au/service-disruptions/train-service-cancellations-flinders-line-from-monday-10-august"
+        language: "en"
+      }
+    }
+    header_text {
+      translation {
+        text: "Train service cancellations - Flinders line - From Monday 10 August"
+        language: "en"
+      }
+    }
+    description_text {
+      translation {
+        text: "<div id=\"component_1636617\"><p class=\"x_elementToProof\"><span data-olk-copy-source=\"MessageBody\">On Monday 10 August 2026, the following Flinders train services are cancelled due to operational issues.&nbsp;</span></p><ul><li>11:04am to Flinders</li><li>11:38am to the city</li></ul><p>Please allow for additional travel time, listen for announcements at stations, and continue to check the Adelaide Metro website for updates.&nbsp;</p></div>"
+        language: "en"
+      }
+    }
+  }
+}
