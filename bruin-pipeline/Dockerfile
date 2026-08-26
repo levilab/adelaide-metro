@@ -17,7 +17,7 @@ COPY bruin/ .
 RUN printf 'default_environment: default\nenvironments:\n  default:\n    connections:\n      google_cloud_platform:\n        - name: gcp\n          project_id: adelaide-metro-505702\n          location: US\n          use_application_default_credentials: true\n' > .bruin.yml
 
 # Bruin requires a git repo
-RUN git config --global user.email "ci@hk-transit-pulse.local" && \
+RUN git config --global user.email "ci@adelaide-transit.local" && \
     git config --global user.name "CI" && \
     git init && git add -A && git commit -m "init" --allow-empty
 
