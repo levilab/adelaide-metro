@@ -1,6 +1,9 @@
 """@bruin
-name: raw.gtfs_static_hk-transport
+name: raw.gtfs_static_adelaide-metro
 type: python
+connection: gcp
+materialization:
+  type: table
 @bruin"""
 
 import io
@@ -11,7 +14,7 @@ import requests
 from google.cloud import bigquery, storage
 
 GTFS_URL = "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
-GCS_BUCKET  = os.environ.get("GCS_BUCKET")
+GCS_BUCKET  = os.environ.get("GCS_BUCKET", "adelaide-metro-505702-raw")
 GCS_PREFIX  = "gtfs_static/adelaide-metro"
 GCP_PROJECT = os.environ["GOOGLE_CLOUD_PROJECT"]
 BQ_DATASET  = "raw"
@@ -26,7 +29,7 @@ GTFS_FILES = {
 }
 
 
-def main():
+def materialize():
     print(f"Downloading GTFS from {GTFS_URL}")
     response = requests.get(GTFS_URL, timeout=60)
     response.raise_for_status()
@@ -64,6 +67,3 @@ def main():
             print(f"Loaded {filename} -> {table_ref}")
 
     print("Ingestion complete.")
-
-
-main()
