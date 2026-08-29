@@ -1,0 +1,54 @@
+name: Daily Batch Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: adelaide-metro-505702
+  REGION: asia-east1
+  BUCKET: adelaide-metro-505702-raw
+  BATCH_IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
+
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push batch image
+        run: |
+          docker build -f bruin/Dockerfile -t ${{ env.BATCH_IMAGE }}:${{ github.sha }} .
+          docker push ${{ env.BATCH_IMAGE }}:${{ github.sha }}
+
+      - name: Deploy batch Cloud Run Job
+        run: |
+          gcloud run jobs deploy batch-job \
+            --image ${{ env.BATCH_IMAGE }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --service-account bruin-pipeline@adelaide-metro-505702.iam.gserviceaccount.com \
+            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},GCS_BUCKET=${{ env.BUCKET }} \
+            --max-retries 1 \
+            --task-timeout 3600
+
+      - name: Run batch job
+        run: |
+          gcloud run jobs execute batch-job \
+            --region ${{ env.REGION }} \
+            --wait
