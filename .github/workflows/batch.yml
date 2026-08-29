@@ -44,6 +44,8 @@ jobs:
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@adelaide-metro-505702.iam.gserviceaccount.com \
             --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},GCS_BUCKET=${{ env.BUCKET }} \
+            --cpu 2 \
+            --memory 4Gi
             --max-retries 1 \
             --task-timeout 3600
 
