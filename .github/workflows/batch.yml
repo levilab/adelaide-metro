@@ -34,7 +34,7 @@ jobs:
 
       - name: Build and push batch image
         run: |
-          docker build -f bruin/Dockerfile -t ${{ env.BATCH_IMAGE }}:${{ github.sha }} .
+          docker build -f bruin-pipeline/Dockerfile -t ${{ env.BATCH_IMAGE }}:${{ github.sha }} .
           docker push ${{ env.BATCH_IMAGE }}:${{ github.sha }}
 
       - name: Deploy batch Cloud Run Job
