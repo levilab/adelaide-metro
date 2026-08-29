@@ -5,4 +5,3 @@ logs/*.log
 __pycache__/
 *.py[cod]
 .venv/
-batch.yml
