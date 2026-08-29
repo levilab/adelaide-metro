@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: adelaide-metro-505702
-  REGION: asia-east1
+  REGION: asia-east2
   BUCKET: adelaide-metro-505702-raw
   BATCH_IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
 
