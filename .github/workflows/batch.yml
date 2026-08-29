@@ -28,6 +28,10 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          
+      - name: Enable required GCP APIs
+        run: |
+          gcloud services enable run.googleapis.com artifactregistry.googleapis.com --project=${{ env.PROJECT_ID }}
 
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
