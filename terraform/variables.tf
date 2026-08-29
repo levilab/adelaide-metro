@@ -6,7 +6,7 @@ variable "project_id" {
 variable "gcs_location" {
   description = "GCS bucket region"
   type        = string
-  default     = "ASIA-EAST2"  # Hong Kong
+  default     = "ASIA-EAST2"
 }
 
 variable "bq_location" {
