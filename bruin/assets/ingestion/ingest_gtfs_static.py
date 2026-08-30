@@ -9,9 +9,10 @@ materialization:
 import io
 import os
 import zipfile
-
+from dotenv import load_dotenv
 import requests
 from google.cloud import bigquery, storage
+load_dotenv()
 
 GTFS_URL = "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
 GCS_BUCKET  = os.environ.get("GCS_BUCKET", "adelaide-metro-505702-raw")
@@ -26,6 +27,7 @@ GTFS_FILES = {
     "trips.txt": "gtfs_trips",
     "stop_times.txt": "gtfs_stop_times",
     "calendar.txt": "gtfs_calendar",
+    "shapes.txt": "gtfs_shapes",
 }
 
 
@@ -67,3 +69,4 @@ def materialize():
             print(f"Loaded {filename} -> {table_ref}")
 
     print("Ingestion complete.")
+materialize()
