@@ -10,8 +10,10 @@ depends:
   - raw.gtfs_static_adelaide-metro
 @bruin */
 
+-- cast a string
+
 SELECT
-    CAST(trip_id AS STRING)         AS trip_id,
+    CAST(trip_id AS STRING)         AS trip_id, 
     CAST(stop_id AS STRING)         AS stop_id,
     CAST(stop_sequence AS INT64)    AS stop_sequence,
     CAST(arrival_time AS STRING)    AS arrival_time,
