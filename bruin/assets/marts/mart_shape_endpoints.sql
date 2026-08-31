@@ -25,8 +25,8 @@ SELECT
     se.dest_stop_id,
     -- Tính khoảng cách đường chim bay giữa trạm đầu và trạm cuối (mét)
     ST_DISTANCE(
-        ST_GEOGPOINT(s1.longitude, s1.latitude),
-        ST_GEOGPOINT(s2.longitude, s2.latitude)
+        ST_GEOGPOINT(s1.stop_lon, s1.stop_lat),
+        ST_GEOGPOINT(s2.stop_lon, s2.stop_lat)
     ) AS geodesic_distance_m
 FROM shape_endpoints se
 JOIN staging.stg_stops s1 ON se.origin_stop_id = s1.stop_id

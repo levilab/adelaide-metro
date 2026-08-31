@@ -12,8 +12,8 @@ depends:
 SELECT
     s.stop_id,
     s.stop_name,
-    s.latitude,
-    s.longitude,
+    s.stop_lat,
+    s.stop_lon,
     COUNT(st.trip_id) as total_departures,
     ANY_VALUE(r.route_type) as route_type
 FROM `adelaide-metro-505702.staging.stg_stop_times` st

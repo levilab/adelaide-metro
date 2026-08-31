@@ -4,7 +4,7 @@ type: bq.sql
 materialization:
   type: table
 depends:
-  - raw.gtfs_static_adelaide-metro
+  - raw.ingest_gtfs_static
 @bruin */
 
 SELECT

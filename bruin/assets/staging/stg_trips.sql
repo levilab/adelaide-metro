@@ -6,7 +6,7 @@ materialization:
   cluster_by:
     - route_id
 depends:
-  - raw.gtfs_static_adelaide-metro
+  - raw.ingest_gtfs_static
 @bruin */
 
 SELECT

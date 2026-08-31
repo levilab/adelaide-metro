@@ -6,7 +6,7 @@ materialization:
   cluster_by:
     - shape_id
 depends:
-  - raw.gtfs_static_adelaide-metro
+  - raw.ingest_gtfs_static
 @bruin */
 
 SELECT 

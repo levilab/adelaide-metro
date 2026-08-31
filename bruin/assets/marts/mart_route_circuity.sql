@@ -11,72 +11,81 @@ depends:
   - staging.stg_stop_times
 @bruin */
 
-WITH shape_routes AS (
-    -- Ánh xạ duy nhất shape_id với route_id
-    SELECT DISTINCT 
-        shape_id, 
-        route_id 
-    FROM staging.stg_trips 
+WITH shape_representative_trips AS (
+    -- 1. Lấy trip đại diện và đếm tổng số chuyến cho mỗi shape_id
+    SELECT 
+        shape_id,
+        route_id,
+        ARRAY_AGG(trip_id LIMIT 1)[OFFSET(0)] AS representative_trip_id,
+        COUNT(DISTINCT trip_id) AS total_trips_count
+    FROM staging.stg_trips
     WHERE shape_id IS NOT NULL
+    GROUP BY shape_id, route_id
 ),
 
-trip_endpoints AS (
-    -- Lấy duy nhất 1 trip đại diện cho mỗi shape_id để tìm origin_stop và dest_stop
+origin_stations AS (
+    -- 2. Xác định chính xác tọa độ trạm đầu tiên (Origin) của từng trip đại diện bằng GROUP BY
     SELECT 
-        t.shape_id,
-        FIRST_VALUE(st.stop_id) OVER (PARTITION BY t.shape_id ORDER BY st.stop_sequence ASC) AS origin_stop_id,
-        FIRST_VALUE(st.stop_id) OVER (PARTITION BY t.shape_id ORDER BY st.stop_sequence DESC) AS dest_stop_id
-    FROM (
-        SELECT 
-            shape_id, 
-            ARRAY_AGG(trip_id LIMIT 1)[OFFSET(0)] AS trip_id 
-        FROM staging.stg_trips 
-        WHERE shape_id IS NOT NULL 
-        GROUP BY shape_id
-    ) t
-    JOIN staging.stg_stop_times st ON t.trip_id = st.trip_id
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY t.shape_id ORDER BY st.stop_sequence ASC) = 1
+        st.trip_id,
+        ARRAY_AGG(ST_GEOGPOINT(s.stop_lon, s.stop_lat) ORDER BY st.stop_sequence ASC LIMIT 1)[OFFSET(0)] AS origin_pt
+    FROM staging.stg_stop_times st
+    JOIN staging.stg_stops s ON st.stop_id = s.stop_id
+    WHERE st.trip_id IN (SELECT representative_trip_id FROM shape_representative_trips)
+    GROUP BY st.trip_id
+),
+
+shape_max_span AS (
+    -- 3. Tính khoảng cách từ trạm đầu tới trạm xa nhất (Max Reach)
+    SELECT 
+        srt.shape_id,
+        srt.route_id,
+        MAX(srt.total_trips_count) AS total_trips_count,
+        MAX(ST_DISTANCE(os.origin_pt, ST_GEOGPOINT(s.stop_lon, s.stop_lat))) AS max_span_m
+    FROM shape_representative_trips srt
+    JOIN staging.stg_stop_times st ON srt.representative_trip_id = st.trip_id
+    JOIN staging.stg_stops s ON st.stop_id = s.stop_id
+    JOIN origin_stations os ON srt.representative_trip_id = os.trip_id
+    GROUP BY srt.shape_id, srt.route_id
 )
 
 SELECT 
     r.route_short_name,
     r.route_long_name,
     sg.shape_id,
-    ROUND(sg.actual_distance_m / 1000.0, 2) AS actual_km,
-    ROUND(
-        ST_DISTANCE(
-            ST_GEOGPOINT(s1.longitude, s1.latitude),
-            ST_GEOGPOINT(s2.longitude, s2.latitude)
-        ) / 1000.0, 
-        2
-    ) AS geodesic_km,
-
-    -- Phân loại tuyến
-    CASE 
-        WHEN ST_DISTANCE(ST_GEOGPOINT(s1.longitude, s1.latitude), ST_GEOGPOINT(s2.longitude, s2.latitude)) < 3000 THEN 'Loop / Local Feeder'
-        ELSE 'Point-to-Point Line'
-    END AS route_type,
     
-    -- Nếu khoảng cách đường chim bay < 1km (các tuyến vòng tròn Loop), gán NULL để tránh circuity_factor bị bùng nổ
+    -- Quãng đường thực tế (km)
+    ROUND(sg.actual_distance_m / 1000.0, 2) AS actual_km,
+    
+    -- Khoảng cách vươn xa nhất của tuyến (km)
+    ROUND(ms.max_span_m / 1000.0, 2) AS max_reach_km,
+    
+    -- Phân loại nghiệp vụ (Service Type)
     CASE 
-        WHEN ST_DISTANCE(ST_GEOGPOINT(s1.longitude, s1.latitude), ST_GEOGPOINT(s2.longitude, s2.latitude)) < 3000 THEN NULL
-        ELSE ROUND(
-            sg.actual_distance_m / 
-            NULLIF(
-                ST_DISTANCE(
-                    ST_GEOGPOINT(s1.longitude, s1.latitude),
-                    ST_GEOGPOINT(s2.longitude, s2.latitude)
-                ), 
-                0
-            ), 
-            2
-        ) 
-    END AS circuity_factor
+        WHEN LOWER(r.route_long_name) LIKE '%school%' 
+             OR LOWER(r.route_long_name) LIKE '%college%' 
+             OR (LOWER(r.route_short_name) LIKE '7%' AND LENGTH(r.route_short_name) = 3)
+             THEN 'School Service'
+        WHEN ms.max_span_m < 3000 
+             OR LOWER(r.route_long_name) LIKE '%loop%' 
+             OR LOWER(r.route_long_name) LIKE '%circuit%' 
+             THEN 'Local Loop / Feeder'
+        ELSE 'Regular Commuter'
+    END AS service_type,
+
+    -- Chỉ số uốn lượn mới (Adjusted Circuity Factor)
+    -- Công thức: Actual Distance / (Max Span * 2)
+    ROUND(
+        sg.actual_distance_m / NULLIF(ms.max_span_m * 2.0, 0), 
+        2
+    ) AS adjusted_circuity_factor,
+
+    -- Số km chạy dư thừa so với bán kính phục vụ
+    ROUND(
+        (sg.actual_distance_m - (ms.max_span_m * 2.0)) / 1000.0, 
+        2
+    ) AS excess_km
 
 FROM marts.mart_shape_geometries sg
-JOIN trip_endpoints te ON sg.shape_id = te.shape_id
-JOIN shape_routes sr ON sg.shape_id = sr.shape_id
-JOIN staging.stg_routes r ON sr.route_id = r.route_id
-JOIN staging.stg_stops s1 ON te.origin_stop_id = s1.stop_id
-JOIN staging.stg_stops s2 ON te.dest_stop_id = s2.stop_id
-ORDER BY circuity_factor DESC NULLS LAST;
+JOIN shape_max_span ms ON sg.shape_id = ms.shape_id
+JOIN staging.stg_routes r ON ms.route_id = r.route_id
+ORDER BY adjusted_circuity_factor DESC;

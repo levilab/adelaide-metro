@@ -1,9 +1,14 @@
 """@bruin
-name: raw.gtfs_static_adelaide-metro
+name: raw.ingest_gtfs_static
 type: python
 connection: gcp
 materialization:
   type: table
+requirements:
+  - python-dotenv
+  - requests
+  - google-cloud-bigquery
+  - google-cloud-storage
 @bruin"""
 
 import io
@@ -17,7 +22,7 @@ load_dotenv()
 GTFS_URL = "https://gtfs.adelaidemetro.com.au/v1/static/latest/google_transit.zip"
 GCS_BUCKET  = os.environ.get("GCS_BUCKET", "adelaide-metro-505702-raw")
 GCS_PREFIX  = "gtfs_static/adelaide-metro"
-GCP_PROJECT = os.environ["GOOGLE_CLOUD_PROJECT"]
+GCP_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "adelaide-metro-505702")
 BQ_DATASET  = "raw"
 
 # Maps filename -> BigQuery table name
