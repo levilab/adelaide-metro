@@ -7,7 +7,7 @@ materialization:
     - stop_id
     - trip_id
 depends:
-  - raw.gtfs_static_adelaide-metro
+  - raw.ingest_gtfs_static
 @bruin */
 
 -- cast a string
