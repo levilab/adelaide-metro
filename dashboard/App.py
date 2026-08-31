@@ -147,7 +147,7 @@ def load_kpi(project_id):
     return get_bq_client().query(f"""
     SELECT
         (SELECT COUNT(*) FROM `{project_id}.marts.mart_ranked_stops`
-         WHERE latitude IS NOT NULL) AS total_stops,
+         WHERE stop_lat IS NOT NULL) AS total_stops,
         (SELECT SUM(total_departures) FROM `{project_id}.marts.mart_ranked_stops`) AS total_departures,
         (SELECT COUNT(DISTINCT route_short_name) FROM `{project_id}.staging.stg_routes`) AS total_routes,
         (SELECT stop_name FROM `{project_id}.marts.mart_ranked_stops`
@@ -173,10 +173,10 @@ peak_hour           = int(kpi["peak_hour"])
 def load_network_data():
     if "stops_df" not in st.session_state:
         stops_df = load_data(f"""
-        SELECT stop_id, stop_name, latitude, longitude, total_departures,
+        SELECT stop_id, stop_name, stop_lat, stop_lon, total_departures,
                COALESCE(route_type, 3) AS route_type
         FROM `{PROJECT_ID}.marts.mart_ranked_stops`
-        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+        WHERE stop_lat IS NOT NULL AND stop_lon IS NOT NULL
         """)
         stops_df["color"] = stops_df["route_type"].apply(route_type_color)
         stops_df["Transport Type"] = stops_df["route_type"].map(ROUTE_TYPE_LABEL).fillna("Unknown")
@@ -259,8 +259,8 @@ with tab_network:
     st.caption(f"Showing: **{selected_label}** stops from GTFS open data.")
     try:
         # Tính tọa độ trung tâm động dựa trên dữ liệu lọc (hoặc fallback về tâm Adelaide)
-        lat_center = f_stops["latitude"].mean() if not f_stops.empty else -34.9285
-        lon_center = f_stops["longitude"].mean() if not f_stops.empty else 138.6007
+        lat_center = f_stops["stop_lat"].mean() if not f_stops.empty else -34.9285
+        lon_center = f_stops["stop_lon"].mean() if not f_stops.empty else 138.6007
 
         st.pydeck_chart(
             pdk.Deck(
@@ -268,7 +268,7 @@ with tab_network:
                     pdk.Layer(
                         "ScatterplotLayer",
                         data=f_stops,
-                        get_position=["longitude", "latitude"],
+                        get_position=["stop_lon", "stop_lat"],
                         get_radius=120,
                         get_fill_color="color",
                         pickable=True,
@@ -277,8 +277,8 @@ with tab_network:
                 ],
                 # Tọa độ trung tâm Adelaide: Lat -34.9285, Lon 138.6007
                 initial_view_state=pdk.ViewState(
-                    latitude=lat_center,
-                    longitude=lon_center,
+                    stop_lat=lat_center,
+                    stop_lon=lon_center,
                     zoom=11,
                     pitch=30,
                 ),

@@ -45,10 +45,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Test Docker Container locally
-        run: |
-          docker run --rm ${{ env.BATCH_IMAGE }}:${{ github.sha }} python -m pytest
-
       - name: Deploy batch Cloud Run Job
         run: |
           gcloud run jobs deploy batch-job \

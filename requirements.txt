@@ -11,3 +11,4 @@ db-dtypes
 pyarrow
 geopandas
 confluent-kafka==2.6.1
+python-dotenv
