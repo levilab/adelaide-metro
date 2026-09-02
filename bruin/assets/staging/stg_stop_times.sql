@@ -17,7 +17,8 @@ SELECT
     CAST(stop_id AS STRING)         AS stop_id,
     CAST(stop_sequence AS INT64)    AS stop_sequence,
     CAST(arrival_time AS STRING)    AS arrival_time,
-    CAST(departure_time AS STRING)  AS departure_time
+    CAST(departure_time AS STRING)  AS departure_time,
+    CAST(shape_dist_traveled as FLOAT64) AS shape_dist_traveled
 FROM `adelaide-metro-505702.raw.gtfs_stop_times`
 WHERE trip_id IS NOT NULL
     AND stop_id IS NOT NULL
