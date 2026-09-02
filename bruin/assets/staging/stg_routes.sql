@@ -11,6 +11,7 @@ SELECT
     CAST(route_id AS STRING) AS route_id,
     CAST(route_short_name AS STRING) AS route_short_name,
     CAST(route_long_name AS STRING) AS route_long_name,
+    CAST(route_desc AS STRING) AS route_desc,
     CAST(route_type AS INT64) AS route_type,
     CAST(agency_id AS STRING) AS agency_id 
 FROM `adelaide-metro-505702.raw.gtfs_routes`

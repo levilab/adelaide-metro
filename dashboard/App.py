@@ -98,6 +98,18 @@ def load_peak_by_type(project_id, route_type=None):
     """).to_dataframe()
 
 @st.cache_data(ttl=3600)
+def load_cbd_corridor_data(project_id):
+    return get_bq_client().query(f"""
+    SELECT 
+        corridor_name,
+        time_bucket,
+        unique_trips,
+        corridor_avg_speed_kmh
+    FROM `{project_id}.marts.mart_cbc_corridor_speed`
+    ORDER BY corridor_name, time_bucket
+    """).to_dataframe()
+
+@st.cache_data(ttl=3600)
 def format_gtfs_time(t):
     """Convert GTFS time (e.g. 25:30:00) to readable format (e.g. 01:30 +1day)."""
     if not t or ":" not in str(t):
@@ -217,7 +229,7 @@ col4.metric("Peak Hour", f"{peak_hour:02d}:00")
 st.divider()
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab_network, = st.tabs(["Network Analytics"])
+tab_network, tab_cbd = st.tabs(["Network Analytics", "CBD Corridor Speed"])
 
 with tab_network:
     with st.spinner("Loading network data..."):
@@ -277,8 +289,8 @@ with tab_network:
                 ],
                 # Tọa độ trung tâm Adelaide: Lat -34.9285, Lon 138.6007
                 initial_view_state=pdk.ViewState(
-                    stop_lat=lat_center,
-                    stop_lon=lon_center,
+                    latitude=lat_center,
+                    longitude=lon_center,
                     zoom=11,
                     pitch=30,
                 ),
@@ -305,6 +317,155 @@ with tab_network:
     top_stops.columns = ["Stop Name", "Total Departures", "Transport Type"]
     st.dataframe(top_stops, width='stretch')
     st.download_button("⬇ Download CSV", data=top_stops.to_csv(index=False),
-                       file_name="hk_busiest_stops.csv", mime="text/csv")
+                       file_name="adelaide_busiest_stops.csv", mime="text/csv")
 
     st.divider()
+
+
+with tab_cbd:
+    st.subheader("Adelaide CBD Transit Speed & Volume Analysis")
+    st.caption("Analyze vehicle speeds and traffic volumes across major Adelaide CBD corridors by time buckets.")
+
+    # Load data
+    try:
+        cbd_df = load_cbd_corridor_data(PROJECT_ID)
+    except Exception as e:
+        st.warning(f"Could not load CBD corridor speed data. Make sure the Bruin asset `mart_cbd_corridor_speed` has been executed. Error: {e}")
+        cbd_df = pd.DataFrame()
+
+    if cbd_df.empty:
+        st.info("No data available in `marts.mart_cbd_corridor_speed` yet.")
+    else:
+        all_corridors = list(cbd_df["corridor_name"].unique())
+
+        # Initialize Session State for CBD corridors if not present
+        if "selected_cbd_corridors" not in st.session_state:
+            st.session_state["selected_cbd_corridors"] = all_corridors
+
+        def reset_cbd_filters():
+            st.session_state["selected_cbd_corridors"] = all_corridors
+
+        # Filters container inside the tab
+        with st.expander("⚙️ Filter Options", expanded=True):
+            f_col1, f_col2 = st.columns([3, 1])
+            with f_col1:
+                selected_corridors = st.multiselect(
+                    "Select Corridors:",
+                    options=all_corridors,
+                    key="selected_cbd_corridors"
+                )
+            with f_col2:
+                st.write("")
+                st.write("")
+                st.button("Reset Filter", on_click=reset_cbd_filters, use_container_width=True)
+
+        filtered_cbd_df = cbd_df[cbd_df["corridor_name"].isin(selected_corridors)].copy()
+
+        if filtered_cbd_df.empty:
+            st.warning("Please select at least one corridor.")
+        else:
+            # Key Metrics Overview
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Total Trips", f"{filtered_cbd_df['unique_trips'].sum():,}")
+            col2.metric("Average CBD Speed", f"{filtered_cbd_df['corridor_avg_speed_kmh'].mean():.2f} km/h")
+            
+            slowest_row = filtered_cbd_df.loc[filtered_cbd_df['corridor_avg_speed_kmh'].idxmin()]
+            col3.metric("Slowest Segment", f"{slowest_row['corridor_name']} ({slowest_row['corridor_avg_speed_kmh']} km/h)")
+            
+            # Dynamic Context Highlights
+            slowest_corridor = filtered_cbd_df.groupby('corridor_name')['corridor_avg_speed_kmh'].mean().idxmin()
+            slowest_speed = filtered_cbd_df.groupby('corridor_name')['corridor_avg_speed_kmh'].mean().min()
+            
+            busiest_corridor = filtered_cbd_df.groupby('corridor_name')['unique_trips'].sum().idxmax()
+            busiest_trips = filtered_cbd_df.groupby('corridor_name')['unique_trips'].sum().max()
+            busiest_speed = filtered_cbd_df.groupby('corridor_name')['corridor_avg_speed_kmh'].mean()[busiest_corridor]
+
+            st.info(f"""
+            * **Lowest Operating Speed:** **{slowest_corridor}** registers the lowest average speed at **{slowest_speed:.1f} km/h** across selected filters.
+            * **Highest Traffic Volume:** **{busiest_corridor}** carries the heaviest load with **{busiest_trips:,} unique trips**, maintaining an average speed of **{busiest_speed:.1f} km/h**.
+            """)
+
+            st.divider()
+
+            # Data Preprocessing for Categorical Sorting
+            time_order = ['1. AM Peak (7-9h)', '2. Mid Day (10-15h)', '3. PM Peak (16-18h)', '4. Off Peak']
+            
+            # Match categories dynamically with existing time_bucket strings
+            filtered_cbd_df['time_bucket'] = pd.Categorical(
+                filtered_cbd_df['time_bucket'], 
+                categories=[c for c in time_order if c in filtered_cbd_df['time_bucket'].unique()] or filtered_cbd_df['time_bucket'].unique(), 
+                ordered=True
+            )
+            filtered_cbd_df = filtered_cbd_df.sort_values(['corridor_name', 'time_bucket'])
+
+            # Visualizations (Heatmap & Bar Chart)
+            left_col, right_col = st.columns(2)
+            
+            with left_col:
+                st.subheader("1. Velocity Heatmap")
+                
+                heatmap_data = filtered_cbd_df.pivot_table(
+                    index="corridor_name", 
+                    columns="time_bucket", 
+                    values="corridor_avg_speed_kmh",
+                    aggfunc='mean',
+                    observed=False
+                )
+                
+                # Build Custom Hover Text Matrix
+                hover_text = []
+                for index, row in heatmap_data.iterrows():
+                    hover_row = []
+                    for col in heatmap_data.columns:
+                        val = row[col]
+                        trips_match = filtered_cbd_df[
+                            (filtered_cbd_df['corridor_name'] == index) & 
+                            (filtered_cbd_df['time_bucket'] == col)
+                        ]['unique_trips']
+                        trips = trips_match.values[0] if not trips_match.empty else 0
+                        
+                        status = "🔴 Severe Bottleneck" if val < 12 else ("🟡 Moderate" if val < 20 else "🟢 Flowing")
+                        
+                        hover_row.append(
+                            f"<b>Corridor:</b> {index}<br>" +
+                            f"<b>Time Window:</b> {col}<br>" +
+                            f"<b>Avg Speed:</b> {val:.1f} km/h<br>" +
+                            f"<b>Unique Trips:</b> {trips:,}<br>" +
+                            f"<b>Status:</b> {status}"
+                        )
+                    hover_text.append(hover_row)
+                
+                fig_heatmap = px.imshow(
+                    heatmap_data,
+                    labels=dict(x="Time Window", y="Corridor", color="Speed (km/h)"),
+                    color_continuous_scale="RdYlGn",
+                    range_color=[5, 35],
+                    aspect="auto",
+                    text_auto=".1f"
+                )
+
+                fig_heatmap.update_traces(
+                    hovertemplate="%{customdata}<extra></extra>",
+                    customdata=hover_text
+                )
+                st.plotly_chart(fig_heatmap, use_container_width=True)
+
+            with right_col:
+                st.subheader("2. Traffic Volume (Unique Trips)")
+                fig_bar = px.bar(
+                    filtered_cbd_df,
+                    x="corridor_name",
+                    y="unique_trips",
+                    color="time_bucket",
+                    barmode="group",
+                    labels={"corridor_name": "Corridor", "unique_trips": "Unique Trips", "time_bucket": "Time Window"},
+                    color_discrete_sequence=px.colors.qualitative.Set2
+                )
+                st.plotly_chart(fig_bar, use_container_width=True)
+                
+            with st.expander("📚 Methodology & Business Definitions"):
+                st.markdown("""
+                * **Scheduled Speed:** Calculated by dividing actual GTFS `shapes.txt` distance by the time difference between arrival and departure times in `stop_times.txt`.
+                * **Unique Trips:** Represents distinct bus runs passing through the corridor segment, deduplicating intermediate stops.
+                * **Off-Peak Baseline:** Reflects the baseline infrastructure speed limit without commuter traffic interference.
+                """)
