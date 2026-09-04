@@ -12,3 +12,5 @@ pyarrow
 geopandas
 confluent-kafka==2.6.1
 python-dotenv
+pandas-gbq
+gtfs-realtime-bindings==1.0.0
