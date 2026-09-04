@@ -19,7 +19,7 @@ WITH raw_entities AS (
             PARTITION BY alert_entity_id, COALESCE(route_id, ''), COALESCE(stop_id, ''), COALESCE(trip_id, '') 
             ORDER BY feed_timestamp DESC, ingested_at DESC
         ) AS rn
-    FROM `{{ var.gcp_project }}.streaming.gtfs_realtime_service_alert_informed_entities`
+    FROM `adelaide-metro-505702.streaming.gtfs_realtime_service_alert_informed_entities`
     WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
 )
 

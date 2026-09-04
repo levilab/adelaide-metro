@@ -31,7 +31,7 @@ WITH raw_vehicles AS (
             PARTITION BY vehicle_id 
             ORDER BY vehicle_timestamp DESC, ingested_at DESC
         ) AS rn
-    FROM `{{ var.gcp_project }}.streaming.gtfs_realtime_vehicle_positions`
+    FROM `adelaide-metro-505702.streaming.gtfs_realtime_vehicle_positions`
     -- Partition pruning: Chỉ quét dữ liệu trong 1 ngày gần nhất để giảm chi phí scan
     WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
 )
