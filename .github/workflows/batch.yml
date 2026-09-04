@@ -10,6 +10,7 @@ env:
   REGION: asia-east2
   BUCKET: adelaide-metro-505702-raw
   BATCH_IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
 
 jobs:
   batch:
