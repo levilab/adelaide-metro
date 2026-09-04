@@ -133,7 +133,7 @@ COLOR_MAP = {"Tram": "#00c864",
             "Express Bus": "#ff7800",
             }
 
-au_tz = pytz.timezone("Australia/South")
+adelaide_tz = pytz.timezone("Australia/Adelaide")
 visible_types = [0, 3, 4, 2]
 
 def route_type_color(rt):
