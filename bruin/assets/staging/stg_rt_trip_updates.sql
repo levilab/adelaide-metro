@@ -31,7 +31,7 @@ WITH raw_trip_updates AS (
             PARTITION BY trip_id, stop_sequence 
             ORDER BY trip_update_timestamp DESC, ingested_at DESC
         ) AS rn
-    FROM `{{ var.gcp_project }}.streaming.gtfs_realtime_trip_updates`
+    FROM `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
     WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
 )
 

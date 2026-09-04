@@ -14,10 +14,7 @@ env:
 jobs:
   batch:
     runs-on: ubuntu-latest
-
-    env:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-      
+    
     permissions:
       contents: read
       id-token: write

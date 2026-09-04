@@ -24,7 +24,7 @@ WITH raw_alerts AS (
             PARTITION BY entity_id 
             ORDER BY feed_timestamp DESC, ingested_at DESC
         ) AS rn
-    FROM `{{ var.gcp_project }}.streaming.gtfs_realtime_service_alerts`
+    FROM `adelaide-metro-505702.streaming.gtfs_realtime_service_alerts`
     WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
 )
 
