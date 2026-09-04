@@ -16,7 +16,7 @@ WITH raw_entities AS (
         alert_entity_id AS alert_id,
         route_id,
         ROW_NUMBER() OVER (
-            PARTITION BY alert_entity_id, COALESCE(route_id, ''), COALESCE(stop_id, ''), COALESCE(trip_id, '') 
+            PARTITION BY alert_entity_id, COALESCE(route_id, '') 
             ORDER BY feed_timestamp DESC, ingested_at DESC
         ) AS rn
     FROM `adelaide-metro-505702.streaming.gtfs_realtime_service_alert_informed_entities`
