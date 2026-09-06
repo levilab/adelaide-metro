@@ -16,7 +16,7 @@ WITH shape_representative_trips AS (
   SELECT
     shape_id,
     route_id,
-    ARRAY_AGG(trip_id LIMIT 1)[OFFSET(0)] AS representative_trip_id,
+    ARRAY_AGG(trip_id ORDER BY trip_id LIMIT 1)[OFFSET(0)] AS representative_trip_id,
     COUNT(DISTINCT trip_id) AS total_trips_count
   FROM `staging.stg_trips`
   WHERE shape_id IS NOT NULL
@@ -74,9 +74,10 @@ classified_shapes AS (
         THEN 'School Service'
       WHEN LOWER(r.route_long_name) LIKE '%loop%'
         OR LOWER(r.route_long_name) LIKE '%circuit%'
+        OR LOWER(r.route_long_name) LIKE '%clockwise%'
         OR LOWER(r.route_long_name) LIKE '%township%'
         OR LOWER(r.route_long_name) LIKE '%town service%'
-        OR LOWER(r.route_long_name) LIKE '%circulator%'
+        OR LOWER(r.route_long_name) LIKE '%connector%'
         OR ms.max_span_m < 3000
         OR (sg.actual_distance_m / NULLIF(ms.max_span_m, 0)) >= 2.5
         THEN 'Local Loop / Feeder'
