@@ -8,51 +8,62 @@ depends:
   - streaming.ingest_gtfs_realtime
 @bruin */
 
-WITH raw_vehicles AS (
-    SELECT
-        ingested_date,
-        ingested_at,
-        feed_timestamp,
-        entity_id,
-        trip_id,
-        route_id,
-        direction_id,
-        start_date,
-        vehicle_id,
-        vehicle_label,
-        latitude,
-        longitude,
-        bearing,
-        speed,
-        current_stop_sequence,
-        stop_id,
-        vehicle_timestamp,
-        ROW_NUMBER() OVER (
-            PARTITION BY vehicle_id 
-            ORDER BY vehicle_timestamp DESC, ingested_at DESC
-        ) AS rn
-    FROM `adelaide-metro-505702.streaming.gtfs_realtime_vehicle_positions`
-    -- Partition pruning: Chỉ quét dữ liệu trong 1 ngày gần nhất để giảm chi phí scan
-    WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
-)
-
-SELECT
+WITH ranked_vehicles AS (
+  SELECT
+    -- Metadata
     ingested_date,
-    ingested_at,
-    feed_timestamp,
-    entity_id,
-    trip_id,
-    route_id,
-    direction_id,
-    start_date,
-    vehicle_id,
-    vehicle_label,
-    latitude,
-    longitude,
-    bearing,
-    speed,
-    current_stop_sequence,
-    stop_id,
-    vehicle_timestamp
-FROM raw_vehicles
-WHERE rn = 1
+    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
+    source_gcs_uri,
+    
+    -- Entity & Trip identifiers
+    CAST(entity_id AS STRING) AS entity_id,
+    CAST(trip_id AS STRING) AS trip_id,
+    CAST(route_id AS STRING) AS route_id,
+    CAST(direction_id AS INT64) AS direction_id,
+    PARSE_DATE('%Y-%m-%d', start_date) AS start_date,
+    
+    -- Vehicle info
+    CAST(vehicle_id AS STRING) AS vehicle_id,
+    CAST(vehicle_label AS STRING) AS vehicle_label,
+    
+    -- Spatial / Position data
+    CAST(latitude AS FLOAT64) AS latitude,
+    CAST(longitude AS FLOAT64) AS longitude,
+    CAST(bearing AS FLOAT64) AS bearing,
+    CAST(speed AS FLOAT64) AS speed,
+    CAST(current_stop_sequence AS INT64) AS current_stop_sequence,
+    CAST(stop_id AS STRING) AS stop_id,
+    CAST(vehicle_timestamp AS TIMESTAMP) AS vehicle_timestamp,
+    
+    -- Window function lấy vị trí mới nhất của từng xe
+    ROW_NUMBER() OVER (
+      PARTITION BY vehicle_id
+      ORDER BY ingested_at DESC, vehicle_timestamp DESC
+    ) AS rn
+  FROM
+    `streaming.gtfs_realtime_vehicle_positions`
+)
+SELECT
+  ingested_date,
+  ingested_at,
+  feed_timestamp,
+  source_gcs_uri,
+  entity_id,
+  trip_id,
+  route_id,
+  direction_id,
+  start_date,
+  vehicle_id,
+  vehicle_label,
+  latitude,
+  longitude,
+  bearing,
+  speed,
+  current_stop_sequence,
+  stop_id,
+  vehicle_timestamp
+FROM
+  ranked_vehicles
+WHERE
+  rn = 1;

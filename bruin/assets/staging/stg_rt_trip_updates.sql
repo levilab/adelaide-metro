@@ -8,50 +8,34 @@ depends:
   - streaming.ingest_gtfs_realtime
 @bruin */
 
-WITH raw_trip_updates AS (
-    SELECT
-        ingested_date,
-        ingested_at,
-        feed_timestamp,
-        entity_id,
-        trip_id,
-        route_id,
-        direction_id,
-        start_date,
-        vehicle_id,
-        vehicle_label,
-        trip_update_timestamp,
-        stop_id,
-        stop_sequence,
-        arrival_time,
-        arrival_delay_seconds,
-        departure_time,
-        departure_delay_seconds,
-        ROW_NUMBER() OVER (
-            PARTITION BY trip_id, stop_sequence 
-            ORDER BY trip_update_timestamp DESC, ingested_at DESC
-        ) AS rn
-    FROM `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
-    WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
-)
-
-SELECT
+WITH ranked_alerts AS (
+  SELECT
     ingested_date,
-    ingested_at,
-    feed_timestamp,
-    entity_id,
-    trip_id,
-    route_id,
-    direction_id,
-    start_date,
-    vehicle_id,
-    vehicle_label,
-    trip_update_timestamp,
-    stop_id,
-    stop_sequence,
-    arrival_time,
-    arrival_delay_seconds,
-    departure_time,
-    departure_delay_seconds
-FROM raw_trip_updates
-WHERE rn = 1
+    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
+    source_gcs_uri,
+    CAST(entity_id AS STRING) AS alert_id,
+    CAST(header_text AS STRING) AS header_text,
+    CAST(url AS STRING) AS alert_url,
+    CAST(active_start AS TIMESTAMP) AS active_start,
+    
+    ROW_NUMBER() OVER (
+      PARTITION BY entity_id
+      ORDER BY ingested_at DESC
+    ) AS rn
+  FROM
+    `streaming.gtfs_realtime_service_alerts`
+)
+SELECT
+  ingested_date,
+  ingested_at,
+  feed_timestamp,
+  source_gcs_uri,
+  alert_id,
+  header_text,
+  alert_url,
+  active_start
+FROM
+  ranked_alerts
+WHERE
+  rn = 1;
