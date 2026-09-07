@@ -15,8 +15,6 @@ requirements:
 @bruin"""
 
 import os
-import re
-import html
 import requests
 import pandas as pd
 from datetime import datetime
@@ -63,29 +61,14 @@ def first_translation(translated_string):
     return translated_string.translation[0].text or None
 
 
-def clean_html(value):
-    if not value:
-        return None
-    text = re.sub(r"<\s*br\s*/?>", "\n", value, flags=re.IGNORECASE)
-    text = re.sub(r"</\s*p\s*>", "\n", text, flags=re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", " ", text)
-    text = html.unescape(text)
-    text = re.sub(r"[ \t\r\f\v]+", " ", text)
-    text = re.sub(r"\n\s*\n+", "\n", text)
-    return text.strip()
-
-
 def download_and_parse(feed_name, url, bucket):
     response = requests.get(url, headers=HEADERS, timeout=60)
     response.raise_for_status()
 
-    # Lấy thời gian hiện tại theo múi giờ Adelaide
     now_adelaide = datetime.now(ADELAIDE_TZ)
-    
     ingested_at = now_adelaide
-    ingested_date = now_adelaide.date()  # Dùng làm Partition Key trong BigQuery
+    ingested_date = now_adelaide.date()
 
-    # Tên file GCS lưu vết theo giờ Adelaide
     gcs_path = f"{GCS_PREFIX}/{feed_name}/{now_adelaide:%Y%m%dT%H%M%S%z}.pb"
     bucket.blob(gcs_path).upload_from_string(
         response.content,
@@ -100,7 +83,7 @@ def download_and_parse(feed_name, url, bucket):
 
 def base_row(feed, ingested_at, ingested_date, source_gcs_uri):
     return {
-        "ingested_date": ingested_date,  # Partition column (YYYY-MM-DD theo giờ Adelaide)
+        "ingested_date": ingested_date,
         "ingested_at": ingested_at,
         "feed_timestamp": epoch_to_adelaide_datetime(feed.header.timestamp),
         "source_gcs_uri": source_gcs_uri,
@@ -120,27 +103,17 @@ def parse_trip_updates(feed, ingested_at, ingested_date, source_gcs_uri):
                     {
                         **base_row(feed, ingested_at, ingested_date, source_gcs_uri),
                         "entity_id": entity.id,
-                        "trip_id": trip.trip_id,
-                        "route_id": trip.route_id,
-                        "direction_id": trip.direction_id,
-                        "start_date": gtfs_date_to_string(trip.start_date),
+                        "trip_id": trip.trip_id if trip.trip_id else None,
+                        "route_id": trip.route_id if trip.route_id else None,
+                        "direction_id": trip.direction_id if trip.HasField("direction_id") else None,
+                        "start_date": gtfs_date_to_string(trip.start_date) if trip.start_date else None,
+                        "schedule_relationship": trip.schedule_relationship if trip.HasField("schedule_relationship") else None,
                         "vehicle_id": vehicle.id if vehicle.id else None,
                         "vehicle_label": vehicle.label if vehicle.label else None,
-                        "trip_update_timestamp": epoch_to_adelaide_datetime(trip_update.timestamp),
-                        "stop_id": stop_update.stop_id,
-                        "stop_sequence": stop_update.stop_sequence,
-                        "arrival_time": epoch_to_adelaide_datetime(stop_update.arrival.time)
-                        if stop_update.HasField("arrival")
-                        else None,
-                        "arrival_delay_seconds": stop_update.arrival.delay
-                        if stop_update.HasField("arrival")
-                        else None,
-                        "departure_time": epoch_to_adelaide_datetime(stop_update.departure.time)
-                        if stop_update.HasField("departure")
-                        else None,
-                        "departure_delay_seconds": stop_update.departure.delay
-                        if stop_update.HasField("departure")
-                        else None,
+                        "trip_update_timestamp": epoch_to_adelaide_datetime(trip_update.timestamp) if trip_update.timestamp else None,
+                        "stop_sequence": stop_update.stop_sequence if stop_update.HasField("stop_sequence") else None,
+                        "stop_id": stop_update.stop_id if stop_update.stop_id else None,
+                        "arrival_time": epoch_to_adelaide_datetime(stop_update.arrival.time) if stop_update.HasField("arrival") and stop_update.arrival.time else None,
                     }
                 )
     return pd.DataFrame(rows)
@@ -153,29 +126,26 @@ def parse_service_alerts(feed, ingested_at, ingested_date, source_gcs_uri):
     for entity in feed.entity:
         if entity.HasField("alert"):
             alert = entity.alert
+            
+            # active_period chỉ lấy start từ file thực tế
             active_starts = [period.start for period in alert.active_period if period.start]
-            active_ends = [period.end for period in alert.active_period if period.end]
 
             alert_rows.append(
                 {
                     **base_row(feed, ingested_at, ingested_date, source_gcs_uri),
                     "entity_id": entity.id,
-                    "cause": alert.cause,
-                    "effect": alert.effect,
                     "header_text": first_translation(alert.header_text),
-                    "description_text": clean_html(first_translation(alert.description_text)),
+                    "url": first_translation(alert.url),
                     "active_start": epoch_to_adelaide_datetime(min(active_starts)) if active_starts else None,
-                    "active_end": epoch_to_adelaide_datetime(max(active_ends)) if active_ends else None,
                 }
             )
 
             for item in alert.informed_entity:
-                trip_id = item.trip.trip_id if item.HasField("trip") else None
                 informed_entity_rows.append(
                     {
                         **base_row(feed, ingested_at, ingested_date, source_gcs_uri),
                         "alert_entity_id": entity.id,
-                        "route_id": item.route_id or None,
+                        "route_id": item.route_id if item.route_id else None,
                     }
                 )
 
@@ -195,19 +165,19 @@ def parse_vehicle_positions(feed, ingested_at, ingested_date, source_gcs_uri):
                 {
                     **base_row(feed, ingested_at, ingested_date, source_gcs_uri),
                     "entity_id": entity.id,
-                    "trip_id": trip.trip_id,
-                    "route_id": trip.route_id,
-                    "direction_id": trip.direction_id,
-                    "start_date": gtfs_date_to_string(trip.start_date),
-                    "vehicle_id": vehicle.id,
-                    "vehicle_label": vehicle.label,
-                    "latitude": position.latitude,
-                    "longitude": position.longitude,
-                    "bearing": position.bearing,
-                    "speed": position.speed,
-                    "current_stop_sequence": vehicle_position.current_stop_sequence,
-                    "stop_id": vehicle_position.stop_id,
-                    "vehicle_timestamp": epoch_to_adelaide_datetime(vehicle_position.timestamp),
+                    "trip_id": trip.trip_id if trip.trip_id else None,
+                    "route_id": trip.route_id if trip.route_id else None,
+                    "direction_id": trip.direction_id if trip.HasField("direction_id") else None,
+                    "start_date": gtfs_date_to_string(trip.start_date) if trip.start_date else None,
+                    "vehicle_id": vehicle.id if vehicle.id else None,
+                    "vehicle_label": vehicle.label if vehicle.label else None,
+                    "latitude": position.latitude if position.HasField("latitude") else None,
+                    "longitude": position.longitude if position.HasField("longitude") else None,
+                    "bearing": position.bearing if position.HasField("bearing") else None,
+                    "speed": position.speed if position.HasField("speed") else None,
+                    "current_stop_sequence": vehicle_position.current_stop_sequence if vehicle_position.HasField("current_stop_sequence") else None,
+                    "stop_id": vehicle_position.stop_id if vehicle_position.stop_id else None,
+                    "vehicle_timestamp": epoch_to_adelaide_datetime(vehicle_position.timestamp) if vehicle_position.timestamp else None,
                 }
             )
     return pd.DataFrame(rows)

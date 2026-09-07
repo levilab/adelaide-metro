@@ -8,26 +8,30 @@ depends:
   - streaming.ingest_gtfs_realtime
 @bruin */
 
-WITH raw_entities AS (
-    SELECT
-        ingested_date,
-        ingested_at,
-        feed_timestamp,
-        alert_entity_id AS alert_id,
-        route_id,
-        ROW_NUMBER() OVER (
-            PARTITION BY alert_entity_id, COALESCE(route_id, '') 
-            ORDER BY feed_timestamp DESC, ingested_at DESC
-        ) AS rn
-    FROM `adelaide-metro-505702.streaming.gtfs_realtime_service_alert_informed_entities`
-    WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
-)
-
-SELECT
+WITH ranked_entities AS (
+  SELECT
     ingested_date,
-    ingested_at,
-    feed_timestamp,
-    alert_id,
-    route_id,
-FROM raw_entities
-WHERE rn = 1
+    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
+    source_gcs_uri,
+    CAST(alert_entity_id AS STRING) AS alert_id,
+    CAST(route_id AS STRING) AS route_id,
+    
+    ROW_NUMBER() OVER (
+      PARTITION BY alert_entity_id, route_id
+      ORDER BY ingested_at DESC
+    ) AS rn
+  FROM
+    `streaming.gtfs_realtime_service_alert_informed_entities`
+)
+SELECT
+  ingested_date,
+  ingested_at,
+  feed_timestamp,
+  source_gcs_uri,
+  alert_id,
+  route_id
+FROM
+  ranked_entities
+WHERE
+  rn = 1;

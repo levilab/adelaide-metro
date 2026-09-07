@@ -8,36 +8,34 @@ depends:
   - streaming.ingest_gtfs_realtime
 @bruin */
 
-WITH raw_alerts AS (
-    SELECT
-        ingested_date,
-        ingested_at,
-        feed_timestamp,
-        entity_id AS alert_id,
-        cause,
-        effect,
-        header_text,
-        description_text,
-        active_start,
-        active_end,
-        ROW_NUMBER() OVER (
-            PARTITION BY entity_id 
-            ORDER BY feed_timestamp DESC, ingested_at DESC
-        ) AS rn
-    FROM `adelaide-metro-505702.streaming.gtfs_realtime_service_alerts`
-    WHERE ingested_date >= DATE_SUB(CURRENT_DATE('Australia/Adelaide'), INTERVAL 1 DAY)
-)
-
-SELECT
+WITH ranked_alerts AS (
+  SELECT
     ingested_date,
-    ingested_at,
-    feed_timestamp,
-    alert_id,
-    cause,
-    effect,
-    header_text,
-    description_text,
-    active_start,
-    active_end
-FROM raw_alerts
-WHERE rn = 1
+    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
+    source_gcs_uri,
+    CAST(entity_id AS STRING) AS alert_id,
+    CAST(header_text AS STRING) AS header_text,
+    CAST(url AS STRING) AS alert_url,
+    CAST(active_start AS TIMESTAMP) AS active_start,
+    
+    ROW_NUMBER() OVER (
+      PARTITION BY entity_id
+      ORDER BY ingested_at DESC
+    ) AS rn
+  FROM
+    `streaming.gtfs_realtime_service_alerts`
+)
+SELECT
+  ingested_date,
+  ingested_at,
+  feed_timestamp,
+  source_gcs_uri,
+  alert_id,
+  header_text,
+  alert_url,
+  active_start
+FROM
+  ranked_alerts
+WHERE
+  rn = 1;
