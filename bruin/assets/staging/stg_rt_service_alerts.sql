@@ -16,9 +16,10 @@ WITH ranked_alerts AS (
     source_gcs_uri,
     CAST(entity_id AS STRING) AS alert_id,
     CAST(header_text AS STRING) AS header_text,
+    CAST(description_text AS STRING) AS description_text,
     CAST(url AS STRING) AS alert_url,
     CAST(active_start AS TIMESTAMP) AS active_start,
-    
+    CAST(route_id AS STRING) AS route_id,
     ROW_NUMBER() OVER (
       PARTITION BY entity_id
       ORDER BY ingested_at DESC
@@ -28,13 +29,11 @@ WITH ranked_alerts AS (
 )
 SELECT
   ingested_date,
-  ingested_at,
-  feed_timestamp,
-  source_gcs_uri,
   alert_id,
   header_text,
-  alert_url,
-  active_start
+  description_text,
+  active_start,
+  route_id
 FROM
   ranked_alerts
 WHERE

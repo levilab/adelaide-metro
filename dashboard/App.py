@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 import plotly.express as px
+import plotly.graph_objects as go
 import requests
 from google.cloud import bigquery
 from datetime import datetime
@@ -16,10 +17,10 @@ _BROWSER_UA = {"User-Agent": "Mozilla/5.0 (compatible; hk-transit-pulse/1.0)"}
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT"]
 
 st.set_page_config(
-    page_title="Adelaide Transit Pulse",
+    page_title="Adelaide Metro - Network Traffic Analytics",
     page_icon="🚌",
-    layout="wide"
-)
+    layout="wide",
+    )
 
 @st.cache_data(ttl=3600)
 def load_csv_url(url):
@@ -105,9 +106,26 @@ def load_cbd_corridor_data(project_id):
         time_bucket,
         unique_trips,
         corridor_avg_speed_kmh
-    FROM `{project_id}.marts.mart_cbc_corridor_speed`
+    FROM `{project_id}.marts.mart_cbd_corridor_speed`
     ORDER BY corridor_name, time_bucket
     """).to_dataframe()
+
+@st.cache_data(ttl=300)
+def load_delay_data(project_id):
+    # Khởi tạo BigQuery Client
+    return get_bq_client().query(f"""
+        SELECT 
+            route_short_name,
+            stop_sequence,
+            stop_name,
+            total_trips_analyzed,
+            avg_delay_mins,
+            delay_added_mins,
+            propagation_factor
+        FROM `{project_id}.marts.mart_rt_delay_propagation`
+        ORDER BY route_short_name, stop_sequence
+    """
+    ).to_dataframe()
 
 @st.cache_data(ttl=3600)
 def format_gtfs_time(t):
@@ -229,7 +247,7 @@ col4.metric("Peak Hour", f"{peak_hour:02d}:00")
 st.divider()
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab_network, tab_cbd = st.tabs(["Network Analytics", "CBD Corridor Speed"])
+tab_network, tab_cbd, tab_delay = st.tabs(["Network Analytics", "CBD Corridor Speed", "Delay Propagation Monitoring"])
 
 with tab_network:
     with st.spinner("Loading network data..."):
@@ -469,3 +487,160 @@ with tab_cbd:
                 * **Unique Trips:** Represents distinct bus runs passing through the corridor segment, deduplicating intermediate stops.
                 * **Off-Peak Baseline:** Reflects the baseline infrastructure speed limit without commuter traffic interference.
                 """)
+
+with tab_delay:
+    st.title("🚌 Adelaide Metro: Corridor Delay & Propagation Analytics")
+    st.markdown(
+        "Phân tích sự phát sinh và lan truyền độ trễ realtime dọc theo các hành lang tuyến xe bus."
+    )
+    try:
+        df = load_delay_data(PROJECT_ID)
+    except Exception as e:
+        st.warning(f"Không thể kết nối BigQuery ({e}). Đang hiển thị dữ liệu mẫu.")
+
+    # ------------------------------------------------------------------------------
+    # 3. SIDEBAR FILTERS
+    # ------------------------------------------------------------------------------
+    routes = sorted(df["route_short_name"].unique())
+    # Tạo một vùng Filter nhỏ gọn ngay trong Tab
+    with st.container():
+        f_col1, f_col2 = st.columns([1, 3])
+        with f_col1:
+            selected_route = st.selectbox("🔍 Chọn tuyến xe (Route):", routes)
+
+    # Lọc dữ liệu theo tuyến được chọn
+    route_df = df[df["route_short_name"] == selected_route].sort_values(
+        "stop_sequence"
+    )
+
+    st.divider()
+
+    # ------------------------------------------------------------------------------
+    # 4. KPI METRICS
+    # ------------------------------------------------------------------------------
+    total_trips = route_df["total_trips_analyzed"].max()
+    max_delay_row = route_df.loc[route_df["avg_delay_mins"].idxmax()]
+    worst_bottleneck_row = route_df.loc[route_df["delay_added_mins"].idxmax()]
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Tuyến đang xem", f"Route {selected_route}")
+    col2.metric("Số chuyến phân tích", f"{total_trips:,} chuyến")
+    col3.metric(
+        "Nút thắt kẹt nặng nhất",
+        f"{worst_bottleneck_row['stop_name']}",
+        f"+{worst_bottleneck_row['delay_added_mins']} phút",
+        delta_color="inverse",
+    )
+    col4.metric(
+        "Trạm trễ tích lũy cao nhất",
+        f"{max_delay_row['stop_name']}",
+        f"{max_delay_row['avg_delay_mins']} phút",
+        delta_color="inverse",
+    )
+
+    st.divider()
+
+    # ------------------------------------------------------------------------------
+    # 5. CHARTS SECTION
+    # ------------------------------------------------------------------------------
+
+    # Chart 1: Combo Chart - Delay Added (Bar) vs Total Avg Delay (Line)
+    st.subheader("1. Sự phát sinh & Tích lũy độ trễ qua từng trạm (Delay Progression)")
+
+    # Tạo nhãn hiển thị dạng "Seq 16 - Stop Name"
+    route_df["stop_label"] = (
+        route_df["stop_sequence"].astype(str) + ". " + route_df["stop_name"]
+    )
+
+    fig_combo = go.Figure()
+
+    # Thanh Bar: Delay phát sinh thêm tại trạm
+    fig_combo.add_trace(
+        go.Bar(
+            x=route_df["stop_label"],
+            y=route_df["delay_added_mins"],
+            name="Độ trễ phát sinh thêm (Delay Added)",
+            marker_color=[
+                "#EF5350" if x > 0 else "#66BB6A" for x in route_df["delay_added_mins"]
+            ],
+            hovertemplate="Trạm: %{x}<br>Phát sinh thêm: %{y:.2f} phút<extra></extra>",
+        )
+    )
+
+    # Đường Line: Tổng độ trễ tích lũy trung bình
+    fig_combo.add_trace(
+        go.Scatter(
+            x=route_df["stop_label"],
+            y=route_df["avg_delay_mins"],
+            name="Tổng độ trễ tích lũy (Avg Delay)",
+            mode="lines+markers",
+            line=dict(color="#29B6F6", width=3),
+            marker=dict(size=8),
+            hovertemplate="Trạm: %{x}<br>Tổng độ trễ tích lũy: %{y:.2f} phút<extra></extra>",
+        )
+    )
+
+    fig_combo.update_layout(
+        xaxis_title="Thứ tự bến dừng (Stop Sequence)",
+        yaxis_title="Thời gian (Phút)",
+        hovermode="x unified",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=450,
+    )
+
+    st.plotly_chart(fig_combo, use_container_width=True)
+
+
+    # Chart 2: Propagation Factor Line Chart
+    st.subheader("2. Hệ số lan truyền trễ dây chuyền (Delay Propagation Factor)")
+    st.caption(
+        "Chỉ số > 1.0 phản ánh độ trễ từ bến xuất phát đang bị nhân rộng (khổ hơn) khi qua các trạm sau."
+    )
+
+    fig_prop = px.line(
+        route_df,
+        x="stop_label",
+        y="propagation_factor",
+        markers=True,
+        labels={
+            "stop_label": "Thứ tự bến dừng",
+            "propagation_factor": "Propagation Factor",
+        },
+    )
+
+    # Thêm đường tham chiếu Baseline = 1.0
+    fig_prop.add_hline(
+        y=1.0,
+        line_dash="dash",
+        line_color="gray",
+        annotation_text="Baseline (1.0)",
+        annotation_position="bottom right",
+    )
+
+    fig_prop.update_traces(
+        line_color="#AB47BC",
+        marker=dict(size=8),
+        hovertemplate="Trạm: %{x}<br>Propagation Factor: %{y:.2f}<extra></extra>",
+    )
+    fig_prop.update_layout(height=350)
+
+    st.plotly_chart(fig_prop, use_container_width=True)
+
+    # ------------------------------------------------------------------------------
+    # 6. DATA TABLE DETAIL
+    # ------------------------------------------------------------------------------
+    with st.expander("📄 Xem chi tiết bảng dữ liệu (Data Table)"):
+        st.dataframe(
+            route_df[
+                [
+                    "stop_sequence",
+                    "stop_name",
+                    "total_trips_analyzed",
+                    "avg_delay_mins",
+                    "delay_added_mins",
+                    "propagation_factor",
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )

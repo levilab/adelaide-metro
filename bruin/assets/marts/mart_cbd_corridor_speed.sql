@@ -1,5 +1,5 @@
 /* @bruin
-name: marts.mart_cbc_corridor_speed
+name: marts.mart_cbd_corridor_speed
 type: bq.sql
 materialization:
   type: table

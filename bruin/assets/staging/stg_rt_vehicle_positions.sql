@@ -32,8 +32,6 @@ WITH ranked_vehicles AS (
     CAST(longitude AS FLOAT64) AS longitude,
     CAST(bearing AS FLOAT64) AS bearing,
     CAST(speed AS FLOAT64) AS speed,
-    CAST(current_stop_sequence AS INT64) AS current_stop_sequence,
-    CAST(stop_id AS STRING) AS stop_id,
     CAST(vehicle_timestamp AS TIMESTAMP) AS vehicle_timestamp,
     
     -- Window function lấy vị trí mới nhất của từng xe
@@ -60,8 +58,6 @@ SELECT
   longitude,
   bearing,
   speed,
-  current_stop_sequence,
-  stop_id,
   vehicle_timestamp
 FROM
   ranked_vehicles
