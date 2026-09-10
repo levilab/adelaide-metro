@@ -9,3 +9,6 @@ unused/
 service_alerts.txt
 trip_updates.txt
 vehicle_positions.txt
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
