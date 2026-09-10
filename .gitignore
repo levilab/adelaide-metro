@@ -14,3 +14,4 @@ vehicle_positions.txt
 *.tfvars
 .terraform.lock.hcl
 **/.terraform/
+adelaide-metro-505702-0645266fa951.json
