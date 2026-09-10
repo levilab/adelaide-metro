@@ -11,4 +11,6 @@ trip_updates.txt
 vehicle_positions.txt
 *.tfstate
 *.tfstate.*
+*.tfvars
 .terraform.lock.hcl
+**/.terraform/
