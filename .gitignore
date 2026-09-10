@@ -6,3 +6,6 @@ __pycache__/
 *.py[cod]
 .venv/
 unused/
+service_alerts.txt
+trip_updates.txt
+vehicle_positions.txt
