@@ -69,62 +69,12 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 ```mermaid
 flowchart TD
-    GH["🔧 GitHub Actions\npush to main"]
-    GH -->|deploy.yml| CR_DASH["☁️ Cloud Run Service\nhk-transit-pulse\nStreamlit Dashboard"]
-    GH -->|batch.yml| CR_BATCH["☁️ Cloud Run Job\nbatch-job\nBruin Pipeline"]
-
-    CS1["⏰ Cloud Scheduler\nevery 1 min"]
-    CS2["⏰ Cloud Scheduler\nevery 1 min"]
-    CS1 --> CR_PROD["☁️ Cloud Run Job\nproducer-job"]
-    CS2 --> CR_CONS["☁️ Cloud Run Job\nconsumer-job"]
-
-    A["🌐 HK Transport GTFS Static\ndata.gov.hk"]
-    B["🚇 MTR Open Data CSVs\nopendata.mtr.com.hk"]
-    MTR_API["🚇 MTR Schedule API\nrt.data.gov.hk"]
-
-    CR_BATCH --> A
-    CR_BATCH --> B
-    A --> C["⚙️ Bruin Ingestion\ningest_gtfs_static.py"]
-    B --> D["⚙️ Bruin Ingestion\ningest_mtr_csv.py"]
-
-    C --> E["🪣 Google Cloud Storage\ngtfs_static/hk-transport/"]
-    D --> F["🪣 Google Cloud Storage\nmtr_static/"]
-
-    E -->|BQ Load Job| G["🗄️ BigQuery — raw\ngtfs_routes · gtfs_stops · gtfs_trips\ngtfs_stop_times · gtfs_calendar"]
-    F -->|BQ Load Job| H["🗄️ BigQuery — raw\nmtr_lines_stations · mtr_bus_stops\nmtr_fares · mtr_light_rail_stops"]
-
-    G --> I["🔧 Bruin Staging Assets\nstg_stops · stg_routes · stg_trips\nstg_stop_times · stg_calendar"]
-    H --> I
-
-    I --> J["📊 Bruin Mart Assets\nmart_stops_ranked · mart_trips_per_route\nmart_peak_hour_analysis · mart_route_service_hours\nmart_service_frequency · mart_transfer_hubs\nmart_weekday_vs_weekend · mart_longest_routes\nmart_early_night_routes · mart_trip_trajectories"]
-
-    CR_PROD --> MTR_API
-    MTR_API -->|events| RP["📨 Redpanda Cloud\nhk-mtr-schedule topic"]
-    RP --> CR_CONS
-    CR_CONS -->|streaming insert| BQ_STREAM["🗄️ BigQuery — streaming\nmtr_schedule_raw"]
-
-    J --> CR_DASH
-    BQ_STREAM --> CR_DASH
-
-    style GH fill:#2088FF,color:#fff,stroke:#2088FF
-    style CR_DASH fill:#4285F4,color:#fff,stroke:#4285F4
-    style CR_BATCH fill:#4285F4,color:#fff,stroke:#4285F4
-    style CR_PROD fill:#4285F4,color:#fff,stroke:#4285F4
-    style CR_CONS fill:#4285F4,color:#fff,stroke:#4285F4
-    style CS1 fill:#34A853,color:#fff,stroke:#34A853
-    style CS2 fill:#34A853,color:#fff,stroke:#34A853
-    style RP fill:#E52B50,color:#fff,stroke:#E52B50
-    style A fill:#e8f4f8,stroke:#4285F4
-    style B fill:#e8f4f8,stroke:#C8102E
-    style C fill:#fff3e0,stroke:#F97316
-    style D fill:#fff3e0,stroke:#F97316
-    style E fill:#e3f2fd,stroke:#4285F4
-    style F fill:#e3f2fd,stroke:#4285F4
-    style G fill:#e8eaf6,stroke:#4285F4
-    style H fill:#e8eaf6,stroke:#4285F4
-    style I fill:#fff3e0,stroke:#F97316
-    style J fill:#fff3e0,stroke:#F97316
-    style BQ_STREAM fill:#e8eaf6,stroke:#4285F4
+    A["GTFS Static Feed\nAdelaide Metro"] --> C["Bruin Ingestion"]
+    B["GTFS-Realtime\ntrip_updates"] --> C
+    C --> D["BigQuery — raw"]
+    D --> E["Bruin SQL — staging"]
+    E --> F["Bruin SQL — marts\ncircuity · corridor speed · delay propagation"]
+    F --> G["Streamlit Dashboard\nSchedule + Real-time views\n+ 3D pydeck map"]
 ```
 
 ---
