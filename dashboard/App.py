@@ -12,7 +12,7 @@ import re
 from dotenv import load_dotenv
 load_dotenv()
 
-_BROWSER_UA = {"User-Agent": "Mozilla/5.0 (compatible; hk-transit-pulse/1.0)"}
+_BROWSER_UA = {"User-Agent": "Mozilla/5.0 (compatible; adelaide-transit-pulse/1.0)"}
 
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT"]
 
@@ -29,25 +29,25 @@ def load_csv_url(url):
     resp.raise_for_status()
     return pd.read_csv(io.StringIO(resp.content.decode("utf-8-sig")))
 
-# ── HK Theme ──────────────────────────────────────────────────────────────────
+# ── Adelaide Theme ──────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* HK red accent */
-    h1, h2, h3 { color: #C8102E; }
-    .stMetric label { color: #C8102E; font-weight: bold; }
+    /* Australian Green & Gold Theme */
+    h1, h2, h3 { color: #00843D; } /* Australian National Green */
+    .stMetric label { color: #00843D; font-weight: bold; }
     .stTabs [data-baseweb="tab-list"] { gap: 8px; }
     .stTabs [data-baseweb="tab"] {
-        background-color: #f5f5f5;
+        background-color: #f4f8f5;
         border-radius: 4px 4px 0 0;
         padding: 8px 20px;
         font-weight: bold;
         color: #333;
     }
     .stTabs [aria-selected="true"] {
-        background-color: #C8102E !important;
+        background-color: #00843D !important;
         color: white !important;
     }
-    .stInfo { border-left: 4px solid #C8102E; }
+    .stInfo { border-left: 4px solid #FFCD00; background-color: #fffef0; } /* Wattle Gold */
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,7 +62,7 @@ _flag_b64 = get_flag_b64()
 st.markdown(f"""
 <div style='display:flex; align-items:center; gap:12px; margin-bottom:0;'>
     <img src='data:image/png;base64,{_flag_b64}' height='44'/>
-    <span style='font-size:2.2rem; font-weight:700; line-height:1.2;'> Adelaide Transit Pulse</span>
+    <span style='font-size:2.2rem; font-weight:700; line-height:1.2;'> Adelaide Network Analytics</span>
 </div>
 """, unsafe_allow_html=True)
 st.markdown("Adelaide public transport network — routes, stops, and peak hours.")
@@ -230,7 +230,7 @@ def load_network_data():
         """)
 
 st.info(
-    f"**Network Snapshot:** HK public transport has **{total_stops:,} stops** across **{total_routes} routes**. "
+    f"**Network Snapshot:** Adelaide public transport has **{total_stops:,} stops** across **{total_routes} routes**. "
     f"Route **{busiest_route}** is the busiest with **{busiest_route_trips:,} trips**. "
     f"The network peaks at **{peak_hour:02d}:00** — morning rush hour. "
     f"The highest-traffic stop is **{top_stop}**."
@@ -271,10 +271,6 @@ with tab_network:
         horizontal=True, label_visibility="collapsed",
     )
     rt_filter = TYPE_OPTIONS[selected_label]
-
-    st.info(
-        ""
-    )
 
     # Filtered dataframes (used throughout this tab)
     f_stops = stops_df if rt_filter is None else stops_df[stops_df["route_type"] == rt_filter]
@@ -489,14 +485,12 @@ with tab_cbd:
                 """)
 
 with tab_delay:
-    st.title("🚌 Adelaide Metro: Corridor Delay & Propagation Analytics")
-    st.markdown(
-        "Phân tích sự phát sinh và lan truyền độ trễ realtime dọc theo các hành lang tuyến xe bus."
-    )
+    st.subheader("Corridor Delay & Propagation Analytics")
+    st.caption("Analyze the delay propagation in real time.")
     try:
         df = load_delay_data(PROJECT_ID)
     except Exception as e:
-        st.warning(f"Không thể kết nối BigQuery ({e}). Đang hiển thị dữ liệu mẫu.")
+        st.warning(f"Failed to connect to BigQuery: ({e}).")
 
     # ------------------------------------------------------------------------------
     # 3. SIDEBAR FILTERS
@@ -506,7 +500,7 @@ with tab_delay:
     with st.container():
         f_col1, f_col2 = st.columns([1, 3])
         with f_col1:
-            selected_route = st.selectbox("🔍 Chọn tuyến xe (Route):", routes)
+            selected_route = st.selectbox("🔍 Select Route:", routes)
 
     # Lọc dữ liệu theo tuyến được chọn
     route_df = df[df["route_short_name"] == selected_route].sort_values(
@@ -523,18 +517,18 @@ with tab_delay:
     worst_bottleneck_row = route_df.loc[route_df["delay_added_mins"].idxmax()]
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Tuyến đang xem", f"Route {selected_route}")
-    col2.metric("Số chuyến phân tích", f"{total_trips:,} chuyến")
+    col1.metric("Current Route", f"Route {selected_route}")
+    col2.metric("Total trips analyzed", f"{total_trips:,} trips")
     col3.metric(
-        "Nút thắt kẹt nặng nhất",
+        "Worst Bottleneck",
         f"{worst_bottleneck_row['stop_name']}",
-        f"+{worst_bottleneck_row['delay_added_mins']} phút",
+        f"+{worst_bottleneck_row['delay_added_mins']} mins",
         delta_color="inverse",
     )
     col4.metric(
-        "Trạm trễ tích lũy cao nhất",
+        "Highest Cumulative Delay Stop",
         f"{max_delay_row['stop_name']}",
-        f"{max_delay_row['avg_delay_mins']} phút",
+        f"{max_delay_row['avg_delay_mins']} mins",
         delta_color="inverse",
     )
 
@@ -545,7 +539,7 @@ with tab_delay:
     # ------------------------------------------------------------------------------
 
     # Chart 1: Combo Chart - Delay Added (Bar) vs Total Avg Delay (Line)
-    st.subheader("1. Sự phát sinh & Tích lũy độ trễ qua từng trạm (Delay Progression)")
+    st.subheader("1. Stop-by-Stop Delay Progression & Accumulation")
 
     # Tạo nhãn hiển thị dạng "Seq 16 - Stop Name"
     route_df["stop_label"] = (
@@ -559,11 +553,11 @@ with tab_delay:
         go.Bar(
             x=route_df["stop_label"],
             y=route_df["delay_added_mins"],
-            name="Độ trễ phát sinh thêm (Delay Added)",
+            name="Delay Added",
             marker_color=[
                 "#EF5350" if x > 0 else "#66BB6A" for x in route_df["delay_added_mins"]
             ],
-            hovertemplate="Trạm: %{x}<br>Phát sinh thêm: %{y:.2f} phút<extra></extra>",
+            hovertemplate="Stop: %{x}<br>Delay Added: %{y:.2f} mins<extra></extra>",
         )
     )
 
@@ -572,17 +566,17 @@ with tab_delay:
         go.Scatter(
             x=route_df["stop_label"],
             y=route_df["avg_delay_mins"],
-            name="Tổng độ trễ tích lũy (Avg Delay)",
+            name="Cumulative Delay (Avg)",
             mode="lines+markers",
             line=dict(color="#29B6F6", width=3),
             marker=dict(size=8),
-            hovertemplate="Trạm: %{x}<br>Tổng độ trễ tích lũy: %{y:.2f} phút<extra></extra>",
+            hovertemplate="Trạm: %{x}<br>Total Accumulated Delay: %{y:.2f} mins<extra></extra>",
         )
     )
 
     fig_combo.update_layout(
-        xaxis_title="Thứ tự bến dừng (Stop Sequence)",
-        yaxis_title="Thời gian (Phút)",
+        xaxis_title="Stop Sequence",
+        yaxis_title="Time (mins)",
         hovermode="x unified",
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         height=450,
@@ -592,9 +586,9 @@ with tab_delay:
 
 
     # Chart 2: Propagation Factor Line Chart
-    st.subheader("2. Hệ số lan truyền trễ dây chuyền (Delay Propagation Factor)")
+    st.subheader("2. Stop-to-Stop Delay Propagation Factor")
     st.caption(
-        "Chỉ số > 1.0 phản ánh độ trễ từ bến xuất phát đang bị nhân rộng (khổ hơn) khi qua các trạm sau."
+        "A factor > 1.0 indicates that delays from previous stops are being amplified as the vehicle moves downstream."
     )
 
     fig_prop = px.line(
@@ -603,7 +597,7 @@ with tab_delay:
         y="propagation_factor",
         markers=True,
         labels={
-            "stop_label": "Thứ tự bến dừng",
+            "stop_label": "Stop Sequence",
             "propagation_factor": "Propagation Factor",
         },
     )
@@ -620,7 +614,7 @@ with tab_delay:
     fig_prop.update_traces(
         line_color="#AB47BC",
         marker=dict(size=8),
-        hovertemplate="Trạm: %{x}<br>Propagation Factor: %{y:.2f}<extra></extra>",
+        hovertemplate="Stop: %{x}<br>Propagation Factor: %{y:.2f}<extra></extra>",
     )
     fig_prop.update_layout(height=350)
 
@@ -629,7 +623,7 @@ with tab_delay:
     # ------------------------------------------------------------------------------
     # 6. DATA TABLE DETAIL
     # ------------------------------------------------------------------------------
-    with st.expander("📄 Xem chi tiết bảng dữ liệu (Data Table)"):
+    with st.expander("📄 View Detailed Data Table"):
         st.dataframe(
             route_df[
                 [
