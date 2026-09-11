@@ -43,10 +43,9 @@ GTFS_SCHEMAS = {
         bigquery.SchemaField("trip_headsign", "STRING"),
         bigquery.SchemaField("trip_short_name", "STRING"),
         bigquery.SchemaField("direction_id", "STRING"),
-        bigquery.SchemaField("block_id", "STRING"), # Quan trọng: ép kiểu STRING cho block_id alphanumeric
+        bigquery.SchemaField("block_id", "STRING"),
         bigquery.SchemaField("shape_id", "STRING"),
         bigquery.SchemaField("wheelchair_accessible", "STRING"),
-        bigquery.SchemaField("bikes_allowed", "STRING"),
     ]
 }
 
