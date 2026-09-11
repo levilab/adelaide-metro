@@ -5,7 +5,7 @@ materialization:
   type: table
   partition_by: ingested_date
 depends:
-  - streaming.ingest_gtfs_realtime
+  - streaming.gtfs_realtime_service_alerts
 @bruin */
 
 WITH ranked_vehicles AS (
