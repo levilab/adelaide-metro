@@ -69,12 +69,34 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 ```mermaid
 flowchart TD
-    A["GTFS Static Feed\nAdelaide Metro"] --> C["Bruin Ingestion"]
-    B["GTFS-Realtime\ntrip_updates"] --> C
-    C --> D["BigQuery — raw"]
-    D --> E["Bruin SQL — staging"]
-    E --> F["Bruin SQL — marts\ncircuity · corridor speed · delay propagation"]
-    F --> G["Streamlit Dashboard\nSchedule + Real-time views\n+ 3D pydeck map"]
+    GH["🔧 GitHub Actions\npush to main"]
+    GH -->|deploy.yml| CR_DASH["☁️ Cloud Run Service\nadelaide-transit-pulse\nStreamlit Dashboard"]
+    GH -->|batch.yml| CR_BATCH["☁️ Cloud Run Job\nbatch-job\nBruin Pipeline"]
+
+    A["🌐 Adelaide Metro GTFS Static\ndata.gov.au"]
+
+    CR_BATCH --> A
+    A --> C["⚙️ Bruin Ingestion\ningest_gtfs_static.py"]
+
+    C --> E["🪣 Google Cloud Storage\ngtfs_static/adelaide-metro/"]
+
+    E -->|BQ Load Job| G["🗄️ BigQuery — raw\ngtfs_routes · gtfs_stops · gtfs_trips\ngtfs_stop_times · gtfs_shapes · gtfs_calendar"]
+
+    G --> I["🔧 Bruin Staging Assets\nstg_stops · stg_routes · stg_trips\nstg_stop_times · stg_shapes · stg_calendar"]
+
+    I --> J["📊 Bruin Mart Assets\nmart_route_circuity · mart_cbd_corridor_speed\nmart_delay_propagation"]
+
+    J --> CR_DASH
+
+    style GH fill:#2088FF,color:#fff,stroke:#2088FF
+    style CR_DASH fill:#4285F4,color:#fff,stroke:#4285F4
+    style CR_BATCH fill:#4285F4,color:#fff,stroke:#4285F4
+    style A fill:#e8f4f8,stroke:#4285F4
+    style C fill:#fff3e0,stroke:#F97316
+    style E fill:#e3f2fd,stroke:#4285F4
+    style G fill:#e8eaf6,stroke:#4285F4
+    style I fill:#fff3e0,stroke:#F97316
+    style J fill:#fff3e0,stroke:#F97316
 ```
 
 ---
