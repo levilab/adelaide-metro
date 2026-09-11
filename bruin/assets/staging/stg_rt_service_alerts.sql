@@ -4,8 +4,6 @@ type: bq.sql
 materialization:
   type: table
   partition_by: ingested_date
-depends:
-  - streaming.gtfs_realtime_service_alerts
 @bruin */
 
 WITH ranked_alerts AS (
