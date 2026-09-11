@@ -67,6 +67,9 @@ def materialize():
                 skip_leading_rows=1,
                 autodetect=True,
                 write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+                schema=[
+                    bigquery.SchemaField("block_id", "STRING"),
+                ]
             )
 
             load_job = bq_client.load_table_from_uri(gcs_uri, table_ref, job_config=job_config)
