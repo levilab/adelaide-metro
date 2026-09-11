@@ -49,7 +49,6 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 | Layer          | Tool                  | Purpose                                      |
 |----------------|-----------------------|-----------------------------------------------|
-
 | Orchestration  | Bruin                 | Pipeline orchestration + SQL transformations  |
 | Infrastructure | Terraform               | Provision GCS, BigQuery, service accounts |
 | Data Warehouse | BigQuery               | raw → staging → marts layers                  |
