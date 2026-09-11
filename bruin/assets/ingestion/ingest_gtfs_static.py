@@ -35,6 +35,21 @@ GTFS_FILES = {
     "shapes.txt": "gtfs_shapes",
 }
 
+GTFS_SCHEMAS = {
+    "trips.txt": [
+        bigquery.SchemaField("route_id", "STRING"),
+        bigquery.SchemaField("service_id", "STRING"),
+        bigquery.SchemaField("trip_id", "STRING"),
+        bigquery.SchemaField("trip_headsign", "STRING"),
+        bigquery.SchemaField("trip_short_name", "STRING"),
+        bigquery.SchemaField("direction_id", "STRING"),
+        bigquery.SchemaField("block_id", "STRING"), # Quan trọng: ép kiểu STRING cho block_id alphanumeric
+        bigquery.SchemaField("shape_id", "STRING"),
+        bigquery.SchemaField("wheelchair_accessible", "STRING"),
+        bigquery.SchemaField("bikes_allowed", "STRING"),
+    ]
+}
+
 
 def materialize():
     print(f"Downloading GTFS from {GTFS_URL}")
@@ -62,15 +77,18 @@ def materialize():
             gcs_uri = f"gs://{GCS_BUCKET}/{gcs_path}"
             table_ref = f"{GCP_PROJECT}.{BQ_DATASET}.{bq_table}"
 
-            job_config = bigquery.LoadJobConfig(
-                source_format=bigquery.SourceFormat.CSV,
-                skip_leading_rows=1,
-                autodetect=True,
-                write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
-                schema=[
-                    bigquery.SchemaField("block_id", "STRING"),
-                ]
-            )
+            job_config_kwargs = {
+                "source_format": bigquery.SourceFormat.CSV,
+                "skip_leading_rows": 1,
+                "write_disposition": bigquery.WriteDisposition.WRITE_TRUNCATE,
+            }
+
+            if filename in GTFS_SCHEMAS:
+                job_config_kwargs["schema"] = GTFS_SCHEMAS[filename]
+            else:
+                job_config_kwargs["autodetect"] = True
+
+            job_config = bigquery.LoadJobConfig(**job_config_kwargs)
 
             load_job = bq_client.load_table_from_uri(gcs_uri, table_ref, job_config=job_config)
             load_job.result()
