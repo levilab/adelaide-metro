@@ -23,22 +23,21 @@ ADELAIDE_TZ = ZoneInfo("Australia/Adelaide")
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 HEADERS = {"accept": "application/x-google-protobuf"}
 
-# Cấu hình độc lập cho từng Feed dựa trên Tần suất & Payload Size thực tế
 FEEDS_CONFIG = {
     "vehicle_positions": {
         "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions",
         "topic": "gtfs.vehicle_positions",
-        "interval": 15,  # 15 giây
+        "interval": 15,  # 15 secs
     },
     "trip_updates": {
         "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/trip_updates",
         "topic": "gtfs.trip_updates",
-        "interval": 60,  # 60 giây
+        "interval": 60,  # 60 secs
     },
     "service_alerts": {
         "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/service_alerts",
         "topic": "gtfs.service_alerts",
-        "interval": 300,  # 5 phút (300 giây)
+        "interval": 300,  # 300 secs
     },
 }
 
@@ -48,11 +47,10 @@ def make_producer(bootstrap_servers: str) -> Producer:
         "bootstrap.servers": bootstrap_servers,
         "client.id": "gtfs-realtime-producer",
         "acks": "all",
-        "compression.type": "snappy",  # Nén snappy rất hiệu quả cho file trip_updates 1.6MB
+        "compression.type": "snappy",
         "linger.ms": 20,
-        # Tăng queue memory để tránh nghẽn RAM khi parse batch 1.6MB của trip_updates
         "queue.buffering.max.messages": 100000,
-        "queue.buffering.max.kbytes": 102400,  # 100MB RAM buffer
+        "queue.buffering.max.kbytes": 102400,
         "retries": 5,
         "retry.backoff.ms": 500,
     }
@@ -126,7 +124,6 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
                 if count % 500 == 0:
                     producer.poll(0)
 
-            # Flush chỉ áp dụng cho bộ đệm của topic hiện tại
             producer.flush(timeout=5)
             logger.info(f"[{feed_name}] Published {count} entities to '{topic}'")
 
@@ -143,12 +140,9 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
 def main():
     producer = make_producer(KAFKA_BOOTSTRAP_SERVERS)
 
-    # Chạy song song 3 worker thread riêng biệt cho 3 feed
     with ThreadPoolExecutor(max_workers=len(FEEDS_CONFIG)) as executor:
         for feed_name, config in FEEDS_CONFIG.items():
             executor.submit(process_feed, producer, feed_name, config)
-
-    # Giữ main process chạy
     try:
         while True:
             time.sleep(1)

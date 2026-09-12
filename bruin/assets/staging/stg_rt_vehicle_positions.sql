@@ -32,7 +32,7 @@ WITH ranked_vehicles AS (
     CAST(speed AS FLOAT64) AS speed,
     CAST(vehicle_timestamp AS TIMESTAMP) AS vehicle_timestamp,
     
-    -- Window function lấy vị trí mới nhất của từng xe
+    -- only get the latest positions for every vehicle
     ROW_NUMBER() OVER (
       PARTITION BY vehicle_id
       ORDER BY ingested_at DESC, vehicle_timestamp DESC

@@ -27,11 +27,11 @@ CONSUMER_GROUP_PREFIX = os.environ.get("CONSUMER_GROUP_PREFIX", "gtfs-bq-loader"
 GCP_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "adelaide-metro-505702")
 BQ_DATASET = os.environ.get("BQ_DATASET", "streaming")
 
-# Cấu hình Tuning riêng biệt cho Consumer theo đặc tính từng Topic
+# define specific config for each topic
 TOPICS_CONFIG = {
     "gtfs.vehicle_positions": {
         "table_name": "gtfs_realtime_vehicle_positions",
-        "poll_timeout": 2.0,      # Poll nhanh để bắt kịp stream
+        "poll_timeout": 2.0,     
     },
     "gtfs.trip_updates": {
         "table_name": "gtfs_realtime_trip_updates",
@@ -53,7 +53,7 @@ def make_consumer(bootstrap_servers: str, topic_name: str) -> Consumer:
         "bootstrap.servers": bootstrap_servers,
         "group.id": group_id,
         "auto.offset.reset": "earliest",
-        "enable.auto.commit": False,  # Manual commit sau khi nạp BigQuery thành công
+        "enable.auto.commit": False,  # Manual commit after loading bigquery
     }
     logger.info(f"Initializing Consumer for topic '{topic_name}' with Group ID '{group_id}'")
     return Consumer(conf)
@@ -102,7 +102,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
 
     rows = []
 
-    # 1. PARSE TRIP UPDATES
+    # PARSE TRIP UPDATES
     if topic == "gtfs.trip_updates" and entity.HasField("trip_update"):
         tu = entity.trip_update
         trip = tu.trip
@@ -125,7 +125,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
                 "arrival_time": epoch_to_adelaide_datetime(stop_update.arrival.time) if stop_update.HasField("arrival") and stop_update.arrival.time else None,
             })
 
-    # 2. PARSE VEHICLE POSITIONS
+    # PARSE VEHICLE POSITIONS
     elif topic == "gtfs.vehicle_positions" and entity.HasField("vehicle"):
         vp = entity.vehicle
         trip = vp.trip
@@ -149,7 +149,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
             "vehicle_timestamp": epoch_to_adelaide_datetime(vp.timestamp) if vp.timestamp else None,
         })
 
-    # 3. PARSE SERVICE ALERTS (Xử lý phẳng explode cho từng informed_entity)
+    # PARSE SERVICE ALERTS
     elif topic == "gtfs.service_alerts" and entity.HasField("alert"):
         alert = entity.alert
         active_starts = [period.start for period in alert.active_period if period.start]
@@ -222,16 +222,16 @@ def process_topic_consumer(topic: str, config: dict):
 
     try:
         while True:
-            # Poll dữ liệu từ Kafka
+            # Poll data from Kafka
             msg = consumer.poll(timeout=config["poll_timeout"])
 
-            # 1. Nếu hết dữ liệu trên Topic (Kafka trả về None) -> Flush sạch toàn bộ buffer vào BQ
+            # if kafka returns None (no more data) -> Flush all buffer to BQ
             if msg is None:
                 if buffer_rows:
                     logger.info(f"[{topic}] End of current batch. Flushing ALL {len(buffer_rows)} rows to BigQuery...")
                     load_batch_to_bigquery(bq_client, config["table_name"], buffer_rows)
                     buffer_rows = []  # Reset buffer
-                    consumer.commit(asynchronous=False)  # Commit offset sau khi nạp xong
+                    consumer.commit(asynchronous=False)  # Commit offset after loading to BQ
                 continue
 
             if msg.error():
@@ -241,7 +241,7 @@ def process_topic_consumer(topic: str, config: dict):
                     logger.error(f"[{topic}] Kafka Error: {msg.error()}")
                     raise KafkaException(msg.error())
 
-            # 2. Parse tin nhắn và gom vào buffer
+            # Parse messages and append to buffer
             headers = parse_kafka_headers(msg.headers())
             entity = gtfs_realtime_pb2.FeedEntity()
             entity.ParseFromString(msg.value())
@@ -252,7 +252,7 @@ def process_topic_consumer(topic: str, config: dict):
     except Exception as e:
         logger.error(f"[{topic}] Worker failed unexpectedly: {e}", exc_info=True)
     finally:
-        # Flush lượng dữ liệu còn sót lại khi dừng ứng dụng
+        # Flush remaining buffer after stopping application.
         if buffer_rows:
             load_batch_to_bigquery(bq_client, config["table_name"], buffer_rows)
             consumer.commit(asynchronous=False)
@@ -262,7 +262,7 @@ def process_topic_consumer(topic: str, config: dict):
 def main():
     logger.info("Starting Multi-threaded GTFS Consumer Framework...")
 
-    # Chạy song song 3 Consumer Workers độc lập cho 3 Topics
+    # running 3 workers in parallel
     with ThreadPoolExecutor(max_workers=len(TOPICS_CONFIG)) as executor:
         for topic, config in TOPICS_CONFIG.items():
             executor.submit(process_topic_consumer, topic, config)
