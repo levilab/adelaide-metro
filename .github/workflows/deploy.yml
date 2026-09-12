@@ -93,3 +93,12 @@ jobs:
             --command python \
             --args "streaming/consumer.py" \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }},CONSUMER_GROUP_PREFIX=gtfs-bq-loader"
+
+      # 4. Execute Cloud Run Jobs (Producer & Consumer)
+      - name: Execute GTFS Producer and Consumer Jobs
+        run: |
+          echo "Executing Producer Job..."
+          gcloud run jobs execute ${{ env.SERVICE_PRODUCER }} --region ${{ env.REGION }} --async
+
+          echo "Executing Consumer Job..."
+          gcloud run jobs execute ${{ env.SERVICE_CONSUMER }} --region ${{ env.REGION }} --async
