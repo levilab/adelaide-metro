@@ -75,33 +75,21 @@ jobs:
       # 2. GTFS Producer Background Service
       - name: Deploy GTFS Producer Service
         run: |
-          gcloud run deploy ${{ env.SERVICE_PRODUCER }} \
+          gcloud run jobs deploy ${{ env.SERVICE_PRODUCER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --command python \
             --args "streaming/producer.py" \
-            --no-allow-unauthenticated \
-            --min-instances=1 \
-            --max-instances=1 \
-            --no-cpu-throttling \
-            --port=8080 \
-            --startup-probe-type=tcp \
             --set-env-vars "KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }}"
 
       # 3. GTFS Consumer Background Service
       - name: Deploy GTFS Consumer Service
         run: |
-          gcloud run deploy ${{ env.SERVICE_CONSUMER }} \
+          gcloud run jobs deploy ${{ env.SERVICE_CONSUMER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --command python \
             --args "streaming/consumer.py" \
-            --no-allow-unauthenticated \
-            --min-instances=1 \
-            --max-instances=1 \
-            --no-cpu-throttling \
-            --port=8080 \
-            --startup-probe-type=tcp \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }},CONSUMER_GROUP_PREFIX=gtfs-bq-loader"
