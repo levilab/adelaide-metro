@@ -50,7 +50,7 @@ jobs:
           gcloud run jobs deploy batch-job \
             --image ${{ env.BATCH_IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
-            --service-account bruin-pipeline@adelaide-metro-505702.iam.gserviceaccount.com \
+            --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},GCS_BUCKET=${{ env.BUCKET }} \
             --cpu 2 \
             --memory 4Gi \
