@@ -64,6 +64,7 @@ def make_producer(bootstrap_servers: str) -> Producer:
             "sasl.mechanism": os.environ.get("KAFKA_SASL_MECHANISM", "SCRAM-SHA-256"),
             "sasl.username": sasl_username,
             "sasl.password": sasl_password,
+            "ssl.ca.location": "/app/ca.pem",
         })
         
     logger.info(f"Initializing Kafka Producer connected to {bootstrap_servers}")

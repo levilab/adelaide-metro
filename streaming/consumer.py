@@ -65,6 +65,7 @@ def make_consumer(bootstrap_servers: str, topic_name: str) -> Consumer:
             "sasl.mechanism": os.environ.get("KAFKA_SASL_MECHANISM", "SCRAM-SHA-256"),
             "sasl.username": sasl_username,
             "sasl.password": sasl_password,
+            "ssl.ca.location": "/app/ca.pem",
         })
     logger.info(f"Initializing Consumer for topic '{topic_name}' with Group ID '{group_id}'")
     return Consumer(conf)
