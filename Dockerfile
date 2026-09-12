@@ -10,4 +10,4 @@ COPY . .
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["streamlit", "run", "dashboard/app.py", "--server.port=$PORT", "--server.address=0.0.0.0", "--server.headless=true"]
+CMD ["streamlit", "run", "dashboard/App.py", "--server.port=$PORT", "--server.address=0.0.0.0", "--server.headless=true"]
