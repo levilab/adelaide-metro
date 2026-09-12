@@ -371,7 +371,7 @@ with tab_cbd:
             with f_col2:
                 st.write("")
                 st.write("")
-                st.button("Reset Filter", on_click=reset_cbd_filters, use_container_width=True)
+                st.button("Reset Filter", on_click=reset_cbd_filters, width='stretch')
 
         filtered_cbd_df = cbd_df[cbd_df["corridor_name"].isin(selected_corridors)].copy()
 
@@ -462,7 +462,7 @@ with tab_cbd:
                     hovertemplate="%{customdata}<extra></extra>",
                     customdata=hover_text
                 )
-                st.plotly_chart(fig_heatmap, use_container_width=True)
+                st.plotly_chart(fig_heatmap, width='stretch')
 
             with right_col:
                 st.subheader("2. Traffic Volume (Unique Trips)")
@@ -475,7 +475,7 @@ with tab_cbd:
                     labels={"corridor_name": "Corridor", "unique_trips": "Unique Trips", "time_bucket": "Time Window"},
                     color_discrete_sequence=px.colors.qualitative.Set2
                 )
-                st.plotly_chart(fig_bar, use_container_width=True)
+                st.plotly_chart(fig_bar, width='stretch')
                 
             with st.expander("📚 Methodology & Business Definitions"):
                 st.markdown("""
@@ -496,13 +496,13 @@ with tab_delay:
     # 3. SIDEBAR FILTERS
     # ------------------------------------------------------------------------------
     routes = sorted(df["route_short_name"].unique())
-    # Tạo một vùng Filter nhỏ gọn ngay trong Tab
+    # Filter creation
     with st.container():
         f_col1, f_col2 = st.columns([1, 3])
         with f_col1:
             selected_route = st.selectbox("🔍 Select Route:", routes)
 
-    # Lọc dữ liệu theo tuyến được chọn
+    # Filtering by selected route
     route_df = df[df["route_short_name"] == selected_route].sort_values(
         "stop_sequence"
     )
@@ -541,14 +541,14 @@ with tab_delay:
     # Chart 1: Combo Chart - Delay Added (Bar) vs Total Avg Delay (Line)
     st.subheader("1. Stop-by-Stop Delay Progression & Accumulation")
 
-    # Tạo nhãn hiển thị dạng "Seq 16 - Stop Name"
+    # Creating labels
     route_df["stop_label"] = (
         route_df["stop_sequence"].astype(str) + ". " + route_df["stop_name"]
     )
 
     fig_combo = go.Figure()
 
-    # Thanh Bar: Delay phát sinh thêm tại trạm
+    # Bar 
     fig_combo.add_trace(
         go.Bar(
             x=route_df["stop_label"],
@@ -582,7 +582,7 @@ with tab_delay:
         height=450,
     )
 
-    st.plotly_chart(fig_combo, use_container_width=True)
+    st.plotly_chart(fig_combo, width='stretch')
 
 
     # Chart 2: Propagation Factor Line Chart
@@ -618,7 +618,7 @@ with tab_delay:
     )
     fig_prop.update_layout(height=350)
 
-    st.plotly_chart(fig_prop, use_container_width=True)
+    st.plotly_chart(fig_prop, width='stretch')
 
     # ------------------------------------------------------------------------------
     # 6. DATA TABLE DETAIL
@@ -635,6 +635,6 @@ with tab_delay:
                     "propagation_factor",
                 ]
             ],
-            use_container_width=True,
+            width='stretch',
             hide_index=True,
         )

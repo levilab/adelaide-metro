@@ -30,7 +30,7 @@ WITH ranked_updates AS (
     CAST(stop_id AS STRING) AS stop_id,
     CAST(arrival_time AS TIMESTAMP) AS arrival_time,
     
-    -- Window function lấy record mới nhất cho từng stop của từng trip
+    -- only get the latest update for each trip
     ROW_NUMBER() OVER (
       PARTITION BY trip_id, stop_sequence, stop_id
       ORDER BY trip_update_timestamp DESC

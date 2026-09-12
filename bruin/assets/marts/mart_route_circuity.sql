@@ -12,7 +12,7 @@ depends:
 @bruin */
 
 WITH shape_representative_trips AS (
-  -- 1. Lấy trip đại diện cho mỗi shape_id
+  -- take a representative trip for each shape & route.
   SELECT
     shape_id,
     route_id,
@@ -24,7 +24,7 @@ WITH shape_representative_trips AS (
 ),
 
 origin_stations AS (
-  -- 2. Xác định tọa độ trạm đầu tiên (Origin) của từng trip đại diện
+  -- identify location (lat/lon) for the first stop
   SELECT
     st.trip_id,
     ARRAY_AGG(
@@ -43,7 +43,7 @@ origin_stations AS (
 ),
 
 shape_max_span AS (
-  -- 3. Tính khoảng cách từ trạm đầu tới trạm xa nhất (Max Reach) cho từng shape_id
+  -- for each shape id, calculate the distance between the first stop and the farthest stop.
   SELECT
     srt.shape_id,
     srt.route_id,
@@ -60,7 +60,7 @@ shape_max_span AS (
 ),
 
 classified_shapes AS (
-  -- 4. Phân loại dịch vụ và tính toán các khoảng cách cho từng shape_id
+  -- categorize service type
   SELECT
     r.route_short_name,
     r.route_long_name,
@@ -90,17 +90,17 @@ classified_shapes AS (
     ON ms.route_id = r.route_id
 )
 
--- 5. TRUY VẤN CUỐI CÙNG: Gom nhóm theo Route để loại bỏ lặp dữ liệu do trùng thông số shape
+-- Group by route to calculate the circuity factor
 SELECT
   route_short_name,
   route_long_name,
   service_type,
 
-  -- Lấy giá trị khoảng cách đại diện (AVG/MAX)
+  -- calculate average actual distance/max reach for all trips having this route & service type
   ROUND(AVG(actual_distance_m) / 1000.0, 2) AS actual_km,
   ROUND(AVG(max_span_m) / 1000.0, 2) AS max_reach_km,
 
-  -- Chỉ số uốn lượn trung bình của tuyến
+  -- calculate circuity factor
   ROUND(
     AVG(
       actual_distance_m / NULLIF(
@@ -114,7 +114,7 @@ SELECT
     2
   ) AS circuity_factor,
 
-  -- Số km dư thừa trung bình
+  -- average access km
   ROUND(
     AVG(
       GREATEST(
@@ -130,7 +130,7 @@ SELECT
     2
   ) AS excess_km,
 
-  -- Thống kê số lượng shape_id tạo nên tuyến này
+  -- Total shape id attributes to this insight
   COUNT(DISTINCT shape_id) AS distinct_shapes_count
 
 FROM classified_shapes

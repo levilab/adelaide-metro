@@ -10,7 +10,7 @@ depends:
   - raw.ingest_gtfs_static
 @bruin */
 
--- cast a string
+-- CAST a string
 
 SELECT
     CAST(trip_id AS STRING)         AS trip_id, 
