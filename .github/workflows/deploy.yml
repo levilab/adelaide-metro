@@ -11,9 +11,9 @@ concurrency:
 
 env:
   PROJECT_ID: adelaide-metro-505702
-  REGION: asia-east1
+  REGION: asia-east2
   SERVICE: adelaide-metro
-  IMAGE: asia-east1-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
+  IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
 
 jobs:
   deploy:
