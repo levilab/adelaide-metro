@@ -1,5 +1,11 @@
 .git
+.gitignore
 .env
+.venv
+venv
+env
+.env
+.pytest_cache
 .bruin.yml
 terraform/
 logs/
