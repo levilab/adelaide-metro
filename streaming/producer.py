@@ -54,6 +54,18 @@ def make_producer(bootstrap_servers: str) -> Producer:
         "retries": 5,
         "retry.backoff.ms": 500,
     }
+    security_protocol = os.environ.get("KAFKA_SECURITY_PROTOCOL", "SASL_SSL")
+    sasl_username = os.environ.get("KAFKA_SASL_USERNAME")
+    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD")
+
+    if sasl_username and sasl_password:
+        conf.update({
+            "security.protocol": security_protocol,
+            "sasl.mechanism": os.environ.get("KAFKA_SASL_MECHANISM", "SCRAM-SHA-256"),
+            "sasl.username": sasl_username,
+            "sasl.password": sasl_password,
+        })
+        
     logger.info(f"Initializing Kafka Producer connected to {bootstrap_servers}")
     return Producer(conf)
 

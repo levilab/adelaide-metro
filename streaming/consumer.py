@@ -55,6 +55,17 @@ def make_consumer(bootstrap_servers: str, topic_name: str) -> Consumer:
         "auto.offset.reset": "earliest",
         "enable.auto.commit": False,  # Manual commit after loading bigquery
     }
+    security_protocol = os.environ.get("KAFKA_SECURITY_PROTOCOL", "SASL_SSL")
+    sasl_username = os.environ.get("KAFKA_SASL_USERNAME")
+    sasl_password = os.environ.get("KAFKA_SASL_PASSWORD")
+
+    if sasl_username and sasl_password:
+        conf.update({
+            "security.protocol": security_protocol,
+            "sasl.mechanism": os.environ.get("KAFKA_SASL_MECHANISM", "SCRAM-SHA-256"),
+            "sasl.username": sasl_username,
+            "sasl.password": sasl_password,
+        })
     logger.info(f"Initializing Consumer for topic '{topic_name}' with Group ID '{group_id}'")
     return Consumer(conf)
 
