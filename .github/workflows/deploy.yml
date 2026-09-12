@@ -13,6 +13,8 @@ env:
   PROJECT_ID: adelaide-metro-505702
   REGION: asia-east2
   SERVICE: adelaide-metro
+  SERVICE_PRODUCER: gtfs-kafka-producer
+  SERVICE_CONSUMER: gtfs-kafka-consumer
   IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro
 
 jobs:
@@ -36,13 +38,22 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
-      - name: Build and Push Docker image
-        run: |
-          docker build -t ${{ env.IMAGE }}:${{ github.sha }} .
-          docker tag ${{ env.IMAGE }}:${{ github.sha }} ${{ env.IMAGE }}:latest
-          docker push ${{ env.IMAGE }}:${{ github.sha }}
-          docker push ${{ env.IMAGE }}:latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
+      # Build & Push có áp dụng Caching gha (tốc độ build cực nhanh ở các lần push sau)
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # 1. Streamlit Dashboard App
       - name: Deploy Streamlit App to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE }} \
@@ -60,6 +71,7 @@ jobs:
             --region ${{ env.REGION }} \
             --format="value(status.url)"
 
+      # 2. GTFS Producer Background Service
       - name: Deploy GTFS Producer Service
         run: |
           gcloud run deploy ${{ env.SERVICE_PRODUCER }} \
@@ -67,21 +79,22 @@ jobs:
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --command python \
-            --args "producer.py" \
+            --args "streaming/producer.py" \
             --no-allow-unauthenticated \
             --min-instances=1 \
             --max-instances=1 \
             --no-cpu-throttling \
             --set-env-vars "KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }}"
 
-      - name: Deploy consumer Cloud Run Job
+      # 3. GTFS Consumer Background Service
+      - name: Deploy GTFS Consumer Service
         run: |
           gcloud run deploy ${{ env.SERVICE_CONSUMER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --command python \
-            --args "consumer.py" \
+            --args "streaming/consumer.py" \
             --no-allow-unauthenticated \
             --min-instances=1 \
             --max-instances=1 \
