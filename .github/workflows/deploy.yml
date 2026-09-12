@@ -85,7 +85,8 @@ jobs:
             --min-instances=1 \
             --max-instances=1 \
             --no-cpu-throttling \
-            --health-check-type=startup-cpu \
+            --port=8080 \
+            --startup-probe-type=tcp \
             --set-env-vars "KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }}"
 
       # 3. GTFS Consumer Background Service
@@ -101,8 +102,6 @@ jobs:
             --min-instances=1 \
             --max-instances=1 \
             --no-cpu-throttling \
-            --port=8080 \
-            --startup-probe-type=tcp \
             --port=8080 \
             --startup-probe-type=tcp \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }},CONSUMER_GROUP_PREFIX=gtfs-bq-loader"
