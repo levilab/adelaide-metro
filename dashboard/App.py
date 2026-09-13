@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from streamlit_autorefresh import st_autorefresh
 import pandas as pd
 import pydeck as pdk
 import plotly.express as px
@@ -640,8 +641,8 @@ with tab_cbd:
 with tab_delay:
     st.subheader("Corridor Delay & Propagation Analytics")
     st.caption("Track how delays start at one stop and build up across the route.")
-    if st.button("🔄 refresh tab"):
-        st.rerun()
+    count = st_autorefresh(interval=60000, limit=100, key="delay_tab_autorefresh")
+    
     try:
         df = load_delay_data(PROJECT_ID)
     except Exception as e:
@@ -652,10 +653,19 @@ with tab_delay:
     # ------------------------------------------------------------------------------
     routes = sorted(df["route_short_name"].unique())
     # Filter creation
-    with st.container():
-        f_col1, f_col2 = st.columns([1, 3])
-        with f_col1:
-            selected_route = st.selectbox("🔍 Select Route:", routes)
+    f_col1, f_col2 = st.columns([1, 3])
+    with f_col1:
+        # 1. Thêm key để Streamlit giữ lại lựa chọn khi rerun/refresh
+        selected_route = st.selectbox(
+            "🔍 Select Route:", 
+            routes, 
+            key="delay_selected_route"
+        )
+        
+        # 2. Đặt nút Refresh ở đây và xóa cache dữ liệu nếu cần
+        if st.button("🔄 Refresh Data"):
+            st.cache_data.clear()  # Xóa cache BigQuery để fetch dữ liệu mới
+            st.rerun()
 
     # Filtering by selected route
     route_df = df[df["route_short_name"] == selected_route].sort_values(
