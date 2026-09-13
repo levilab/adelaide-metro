@@ -10,6 +10,7 @@ from datetime import datetime
 import pytz
 import re
 from dotenv import load_dotenv
+import time
 load_dotenv()
 
 _BROWSER_UA = {"User-Agent": "Mozilla/5.0 (compatible; adelaide-transit-pulse/1.0)"}
@@ -96,6 +97,21 @@ def load_peak_by_type(project_id, route_type=None):
       AND CAST(SUBSTR(st.departure_time, 1, 2) AS INT64) BETWEEN 0 AND 23
       {rt_sql}
     GROUP BY hour_of_day, route_type_name ORDER BY hour_of_day
+    """).to_dataframe()
+
+@st.cache_data(ttl=3600)
+def load_circuity_data(project_id):
+    return get_bq_client().query(f"""
+    SELECT 
+            route_short_name,
+            route_long_name,
+            service_type,
+            actual_km,
+            max_reach_km,
+            circuity_factor,
+            excess_km,
+            distinct_shapes_count
+        FROM `{project_id}.marts.mart_route_circuity`
     """).to_dataframe()
 
 @st.cache_data(ttl=3600)
@@ -247,7 +263,7 @@ col4.metric("Peak Hour", f"{peak_hour:02d}:00")
 st.divider()
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab_network, tab_cbd, tab_delay = st.tabs(["Network Analytics", "CBD Corridor Speed", "Delay Propagation Monitoring"])
+tab_network, tab_circuity, tab_cbd, tab_delay = st.tabs(["Network Analytics", "Circuity Analysis", "CBD Corridor Speed", "Delay Propagation Monitoring"])
 
 with tab_network:
     with st.spinner("Loading network data..."):
@@ -335,6 +351,142 @@ with tab_network:
 
     st.divider()
 
+with tab_circuity:
+    df = load_circuity_data(PROJECT_ID)
+    st.subheader("🚌 Adelaide Metro: Route Circuity & Network Efficiency Monitor")
+    st.caption("Operational dashboard tracking transit route circuity factors and spatial efficiency across network shapes.")
+
+    with st.expander("🔍 Filter Options", expanded=True):
+        # Service Type Filter
+        service_types = df["service_type"].dropna().unique().tolist()
+        selected_services = st.multiselect(
+            "Service Type:",
+            options=service_types,
+            default=["Regular Commuter"] if "Regular Commuter" in service_types else service_types
+        )
+
+        # Circuity Factor Threshold Slider
+        min_circuity = st.slider(
+            "Minimum Circuity Factor:",
+            min_value=1.0,
+            max_value=float(df["circuity_factor"].max()) if not df.empty else 5.0,
+            value=1.0,
+            step=0.1
+        )
+
+    # Apply filters (giữ nguyên logic lọc dữ liệu phía dưới)
+    filtered_df = df[
+        (df["service_type"].isin(selected_services)) & 
+        (df["circuity_factor"] >= min_circuity)
+    ]
+
+    st.divider()
+
+    # 4. TIER 1: HIGH-LEVEL KPI METRICS
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+
+    with kpi1:
+        median_circuity = filtered_df["circuity_factor"].median()
+        st.metric(
+            label="Median Circuity Factor", 
+            value=f"{median_circuity:.2f}" if pd.notnull(median_circuity) else "N/A",
+            help="Network median baseline. Benchmark standard: 1.20 - 1.50"
+        )
+
+    with kpi2:
+        high_circuity_count = (filtered_df["circuity_factor"] >= 1.8).sum()
+        st.metric(
+            label="High Circuity Routes (>= 1.8)", 
+            value=f"{high_circuity_count} routes",
+            delta="Review Needed" if high_circuity_count > 0 else "Optimal",
+            delta_color="inverse"
+        )
+
+    with kpi3:
+        total_excess = filtered_df["excess_km"].sum()
+        st.metric(
+            label="Total Excess Distance / Trip", 
+            value=f"{total_excess:,.1f} km" if pd.notnull(total_excess) else "0 km",
+            help="Cumulative delta between actual travel distance and maximum spatial reach (* 2)"
+        )
+
+    with kpi4:
+        total_routes = len(filtered_df)
+        st.metric(
+            label="Active Routes Displayed", 
+            value=f"{total_routes}"
+        )
+
+    st.divider()
+
+    # 5. TIER 2: ANALYTICAL VISUALIZATIONS
+    col_chart1, col_chart2 = st.columns([1, 1])
+
+    with col_chart1:
+        st.subheader("📊 Network Composition by Service Type")
+        fig_pie = px.pie(
+            df, 
+            names="service_type", 
+            title="Distribution of Network Route Patterns",
+            color_discrete_sequence=px.colors.qualitative.Set2,
+            hole=0.4
+        )
+        st.plotly_chart(fig_pie, width='stretch')
+        st.caption("*Note: School Services & Local Loops intentionally exhibit higher circuity factors due to door-to-door feeder characteristics.*")
+
+    with col_chart2:
+        st.subheader("📈 Circuity Factor Distribution")
+        fig_hist = px.histogram(
+            filtered_df, 
+            x="circuity_factor", 
+            nbins=20,
+            title="Circuity Factor Frequency",
+            labels={"circuity_factor": "Circuity Factor"},
+            color_discrete_sequence=["#2b5c8f"]
+        )
+        fig_hist.add_vline(x=1.5, line_dash="dash", line_color="orange", annotation_text="Standard Target (1.5)")
+        fig_hist.add_vline(x=1.8, line_dash="dash", line_color="red", annotation_text="Threshold Warning (1.8)")
+        st.plotly_chart(fig_hist, width='stretch')
+
+    st.divider()
+
+    # 6. TIER 3: ACTIONABLE MONITORING TABLE
+    st.subheader("⚠️ Priority Network Review Table")
+    st.markdown("Detailed list of routes prioritized by highest circuity factor based on active filters:")
+
+    # Prepare table display
+    display_df = filtered_df.sort_values(by="circuity_factor", ascending=False).copy()
+
+    # Rename columns to English standardized schema
+    display_df = display_df.rename(columns={
+        "route_short_name": "Route ID",
+        "route_long_name": "Route Description",
+        "service_type": "Service Type",
+        "actual_km": "Actual Distance (km)",
+        "max_reach_km": "Max Reach (km)",
+        "circuity_factor": "Circuity Factor",
+        "excess_km": "Excess Distance (km)",
+        "distinct_shapes_count": "Shapes Count"
+    })
+
+    # Display formatted dataframe
+    st.dataframe(
+        display_df[[
+            "Route ID", "Route Description", "Service Type", 
+            "Actual Distance (km)", "Max Reach (km)", "Circuity Factor", 
+            "Excess Distance (km)", "Shapes Count"
+        ]],
+        column_config={
+            "Circuity Factor": st.column_config.NumberColumn(format="%.2f"),
+            "Actual Distance (km)": st.column_config.NumberColumn(format="%.2f"),
+            "Max Reach (km)": st.column_config.NumberColumn(format="%.2f"),
+            "Excess Distance (km)": st.column_config.NumberColumn(format="%.2f"),
+            "Shapes Count": st.column_config.NumberColumn(format="%d"),
+        },
+        width='stretch',
+        hide_index=True
+    )
+    st.divider()
 
 with tab_cbd:
     st.subheader("Adelaide CBD Transit Speed & Volume Analysis")
@@ -483,10 +635,13 @@ with tab_cbd:
                 * **Unique Trips:** Represents distinct bus runs passing through the corridor segment, deduplicating intermediate stops.
                 * **Off-Peak Baseline:** Reflects the baseline infrastructure speed limit without commuter traffic interference.
                 """)
+    st.divider()
 
 with tab_delay:
     st.subheader("Corridor Delay & Propagation Analytics")
-    st.caption("Analyze the delay propagation in real time.")
+    st.caption("Track how delays start at one stop and build up across the route.")
+    if st.button("🔄 refresh tab"):
+        st.rerun()
     try:
         df = load_delay_data(PROJECT_ID)
     except Exception as e:
@@ -518,15 +673,15 @@ with tab_delay:
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Current Route", f"Route {selected_route}")
-    col2.metric("Total trips analyzed", f"{total_trips:,} trips")
+    col2.metric("Total trips analyzed for this route", f"{total_trips:,} trips")
     col3.metric(
-        "Worst Bottleneck",
+        "Stop With Worst Bottleneck",
         f"{worst_bottleneck_row['stop_name']}",
         f"+{worst_bottleneck_row['delay_added_mins']} mins",
         delta_color="inverse",
     )
     col4.metric(
-        "Highest Cumulative Delay Stop",
+        "Stop With Highest Average Time ",
         f"{max_delay_row['stop_name']}",
         f"{max_delay_row['avg_delay_mins']} mins",
         delta_color="inverse",
@@ -540,6 +695,11 @@ with tab_delay:
 
     # Chart 1: Combo Chart - Delay Added (Bar) vs Total Avg Delay (Line)
     st.subheader("1. Stop-by-Stop Delay Progression & Accumulation")
+    st.caption("""
+        💡 **Understanding the Metrics:**
+        - **Bar (Delay Added):** Instant delay generated (+) or recovered (-) specifically at this stop.
+        - **Line (Average Delay):** Cumulative total delay accumulated up to this stop.
+        """)
 
     # Creating labels
     route_df["stop_label"] = (
@@ -548,7 +708,7 @@ with tab_delay:
 
     fig_combo = go.Figure()
 
-    # Bar 
+    # Bar chart: Delay added 
     fig_combo.add_trace(
         go.Bar(
             x=route_df["stop_label"],
@@ -561,16 +721,16 @@ with tab_delay:
         )
     )
 
-    # Đường Line: Tổng độ trễ tích lũy trung bình
+    # Line chart: Cumulative Avg Delay
     fig_combo.add_trace(
         go.Scatter(
             x=route_df["stop_label"],
             y=route_df["avg_delay_mins"],
-            name="Cumulative Delay (Avg)",
+            name="Average Delay Minutes",
             mode="lines+markers",
             line=dict(color="#29B6F6", width=3),
             marker=dict(size=8),
-            hovertemplate="Trạm: %{x}<br>Total Accumulated Delay: %{y:.2f} mins<extra></extra>",
+            hovertemplate="Stop: %{x}<br>Total Average Delay: %{y:.2f} mins<extra></extra>",
         )
     )
 
@@ -587,9 +747,12 @@ with tab_delay:
 
     # Chart 2: Propagation Factor Line Chart
     st.subheader("2. Stop-to-Stop Delay Propagation Factor")
-    st.caption(
-        "A factor > 1.0 indicates that delays from previous stops are being amplified as the vehicle moves downstream."
-    )
+    st.caption("""
+        💡 **Understanding the Factor:**
+        - **> 1.0 (Amplified Delay):** Delays are worsening downstream (e.g., **1.5x** means a 2-min initial delay expanded to 3 mins).
+        - **= 1.0 (Stable Delay):** Delay remains constant.
+        - **< 1.0 (Recovered Delay):** The driver is absorbing the delay and recovering back to schedule.
+        """)
 
     fig_prop = px.line(
         route_df,
@@ -623,18 +786,81 @@ with tab_delay:
     # ------------------------------------------------------------------------------
     # 6. DATA TABLE DETAIL
     # ------------------------------------------------------------------------------
-    with st.expander("📄 View Detailed Data Table"):
-        st.dataframe(
-            route_df[
-                [
-                    "stop_sequence",
-                    "stop_name",
-                    "total_trips_analyzed",
-                    "avg_delay_mins",
-                    "delay_added_mins",
-                    "propagation_factor",
-                ]
-            ],
-            width='stretch',
-            hide_index=True,
+    with st.expander("📄 View Detailed Analytics Table", expanded=False):
+        tab_top, tab_all = st.tabs(
+            ["🔥 Top Bottlenecks (Action Needed)", "📋 Full Route Table"]
         )
+
+        with tab_top:
+            # Lọc các trạm gây trễ lớn nhất hoặc nhân bản trễ cao nhất
+            top_bottlenecks = (
+                route_df[route_df["delay_added_mins"] > 0]
+                .sort_values(by="delay_added_mins", ascending=False)
+                .head(10)
+            )
+
+            st.dataframe(
+                top_bottlenecks[
+                    [
+                        "stop_sequence",
+                        "stop_name",
+                        "delay_added_mins",
+                        "avg_delay_mins",
+                        "propagation_factor",
+                    ]
+                ],
+                column_config={
+                    "stop_sequence": st.column_config.NumberColumn("Seq"),
+                    "stop_name": "Stop Name",
+                    "delay_added_mins": st.column_config.ProgressColumn(
+                        "Delay Added (mins)",
+                        format="%.2f",
+                        min_value=0,
+                        max_value=float(
+                            route_df["delay_added_mins"].max() or 1
+                        ),
+                    ),
+                    "avg_delay_mins": st.column_config.NumberColumn(
+                        "Avg Delay (mins)", format="%.2f"
+                    ),
+                    "propagation_factor": st.column_config.NumberColumn(
+                        "Prop. Factor", format="%.2f"
+                    ),
+                },
+                hide_index=True,
+                width='stretch',
+            )
+
+        with tab_all:
+            st.dataframe(
+                route_df[
+                    [
+                        "stop_sequence",
+                        "stop_name",
+                        "total_trips_analyzed",
+                        "avg_delay_mins",
+                        "delay_added_mins",
+                        "propagation_factor",
+                    ]
+                ],
+                column_config={
+                    "stop_sequence": st.column_config.NumberColumn("Seq"),
+                    "stop_name": "Stop Name",
+                    "total_trips_analyzed": st.column_config.NumberColumn(
+                        "Trips Analyzed"
+                    ),
+                    "avg_delay_mins": st.column_config.NumberColumn(
+                        "Avg Delay (mins)", format="%.2f"
+                    ),
+                    "delay_added_mins": st.column_config.NumberColumn(
+                        "Delay Added (mins)", format="%.2f"
+                    ),
+                    "propagation_factor": st.column_config.NumberColumn(
+                        "Prop. Factor", format="%.2f"
+                    ),
+                },
+                hide_index=True,
+                width='stretch',
+            )
+    time.sleep(60)
+    st.rerun()
