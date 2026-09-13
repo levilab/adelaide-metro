@@ -1,6 +1,12 @@
 name: Daily Batch Pipeline
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'bruin/**'
+      - '.github/workflows/batch.yml'
   schedule:
     # Chạy lúc 02:00 AM ACST hàng ngày (tương đương 16:30 UTC)
     - cron: '30 16 * * *'
