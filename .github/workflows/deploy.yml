@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'dashboard/**'
+      - 'streaming/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 concurrency:
@@ -42,7 +48,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build & Push có áp dụng Caching gha (tốc độ build cực nhanh ở các lần push sau)
+      # Build & Push with Caching gha
       - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:

@@ -14,6 +14,7 @@ requirements:
 import io
 import os
 import zipfile
+import hashlib
 from dotenv import load_dotenv
 import requests
 from google.cloud import bigquery, storage
@@ -129,9 +130,25 @@ def materialize():
     response = requests.get(GTFS_URL, timeout=60)
     response.raise_for_status()
 
+    # calculate sha1 háh for the new zip
+    sha1_hash = hashlib.sha1(response.content).hexdigest()
+
     gcs_client = storage.Client(project=GCP_PROJECT)
     bq_client = bigquery.Client(project=GCP_PROJECT)
     bucket = gcs_client.bucket(GCS_BUCKET)
+
+    hash_blob_path = f"{GCS_PREFIX}/latest_sha1.txt"
+    hash_blob = bucket.blob(hash_blob_path)
+
+    current_sha1 = ""
+    if hash_blob.exists():
+        current_sha1 = hash_blob.download_as_text().strip()
+
+    if sha1_hash == current_sha1:
+        print(f"GTFS Static feed unchanged (SHA1: {sha1_hash}). Skipping ingestion.")
+        return
+
+    print(f"New GTFS Static feed detected! Previous: '{current_sha1}' -> New: '{sha1_hash}'")
 
     with zipfile.ZipFile(io.BytesIO(response.content)) as zf:
         for filename, bq_table in GTFS_FILES.items():
@@ -165,5 +182,7 @@ def materialize():
             load_job.result()
             print(f"Loaded {filename} -> {table_ref}")
 
+    hash_blob.upload_from_string(sha1_hash, content_type="text/plain")
+    print(f"Updated latest SHA1 hash ({sha1_hash}) to GCS.")
     print("Ingestion complete.")
 materialize()
