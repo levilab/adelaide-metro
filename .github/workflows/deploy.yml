@@ -81,30 +81,27 @@ jobs:
       # 2. GTFS Producer Background Service
       - name: Deploy GTFS Producer Service
         run: |
-          gcloud run jobs deploy ${{ env.SERVICE_PRODUCER }} \
+          gcloud run deploy ${{ env.SERVICE_PRODUCER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
+            --no-allow-unauthenticated \
+            --min-instances=1 \
+            --max-instances=1 \
             --command python \
             --args "streaming/producer.py" \
             --set-env-vars "KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }}"
 
-      # 3. GTFS Consumer Background Service
+      # 3. GTFS Consumer Background Service (Cloud Run Service 24/7)
       - name: Deploy GTFS Consumer Service
         run: |
-          gcloud run jobs deploy ${{ env.SERVICE_CONSUMER }} \
+          gcloud run deploy ${{ env.SERVICE_CONSUMER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
+            --no-allow-unauthenticated \
+            --min-instances=1 \
+            --max-instances=1 \
             --command python \
             --args "streaming/consumer.py" \
             --set-env-vars "GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }},CONSUMER_GROUP_PREFIX=gtfs-bq-loader"
-
-      # 4. Execute Cloud Run Jobs (Producer & Consumer)
-      - name: Execute GTFS Producer and Consumer Jobs
-        run: |
-          echo "Executing Producer Job..."
-          gcloud run jobs execute ${{ env.SERVICE_PRODUCER }} --region ${{ env.REGION }} --async
-
-          echo "Executing Consumer Job..."
-          gcloud run jobs execute ${{ env.SERVICE_CONSUMER }} --region ${{ env.REGION }} --async
