@@ -71,7 +71,7 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 **Streamlit** — Chosen for rapid dashboard development in pure Python, with `pydeck` support for 3D geospatial rendering (route shapes, stop density) that standard BI tools don't handle well.
 | Tabs | Captures | Description 
 |---|---|---|
-| Network Analytics | ![Network Analytics](docs/images/streamlit_network_analytics.png) | Stop location maps, busiest routes, coverage hubs filtered by Local Government Areas (LGAs) | 
+| Network Analytics | ![Network Analytics](docs/images/streamlit_network_analytics.png) ![Network Analytics](docs/images/streamlit_spatial_reach.png) ![Network Analytics](docs/images/streamlit_spatial_reach-2.png) | Stop location maps, busiest routes, coverage hubs filtered by Local Government Areas (LGAs) | 
 | Circuity Analysis | ![Circuity Analysis](docs/images/streamlit_circuity.png) | Operational dashboard tracking transit route circuity factors and spatial efficiency across network shapes. |
 | CBD speed analysis | ![CBD speed analysis](docs/images/streamlit_CBD_speed.png) | Analyze vehicle speeds and traffic volumes across major Adelaide CBD corridors by time buckets.|
 | Delay & Propagation Analytics | ![Delay & Propagation Analytics](docs/images/streamlit_dealy_propagation.png) | Real-time event volume, tracking how delays start at one stop and build up across the route. |
