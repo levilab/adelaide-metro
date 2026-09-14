@@ -141,6 +141,8 @@ flowchart TD
     style J fill:#fff3e0,stroke:#F97316
     style J_RT fill:#fff3e0,stroke:#F97316
     style BQ_STREAM fill:#e8eaf6,stroke:#4285F4
+
+```
 ---
 
 ## Project Structure
