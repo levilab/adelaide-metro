@@ -65,14 +65,16 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 | Overview | Topics |
 |---|---|
-| ![Overview](DOCS/images/redpanda_overview.png) | ![Redpanda Topics](DOCS/images/redpandas_topics.png) |
+| ![Overview](docs/images/aiven.png) | ![Topics](docs/images/topics.png) |
 | Aiven Kafka cluster metrics for Adelaide Metro — showing topic/storage usage, producer rate, and consumer throughput | Three topics in use: `gtfs.vehicle_positions` for real-time vehicle positions, `gtfs.trip_updates` for real-time trip updates, and `gtfs.service_alerts` for service alerts |
 
 **Streamlit** — Chosen for rapid dashboard development in pure Python, with `pydeck` support for 3D geospatial rendering (route shapes, stop density) that standard BI tools don't handle well.
-
-| Network Analytics | ![Network Analytics](DOCS/images/streamlit_network_analytics.png) | Stop location maps, busiest routes, coverage hubs filtered by Local Government Areas (LGAs) | 
-| MTR Live | | ![MTR Live](DOCS/images/streamlit_mtr_live.png) | Operational dashboard tracking transit route circuity factors and spatial efficiency across network shapes. |
-| Streaming Analytics | |![Streaming Analytics](DOCS/images/streamlit_streaming_analytics.png) | Real-time event volume, tracking how delays start at one stop and build up across the route. |
+| Tabs | Captures | Description 
+|---|---|---|
+| Network Analytics | ![Network Analytics](docs/images/streamlit_network_analytics.png) | Stop location maps, busiest routes, coverage hubs filtered by Local Government Areas (LGAs) | 
+| Circuity Analysis | | ![MTR Live](docs/images/streamlit_circuity.png) | Operational dashboard tracking transit route circuity factors and spatial efficiency across network shapes. |
+| CBD speed analysis | | ![MTR Live](docs/images/streamlit_CBD_speed.png) | Analyze vehicle speeds and traffic volumes across major Adelaide CBD corridors by time buckets.|
+| Delay & Propagation Analytics | |![Streaming Analytics](docs/images/streamlit_dealy_propagation.png) | Real-time event volume, tracking how delays start at one stop and build up across the route. |
 
 ---
 
