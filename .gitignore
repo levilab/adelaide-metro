@@ -19,3 +19,4 @@ gtfs/
 *.geojson
 *.zip
 ca.pem
+README.md
