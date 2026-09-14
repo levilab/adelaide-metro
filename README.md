@@ -80,37 +80,67 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 ## Architecture
 
-```mermaid
 flowchart TD
     GH["🔧 GitHub Actions\npush to main"]
-    GH -->|deploy.yml| CR_DASH["☁️ Cloud Run Service\nadelaide-transit-pulse\nStreamlit Dashboard"]
+    GH -->|deploy.yml| CR_DASH["☁️ Cloud Run Service\nadelaide-metro\nStreamlit Dashboard"]
     GH -->|batch.yml| CR_BATCH["☁️ Cloud Run Job\nbatch-job\nBruin Pipeline"]
 
+    CS1["⏰ Cloud Scheduler\nevery 1 min"]
+    CS1 --> CR_PROD["☁️ Cloud Run Job\nproducer-job\n(Poll RT API every 1m)"]
+
     A["🌐 Adelaide Metro GTFS Static\ndata.gov.au"]
+    B["🗺️ GEO LGA Data\ndata.gov.au / ABS"]
+    RT_API["📡 Adelaide Metro GTFS Realtime\ndata.sa.gov.au"]
 
     CR_BATCH --> A
+    CR_BATCH --> B
     A --> C["⚙️ Bruin Ingestion\ningest_gtfs_static.py"]
+    B --> D["⚙️ Python Ingestion & Preprocess\ningest_geo_lga.py"]
 
     C --> E["🪣 Google Cloud Storage\ngtfs_static/adelaide-metro/"]
+    D --> F["🪣 Google Cloud Storage\ngeo_lga/"]
 
     E -->|BQ Load Job| G["🗄️ BigQuery — raw\ngtfs_routes · gtfs_stops · gtfs_trips\ngtfs_stop_times · gtfs_shapes · gtfs_calendar"]
+    F -->|BQ Load Job| I_LGA["🔧 BigQuery — staging\nstg_lgas"]
+
+    CR_PROD --> RT_API
+    RT_API -->|events| RP["📨 Apache Kafka\ngtfs_trip_updates topic"]
+
+    CR_CONS["☁️ Cloud Run Service\nconsumer-worker-pool\n(Continuous Listener)"]
+    RP --> CR_CONS
+    CR_CONS -->|streaming insert| BQ_STREAM["🗄️ BigQuery — raw\ngtfs_realtime_trip_updates"]
 
     G --> I["🔧 Bruin Staging Assets\nstg_stops · stg_routes · stg_trips\nstg_stop_times · stg_shapes · stg_calendar"]
+    BQ_STREAM --> I_RT["🔧 Bruin Staging Assets\nstg_rt_trip_updates"]
 
-    I --> J["📊 Bruin Mart Assets\nmart_route_circuity · mart_cbd_corridor_speed\nmart_delay_propagation"]
+    I --> J["📊 Bruin Mart Assets\nmart_cbd_corridor_speed · mart_longest_routes\nmart_peak_hour_analysis · mart_ranked_stops\nmart_route_circuity · mart_transfer_hubs\nmart_route_segment_speeds · mart_shape_geometries\nmart_trips_per_route · mart_trips_per_stop"]
+    I_LGA --> J
+    I_RT --> J_RT["📊 Bruin Mart Assets\nmart_rt_delay_propagation"]
 
     J --> CR_DASH
+    J_RT --> CR_DASH
 
     style GH fill:#2088FF,color:#fff,stroke:#2088FF
     style CR_DASH fill:#4285F4,color:#fff,stroke:#4285F4
     style CR_BATCH fill:#4285F4,color:#fff,stroke:#4285F4
+    style CR_PROD fill:#4285F4,color:#fff,stroke:#4285F4
+    style CR_CONS fill:#4285F4,color:#fff,stroke:#4285F4
+    style CS1 fill:#34A853,color:#fff,stroke:#34A853
+    style RP fill:#E52B50,color:#fff,stroke:#E52B50
     style A fill:#e8f4f8,stroke:#4285F4
+    style B fill:#e8f4f8,stroke:#4285F4
+    style RT_API fill:#e8f4f8,stroke:#4285F4
     style C fill:#fff3e0,stroke:#F97316
+    style D fill:#fff3e0,stroke:#F97316
     style E fill:#e3f2fd,stroke:#4285F4
+    style F fill:#e3f2fd,stroke:#4285F4
     style G fill:#e8eaf6,stroke:#4285F4
     style I fill:#fff3e0,stroke:#F97316
+    style I_LGA fill:#fff3e0,stroke:#F97316
+    style I_RT fill:#fff3e0,stroke:#F97316
     style J fill:#fff3e0,stroke:#F97316
-```
+    style J_RT fill:#fff3e0,stroke:#F97316
+    style BQ_STREAM fill:#e8eaf6,stroke:#4285F4
 
 ---
 
