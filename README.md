@@ -61,6 +61,13 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 **Bruin** — Unifies YAML-defined job orchestration and SQL assets under one CLI (`bruin run`), making raw → staging → marts dependency resolution explicit and reproducible.
 
+**Apache Kafka (Hosted on Aiven)** - An open-source distributed event streaming platform used to bridge the gap between the Adelaide Metro GTFS Realtime API (polled every minute) and BigQuery. The producer worker pool publishes real-time transit updates to the adelaide-transit-rt topic, while the continuous consumer worker pool drains these events into BigQuery for real-time analysis.
+
+| Overview | Topics |
+|---|---|
+| ![Redpanda Overview](DOCS/images/redpanda_overview.png) | ![Redpanda Topics](DOCS/images/redpandas_topics.png) |
+| Aiven Kafka cluster metrics for Adelaide Metro — showing topic/storage usage, producer rate, and consumer throughput | Three topics in use: `gtfs.vehicle_positions` for real-time vehicle positions, `gtfs.trip_updates` for real-time trip updates, and `gtfs.service_alerts` for service alerts |
+
 **Streamlit** — Chosen for rapid dashboard development in pure Python, with `pydeck` support for 3D geospatial rendering (route shapes, stop density) that standard BI tools don't handle well.
 
 ---
