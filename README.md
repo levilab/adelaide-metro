@@ -79,7 +79,7 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 ---
 
 ## Architecture
-
+```mermaid
 flowchart TD
     GH["🔧 GitHub Actions\npush to main"]
     GH -->|deploy.yml| CR_DASH["☁️ Cloud Run Service\nadelaide-metro\nStreamlit Dashboard"]
@@ -141,7 +141,6 @@ flowchart TD
     style J fill:#fff3e0,stroke:#F97316
     style J_RT fill:#fff3e0,stroke:#F97316
     style BQ_STREAM fill:#e8eaf6,stroke:#4285F4
-
 ---
 
 ## Project Structure
