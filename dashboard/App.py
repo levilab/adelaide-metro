@@ -101,6 +101,26 @@ def load_peak_by_type(project_id, route_type=None):
     """).to_dataframe()
 
 @st.cache_data(ttl=3600)
+def load_lga_polygons(project_id):
+    df = get_bq_client().query(f"""
+        SELECT 
+            lga_name AS lga, 
+            ST_ASGEOJSON(polygon_geom) AS geojson
+        FROM `{project_id}.staging.stg_lgas`
+        WHERE lga_name IS NOT NULL
+    """).to_dataframe()
+
+    import json
+    features = []
+    for _, row in df.iterrows():
+        features.append({
+            "type": "Feature",
+            "properties": {"lga": row["lga"]},
+            "geometry": json.loads(row["geojson"]),
+        })
+    return features
+
+@st.cache_data(ttl=3600)
 def load_circuity_data(project_id):
     return get_bq_client().query(f"""
     SELECT 
@@ -249,7 +269,7 @@ def load_network_data():
 st.info(
     f"**Network Snapshot:** Adelaide public transport has **{total_stops:,} stops** across **{total_routes} routes**. "
     f"Route **{busiest_route}** is the busiest with **{busiest_route_trips:,} trips**. "
-    f"The network peaks at **{peak_hour:02d}:00** — morning rush hour. "
+    f"The network peaks at **{peak_hour:02d}:00**. "
     f"The highest-traffic stop is **{top_stop}**."
 )
 
@@ -294,8 +314,6 @@ with tab_network:
     f_trips = trips_df if rt_filter is None else trips_df[trips_df["route_type"] == rt_filter]
     rt_sql  = "" if rt_filter is None else f"AND route_type = {rt_filter}"
     rt_sql_where = "" if rt_filter is None else f"WHERE route_type = {rt_filter}"
-
-    st.divider()
 
     # ── Stop map ───────────────────────────────────────────────────────────────
     st.subheader("Stop Locations")
@@ -349,6 +367,361 @@ with tab_network:
     st.dataframe(top_stops, width='stretch')
     st.download_button("⬇ Download CSV", data=top_stops.to_csv(index=False),
                        file_name="adelaide_busiest_stops.csv", mime="text/csv")
+
+    st.divider()
+
+    # ── Coverage Hubs Component ────────────────────────────────────────────────
+    st.subheader("Coverage Hubs & Spatial Reach Inspector")
+    st.markdown(
+        "Explore major transit hubs in Greater Adelaide and inspect direct inter-LGA connectivity."
+    )
+    TOP_N_DEFAULT = 50
+
+    with st.expander("📚 What am I looking at?", expanded=False):
+        st.markdown(f"""
+        **What this shows:** 
+        Which stops let passengers travel to the most **different Local Government Areas (LGAs) without transferring**. 
+        It measures **direct spatial reach**, not how many transfers you can make.
+
+        This is a **one-seat-ride reach** metric — not "transfer" in the sense of switching routes
+        at a single interchange point. A stop with a high reach score means: if you board here, you
+        can ride straight through to many different areas without getting off along the way.
+
+        **How to read it:**
+        - **Table below** — most reliable numbers, best for comparing stops.
+        - **Default map** — top {TOP_N_DEFAULT} hubs by route count; darker color = higher reach.
+        Toggle "Show all stops" to see everything.
+        - **Click a stop** — arcs show its direct LGA connections. Thicker/darker arc = more
+        routes on that link (stronger connection, not just presence).
+
+        **Use case:** spotting "regional gateway" stops worth prioritizing for infrastructure
+        upgrades (shelters, real-time displays, frequency).
+        """)
+
+    hubs_df = load_data(f"""
+        SELECT 
+            stop_id, stop_name, lga, stop_lat, stop_lon, 
+            route_count, connected_lgas, connected_lgas_list,
+            transport_modes, top_5_routes, operators
+        FROM `{PROJECT_ID}.marts.mart_coverage_hubs` 
+        ORDER BY route_count DESC
+    """)
+
+    if hubs_df.empty:
+        st.warning("⚠️ No data returned from BigQuery for `marts.mart_coverage_hubs`.")
+    else:
+        # 0. Clean & format spatial coordinates
+        hubs_df = hubs_df.dropna(subset=["stop_lat", "stop_lon"]).copy()
+        hubs_df["clean_stop_name"] = hubs_df["stop_name"].apply(clean_stop_name)
+        hubs_df["stop_lat"] = hubs_df["stop_lat"].astype(float)
+        hubs_df["stop_lon"] = hubs_df["stop_lon"].astype(float)
+
+        max_routes_in_db = int(hubs_df["route_count"].max()) if not hubs_df.empty else 2
+
+        # 1. Filters & Control Panel
+
+        col_filter_lga, col_filter_routes, col_view_mode, col_inspector, col_reset = st.columns(
+            [1, 1, 1, 2, 0.8]
+        )
+
+        with col_filter_lga:
+            all_lgas = ["All LGAs"] + sorted(
+                [l for l in hubs_df["lga"].dropna().unique() if l != "Other"]
+            )
+            selected_lga = st.selectbox("Filter LGA:", all_lgas)
+
+        with col_filter_routes:
+            min_routes = st.slider(
+                "Min Routes:",
+                min_value=2,
+                max_value=max_routes_in_db,
+                value=min(3, max_routes_in_db),
+            )
+
+        with col_view_mode:
+            st.write("")
+            show_all_stops = st.toggle(
+                "Show all stops",
+                value=False,
+                key="show_all_stops",
+                help=f"Off: chỉ hiện top {TOP_N_DEFAULT} hub theo route count. On: hiện toàn bộ stop đạt ngưỡng lọc.",
+            )
+        # Filter dataframe based on selections
+        filtered_hubs = hubs_df[hubs_df["route_count"] >= min_routes].copy()
+        if selected_lga != "All LGAs":
+            filtered_hubs = filtered_hubs[filtered_hubs["lga"] == selected_lga]
+
+        if "inspect_hub" not in st.session_state:
+            st.session_state["inspect_hub"] = "None (Show All Hubs)"
+
+        with col_reset:
+            st.write("")
+            st.write("")
+            if st.button("❌ Clear", use_container_width=True):
+                st.session_state["inspect_hub"] = "None (Show All Hubs)"
+                st.rerun()
+
+        hub_options = ["None (Show All Hubs)"] + filtered_hubs[
+            "clean_stop_name"
+        ].tolist()
+
+        if st.session_state["inspect_hub"] not in hub_options:
+            st.session_state["inspect_hub"] = "None (Show All Hubs)"
+
+        def on_hub_select():
+            st.session_state["inspect_hub"] = st.session_state["hub_widget_key"]
+
+        with col_inspector:
+            selected_hub_name = st.selectbox(
+                "🔍 Inspect Hub Reach (Click Map or Select):",
+                options=hub_options,
+                index=hub_options.index(st.session_state["inspect_hub"]),
+                key="hub_widget_key",
+                on_change=on_hub_select,
+            )
+
+        current_inspect_hub = st.session_state["inspect_hub"]
+
+        # 2. KPI Summary Metrics Header
+        if not filtered_hubs.empty:
+            kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+            kpi1.metric("Active Hubs", len(filtered_hubs))
+            top_hub = filtered_hubs.iloc[0]
+            kpi2.metric("Top Connected Hub", top_hub["clean_stop_name"], f"{top_hub['route_count']} routes")
+            kpi3.metric("Avg Reach / Hub", f"{filtered_hubs['connected_lgas'].mean():.1f} LGAs")
+            if selected_lga == "All LGAs":
+                kpi4.metric("Top Transit LGA", filtered_hubs.groupby("lga")["route_count"].sum().idxmax())
+            else:
+                kpi4.metric("Total Routes in Area", f"{filtered_hubs['route_count'].sum():,}")
+            st.write("")
+
+        if filtered_hubs.empty:
+            st.info("ℹ️ No transfer hubs match the selected filters. Try lowering the 'Min Routes' slider.")
+        else:
+            # 3. Arc & Focus Logic Calculation
+            selected_lgas_to_highlight = []
+            selected_hub_row = None
+
+            if current_inspect_hub != "None (Show All Hubs)":
+                selected_hub_df = filtered_hubs[
+                    filtered_hubs["clean_stop_name"] == current_inspect_hub
+                ].head(1)
+                if not selected_hub_df.empty:
+                    selected_hub_row = selected_hub_df.iloc[0]
+                    if selected_hub_row["connected_lgas_list"]:
+                        selected_lgas_to_highlight = [
+                            item.strip().split(":")[0].strip()
+                            for item in selected_hub_row["connected_lgas_list"].split("|")
+                        ]
+
+            if selected_hub_row is not None:
+                st.success(
+                    f"📍 **{current_inspect_hub}** (in **{selected_hub_row['lga']}**) connects directly to "
+                    f"**{selected_hub_row['connected_lgas']} LGAs** via **{selected_hub_row['route_count']} routes**!"
+                )
+
+            # 4. Full-Width Map Render
+            layers = []
+            is_inspecting = current_inspect_hub != "None (Show All Hubs)"
+
+            if is_inspecting and selected_hub_row is not None:
+                # Layer 1: Background Dimmed Hubs
+                bg_layer = pdk.Layer(
+                    "ScatterplotLayer",
+                    id="bg-scatterplot",
+                    data=filtered_hubs[filtered_hubs["clean_stop_name"] != current_inspect_hub],
+                    get_position=["stop_lon", "stop_lat"],
+                    get_radius=60,
+                    get_fill_color=[180, 180, 180, 120],
+                    pickable=True,
+                )
+                layers.append(bg_layer)
+
+                # Layer 2: Calculated LGA Centroid Arcs
+                hub_lat = float(selected_hub_row["stop_lat"])
+                hub_lon = float(selected_hub_row["stop_lon"])
+
+                if selected_lgas_to_highlight:
+                    # Parse "lga:routes_to_lga" ra dict {lga: weight} từ connected_lgas_list gốc
+                    lga_weights = {}
+                    if selected_hub_row["connected_lgas_list"]:
+                        for item in selected_hub_row["connected_lgas_list"].split("|"):
+                            item = item.strip()
+                            if ":" in item:
+                                lga_name, weight_str = item.rsplit(":", 1)
+                                lga_weights[lga_name.strip()] = int(weight_str)
+
+                    max_weight = max(lga_weights.values()) if lga_weights else 1
+
+                    def weight_to_fill(weight, max_w):
+                        # weight cao -> đỏ đậm hơn, weight thấp -> vàng nhạt hơn. Alpha thấp vì đây là fill cả vùng
+                        t = weight / max_w if max_w > 0 else 0
+                        r = 230
+                        g = int(200 * (1 - t))
+                        b = int(40 * (1 - t))
+                        return [r, g, b, 130]
+
+                    lga_polygons = load_lga_polygons(PROJECT_ID)
+
+                    geojson_features = []
+                    for feat in lga_polygons:
+                        lga_name = feat["properties"]["lga"]
+                        if lga_name in lga_weights:
+                            weight = lga_weights[lga_name]
+                            feat_copy = {
+                                "type": "Feature",
+                                "geometry": feat["geometry"],
+                                "properties": {
+                                    "lga": lga_name,
+                                    "routes_to_lga": weight,
+                                    "fill_color": weight_to_fill(weight, max_weight),
+                                    # Field trùng tên với map_tooltip để tooltip resolve đúng khi hover vào polygon
+                                    "clean_stop_name": f"Region: {lga_name}",
+                                    "route_count": weight,
+                                    "connected_lgas": "—",
+                                },
+                            }
+                            geojson_features.append(feat_copy)
+
+                    if geojson_features:
+                        coverage_layer = pdk.Layer(
+                            "GeoJsonLayer",
+                            id="lga-coverage",
+                            data={"type": "FeatureCollection", "features": geojson_features},
+                            get_fill_color="properties.fill_color",
+                            get_line_color=[200, 60, 60, 200],
+                            line_width_min_pixels=1.5,
+                            stroked=True,
+                            filled=True,
+                            pickable=True,
+                        )
+                        layers.append(coverage_layer)
+
+                view_lat, view_lon, view_zoom, view_pitch = hub_lat, hub_lon, 12, 35
+
+            else:
+                # Chọn tập dữ liệu vẽ: top N hub (default) hoặc toàn bộ nếu user bật toggle
+                if show_all_stops:
+                    map_data = filtered_hubs.copy()
+                else:
+                    map_data = filtered_hubs.sort_values("route_count", ascending=False).head(
+                        TOP_N_DEFAULT
+                    ).copy()
+
+                map_data["radius_px"] = (map_data["route_count"] ** 0.5) * 25
+                map_data["radius_px"] = map_data["radius_px"].clip(upper=150)
+
+                max_reach = max(map_data["connected_lgas"].max(), 1)
+
+                def reach_to_color(reach):
+                    t = reach / max_reach
+                    r = 255
+                    g = int(220 * (1 - t))
+                    b = 0
+                    return [r, g, b, 200]
+
+                map_data["fill_color"] = map_data["connected_lgas"].apply(reach_to_color)
+
+                hub_layer = pdk.Layer(
+                    "ScatterplotLayer",
+                    id="all-hubs-scatterplot",
+                    data=map_data,
+                    get_position=["stop_lon", "stop_lat"],
+                    get_radius="radius_px",
+                    get_fill_color="fill_color",
+                    pickable=True,
+                    auto_highlight=True,
+                )
+                layers.append(hub_layer)
+                view_lat, view_lon, view_zoom, view_pitch = -34.9285, 138.6007, 10.8, 0
+
+            map_tooltip = {
+                "text": "Stop: {clean_stop_name}\nLGA: {lga}\nRoutes: {route_count}\nDirect Reach: {connected_lgas} LGAs"
+            }
+
+            deck_chart = pdk.Deck(
+                layers=layers,
+                initial_view_state=pdk.ViewState(
+                    latitude=view_lat,
+                    longitude=view_lon,
+                    zoom=view_zoom,
+                    pitch=view_pitch,
+                ),
+                tooltip=map_tooltip,
+                map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+            )
+
+            event = st.pydeck_chart(
+                deck_chart,
+                on_select="rerun",
+                selection_mode="single-object",
+                key="hub_map_chart",
+            )
+
+            # Handle Map Selection Event
+            if event and hasattr(event, "selection") and event.selection:
+                objects = event.selection.get("objects", {})
+                clicked_obj = None
+                for layer_id in ["all-hubs-scatterplot", "bg-scatterplot", "focus-scatterplot"]:
+                    if layer_id in objects and objects[layer_id]:
+                        clicked_obj = objects[layer_id][0]
+                        break
+
+                if clicked_obj and "clean_stop_name" in clicked_obj:
+                    clicked_name = clicked_obj["clean_stop_name"]
+                    if clicked_name != st.session_state["inspect_hub"]:
+                        st.session_state["inspect_hub"] = clicked_name
+                        st.rerun()
+
+            # 5. Full-Width Clean Data Table (Bên dưới bản đồ)
+            st.subheader("📋 Top Coverage Hubs Breakdown")
+            
+            table_df = filtered_hubs[[
+                "clean_stop_name",
+                "lga",
+                "route_count",
+                "connected_lgas",
+                "top_5_routes",
+            ]].copy()
+
+            table_df.columns = [
+                "Stop Name",
+                "LGA",
+                "Routes Count",
+                "Direct Reach",
+                "Key Served Routes",
+            ]
+
+            max_reach_val = int(hubs_df["connected_lgas"].max()) if not hubs_df.empty else 10
+
+            table_event = st.dataframe(
+                            table_df,
+                            column_config={
+                                "Stop Name": st.column_config.TextColumn("Stop Name", width="large"),
+                                "LGA": st.column_config.TextColumn("LGA Region", width="medium"),
+                                "Routes Count": st.column_config.NumberColumn("Routes", format="%d lines"),
+                                "Direct Reach": st.column_config.ProgressColumn(
+                                    "Inter-LGA Reach",
+                                    format="%d LGAs",
+                                    min_value=0,
+                                    max_value=max_reach_val,
+                                ),
+                                "Key Served Routes": st.column_config.TextColumn("Key Routes", width="large"),
+                            },
+                            hide_index=True,
+                            use_container_width=True,
+                            height=350,
+                            on_select="rerun",
+                            selection_mode="single-row",
+                            key="hub_table",
+                        )
+
+            if table_event and hasattr(table_event, "selection") and table_event.selection.get("rows"):
+                selected_idx = table_event.selection["rows"][0]
+                clicked_name = table_df.iloc[selected_idx]["Stop Name"]
+                if clicked_name != st.session_state["inspect_hub"]:
+                    st.session_state["inspect_hub"] = clicked_name
+                    st.rerun()
 
     st.divider()
 

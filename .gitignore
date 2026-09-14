@@ -16,4 +16,6 @@ vehicle_positions.txt
 **/.terraform/
 adelaide-metro-505702-0645266fa951.json
 gtfs/
+*.geojson
 *.zip
+ca.pem
