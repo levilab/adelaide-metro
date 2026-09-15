@@ -149,7 +149,7 @@ def load_cbd_corridor_data(project_id):
 
 @st.cache_data(ttl=300)
 def load_delay_data(project_id):
-    # Khởi tạo BigQuery Client
+    # initilize BigQuery Client
     return get_bq_client().query(f"""
         SELECT 
             route_short_name,
@@ -319,7 +319,7 @@ with tab_network:
     st.subheader("Stop Locations")
     st.caption(f"Showing: **{selected_label}** stops from GTFS open data.")
     try:
-        # Tính tọa độ trung tâm động dựa trên dữ liệu lọc (hoặc fallback về tâm Adelaide)
+        # calculate central coordinates (or fallback to Adelaide coordinates)
         lat_center = f_stops["stop_lat"].mean() if not f_stops.empty else -34.9285
         lon_center = f_stops["stop_lon"].mean() if not f_stops.empty else 138.6007
 
@@ -336,7 +336,7 @@ with tab_network:
                         auto_highlight=True,
                     )
                 ],
-                # Tọa độ trung tâm Adelaide: Lat -34.9285, Lon 138.6007
+                # Adelaide coordinates: Lat -34.9285, Lon 138.6007
                 initial_view_state=pdk.ViewState(
                     latitude=lat_center,
                     longitude=lon_center,
@@ -346,7 +346,6 @@ with tab_network:
                 tooltip={
                     "text": "{stop_name}\nDepartures: {total_departures}\nType: {Transport Type}"
                 },
-                # Style Mapbox chuẩn, sạch đẹp, load cực nhanh và ổn định
                 map_style="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
             )
         )
@@ -410,7 +409,7 @@ with tab_network:
     if hubs_df.empty:
         st.warning("⚠️ No data returned from BigQuery for `marts.mart_coverage_hubs`.")
     else:
-        # 0. Clean & format spatial coordinates
+        # Clean & format spatial coordinates
         hubs_df = hubs_df.dropna(subset=["stop_lat", "stop_lon"]).copy()
         hubs_df["clean_stop_name"] = hubs_df["stop_name"].apply(clean_stop_name)
         hubs_df["stop_lat"] = hubs_df["stop_lat"].astype(float)
@@ -418,7 +417,7 @@ with tab_network:
 
         max_routes_in_db = int(hubs_df["route_count"].max()) if not hubs_df.empty else 2
 
-        # 1. Filters & Control Panel
+        # Filters & Control Panel
 
         col_filter_lga, col_filter_routes, col_view_mode, col_inspector, col_reset = st.columns(
             [1, 1, 1, 2, 0.8]
@@ -482,7 +481,7 @@ with tab_network:
 
         current_inspect_hub = st.session_state["inspect_hub"]
 
-        # 2. KPI Summary Metrics Header
+        # KPI Summary Metrics Header
         if not filtered_hubs.empty:
             kpi1, kpi2, kpi3, kpi4 = st.columns(4)
             kpi1.metric("Active Hubs", len(filtered_hubs))
@@ -498,7 +497,7 @@ with tab_network:
         if filtered_hubs.empty:
             st.info("ℹ️ No transfer hubs match the selected filters. Try lowering the 'Min Routes' slider.")
         else:
-            # 3. Arc & Focus Logic Calculation
+            # Arc & Focus Logic Calculation
             selected_lgas_to_highlight = []
             selected_hub_row = None
 
@@ -520,7 +519,7 @@ with tab_network:
                     f"**{selected_hub_row['connected_lgas']} LGAs** via **{selected_hub_row['route_count']} routes**!"
                 )
 
-            # 4. Full-Width Map Render
+            # Full-Width Map Render
             layers = []
             is_inspecting = current_inspect_hub != "None (Show All Hubs)"
 
@@ -554,7 +553,7 @@ with tab_network:
                     max_weight = max(lga_weights.values()) if lga_weights else 1
 
                     def weight_to_fill(weight, max_w):
-                        # weight cao -> đỏ đậm hơn, weight thấp -> vàng nhạt hơn. Alpha thấp vì đây là fill cả vùng
+                        # heavy weight -> darker red, light weight -> light yellow.
                         t = weight / max_w if max_w > 0 else 0
                         r = 230
                         g = int(200 * (1 - t))
@@ -575,7 +574,6 @@ with tab_network:
                                     "lga": lga_name,
                                     "routes_to_lga": weight,
                                     "fill_color": weight_to_fill(weight, max_weight),
-                                    # Field trùng tên với map_tooltip để tooltip resolve đúng khi hover vào polygon
                                     "clean_stop_name": f"Region: {lga_name}",
                                     "route_count": weight,
                                     "connected_lgas": "—",
@@ -600,7 +598,7 @@ with tab_network:
                 view_lat, view_lon, view_zoom, view_pitch = hub_lat, hub_lon, 12, 35
 
             else:
-                # Chọn tập dữ liệu vẽ: top N hub (default) hoặc toàn bộ nếu user bật toggle
+                # select data to display: top N hub (default) or all data points if user toggles on
                 if show_all_stops:
                     map_data = filtered_hubs.copy()
                 else:
@@ -673,7 +671,7 @@ with tab_network:
                         st.session_state["inspect_hub"] = clicked_name
                         st.rerun()
 
-            # 5. Full-Width Clean Data Table (Bên dưới bản đồ)
+            # Full-Width Clean Data Table
             st.subheader("📋 Top Coverage Hubs Breakdown")
             
             table_df = filtered_hubs[[
@@ -748,7 +746,7 @@ with tab_circuity:
             step=0.1
         )
 
-    # Apply filters (giữ nguyên logic lọc dữ liệu phía dưới)
+    # Apply filters
     filtered_df = df[
         (df["service_type"].isin(selected_services)) & 
         (df["circuity_factor"] >= min_circuity)
@@ -756,7 +754,7 @@ with tab_circuity:
 
     st.divider()
 
-    # 4. TIER 1: HIGH-LEVEL KPI METRICS
+    # HIGH-LEVEL KPI METRICS
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
 
     with kpi1:
@@ -793,7 +791,7 @@ with tab_circuity:
 
     st.divider()
 
-    # 5. TIER 2: ANALYTICAL VISUALIZATIONS
+    # ANALYTICAL VISUALIZATIONS
     col_chart1, col_chart2 = st.columns([1, 1])
 
     with col_chart1:
@@ -824,7 +822,7 @@ with tab_circuity:
 
     st.divider()
 
-    # 6. TIER 3: ACTIONABLE MONITORING TABLE
+    # ACTIONABLE MONITORING TABLE
     st.subheader("⚠️ Priority Network Review Table")
     st.markdown("Detailed list of routes prioritized by highest circuity factor based on active filters:")
 
@@ -1022,22 +1020,22 @@ with tab_delay:
         st.warning(f"Failed to connect to BigQuery: ({e}).")
 
     # ------------------------------------------------------------------------------
-    # 3. SIDEBAR FILTERS
+    # SIDEBAR FILTERS
     # ------------------------------------------------------------------------------
     routes = sorted(df["route_short_name"].unique())
     # Filter creation
     f_col1, f_col2 = st.columns([1, 3])
     with f_col1:
-        # 1. Thêm key để Streamlit giữ lại lựa chọn khi rerun/refresh
+        # Add key so Streamlit retains choice after rerun/refresh
         selected_route = st.selectbox(
             "🔍 Select Route:", 
             routes, 
             key="delay_selected_route"
         )
         
-        # 2. Đặt nút Refresh ở đây và xóa cache dữ liệu nếu cần
+        # Place Refresh here and clear cache if needed
         if st.button("🔄 Refresh Data"):
-            st.cache_data.clear()  # Xóa cache BigQuery để fetch dữ liệu mới
+            st.cache_data.clear()
             st.rerun()
 
     # Filtering by selected route
@@ -1048,7 +1046,7 @@ with tab_delay:
     st.divider()
 
     # ------------------------------------------------------------------------------
-    # 4. KPI METRICS
+    # KPI METRICS
     # ------------------------------------------------------------------------------
     total_trips = route_df["total_trips_analyzed"].max()
     max_delay_row = route_df.loc[route_df["avg_delay_mins"].idxmax()]
@@ -1073,7 +1071,7 @@ with tab_delay:
     st.divider()
 
     # ------------------------------------------------------------------------------
-    # 5. CHARTS SECTION
+    # CHARTS SECTION
     # ------------------------------------------------------------------------------
 
     # Chart 1: Combo Chart - Delay Added (Bar) vs Total Avg Delay (Line)
@@ -1148,7 +1146,7 @@ with tab_delay:
         },
     )
 
-    # Thêm đường tham chiếu Baseline = 1.0
+    # add Baseline = 1.0
     fig_prop.add_hline(
         y=1.0,
         line_dash="dash",
@@ -1167,7 +1165,7 @@ with tab_delay:
     st.plotly_chart(fig_prop, width='stretch')
 
     # ------------------------------------------------------------------------------
-    # 6. DATA TABLE DETAIL
+    # DATA TABLE DETAIL
     # ------------------------------------------------------------------------------
     with st.expander("📄 View Detailed Analytics Table", expanded=False):
         tab_top, tab_all = st.tabs(
@@ -1175,7 +1173,7 @@ with tab_delay:
         )
 
         with tab_top:
-            # Lọc các trạm gây trễ lớn nhất hoặc nhân bản trễ cao nhất
+            # Filter stops with highest added delay or propagation factor
             top_bottlenecks = (
                 route_df[route_df["delay_added_mins"] > 0]
                 .sort_values(by="delay_added_mins", ascending=False)

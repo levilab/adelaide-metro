@@ -17,7 +17,7 @@ WITH raw_latest AS (
         s.stop_name,
         tu.trip_id,
         
-        -- Tính delay_minutes trực tiếp
+        -- calculate delays between actual and scheduled arrival time)
         DATETIME_DIFF(
             DATETIME(tu.arrival_time, 'Australia/Adelaide'),
             DATETIME_ADD(
@@ -37,7 +37,7 @@ WITH raw_latest AS (
     JOIN `staging.stg_stops` s ON tu.stop_id = s.stop_id
     WHERE tu.arrival_time IS NOT NULL
 
-    -- Lọc bản ghi mới nhất ngay tại đây
+    -- Filter only the latest updates
     QUALIFY ROW_NUMBER() OVER (
         PARTITION BY tu.trip_id, tu.stop_sequence 
         ORDER BY tu.trip_update_timestamp DESC, tu.feed_timestamp DESC
@@ -52,12 +52,12 @@ rt_delay_base AS (
         trip_id,
         delay_minutes,
         
-        -- Lấy delay của trạm kế trước
+        -- calculate delay for the previous stop.
         LAG(delay_minutes) OVER (
             PARTITION BY trip_id ORDER BY stop_sequence
         ) AS prev_stop_delay_minutes,
         
-        -- Lấy delay của trạm đầu tiên (Origin)
+        -- calculate delay for the first stop.
         FIRST_VALUE(delay_minutes) OVER (
             PARTITION BY trip_id ORDER BY stop_sequence
         ) AS origin_delay_minutes
@@ -71,13 +71,14 @@ SELECT
     
     COUNT(DISTINCT trip_id) AS total_trips_analyzed,
 
-    -- 1. Độ trễ trung bình tại trạm
+    -- average delay minutes compared to schedule (from multiple trips)
     ROUND(AVG(delay_minutes), 2) AS avg_delay_mins,
     
-    -- 2. Tải thêm độ trễ (delay_added_mins)
+    -- average added delay minutes between trips
     ROUND(AVG(delay_minutes - COALESCE(prev_stop_delay_minutes, delay_minutes)), 2) AS delay_added_mins,
     
-    -- 3. Tỷ lệ lan truyền độ trễ (propagation_factor)
+    -- calculate propagation_factor to evaluate how serious the delay from the first stop 
+    -- spreads over
     ROUND(AVG(
         CASE 
             WHEN origin_delay_minutes > 0 THEN (delay_minutes / origin_delay_minutes)

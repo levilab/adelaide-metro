@@ -133,7 +133,7 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
             for entity in feed.entity:
                 publish_event(producer, topic, entity, feed_timestamp, fetch_time)
                 count += 1
-                # Poll nhẹ internal events của producer mỗi 500 msgs để tránh tràn bộ đệm
+                # Poll  internal events from producer every 500 msgs to avoid out of memory
                 if count % 500 == 0:
                     producer.poll(0)
 
