@@ -8,8 +8,8 @@ on:
       - 'bruin/**'
       - '.github/workflows/batch.yml'
   schedule:
-    # Chạy lúc 02:00 AM ACST hàng ngày (tương đương 16:30 UTC)
-    - cron: '30 16 * * *'
+    # Run 02:30 AM ACST daily (equavalent to 12:00 UTC)
+    - cron: '00 12 * * *'
   workflow_dispatch:
 
 env:

@@ -10,10 +10,8 @@ depends:
   - staging.stg_stops
 @bruin */
 
--- Transfer hubs: trạm kết nối nhiều tuyến bus/tram/train tại Adelaide
-
 WITH stops_with_lga AS (
-    -- 1. Nối trạm dừng với Polygon LGA để xem trạm thuộc LGA nào
+    -- JOIN with polygon to find out which LGA the stop belongs
     SELECT 
         s.stop_id,
         s.stop_name,
@@ -26,8 +24,7 @@ WITH stops_with_lga AS (
 ),
  
 direct_lga_connections AS (
-    -- 2. Tính xem từ trạm này đi THẲNG (cùng 1 trip) đến được bao nhiêu LGA KHÁC,
-    --    kèm số route riêng biệt phục vụ mỗi cặp (origin_stop -> destination_lga)
+    -- Find out how many LGAS that a specific stop can reach out to
     SELECT
         st1.stop_id AS origin_stop_id,
         sl2.lga AS destination_lga,
@@ -55,7 +52,6 @@ SELECT
     COUNT(DISTINCT r.route_id) AS route_count,
     COUNT(DISTINCT r.route_type) AS transport_modes,
     
-    -- Chỉ số kết nối: Đi thẳng tới bao nhiêu LGA khác trong Adelaide
     COUNT(DISTINCT dlc.destination_lga) AS connected_lgas,
     STRING_AGG(DISTINCT CONCAT(dlc.destination_lga, ':', CAST(dlc.routes_to_lga AS STRING)), ' | ') AS connected_lgas_list,
 

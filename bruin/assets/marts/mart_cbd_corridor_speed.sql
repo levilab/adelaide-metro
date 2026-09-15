@@ -10,26 +10,22 @@ depends:
 @bruin */
 
 WITH ordered_stops AS (
-    -- 1. JOIN bảng tên trạm TRƯỚC khi dùng LEAD để tận dụng cấu trúc cột của BigQuery
     SELECT 
         st.trip_id,
         st.departure_time AS dept_str,
-        -- Lấy luôn thông tin trạm đích bằng LEAD ngay tại đây
         LEAD(st.arrival_time) OVER (PARTITION BY st.trip_id ORDER BY st.stop_sequence) AS arr_str,
-        
+
         s.stop_name AS from_stop_name,
-        -- Đẩy thẳng tên trạm kế tiếp lên cùng một dòng
         LEAD(s.stop_name) OVER (PARTITION BY st.trip_id ORDER BY st.stop_sequence) AS to_stop_name,
         
         st.shape_dist_traveled AS dist_from,
         LEAD(st.shape_dist_traveled) OVER (PARTITION BY st.trip_id ORDER BY st.stop_sequence) AS dist_to
     FROM staging.stg_stop_times st
-    -- Chỉ cần 1 lệnh JOIN duy nhất thay vì 2 lệnh JOIN ở ngoài
     LEFT JOIN staging.stg_stops s ON st.stop_id = s.stop_id
 ),
 
 raw_segments AS (
-    -- 2. Thực hiện tính toán khoảng cách và bóc tách giờ ngay khi dữ liệu đã phẳng
+    -- calculate distance between two stops
     SELECT 
         trip_id,
         dept_str,
@@ -39,7 +35,6 @@ raw_segments AS (
         from_stop_name,
         to_stop_name
     FROM ordered_stops
-    -- Lọc dữ liệu lỗi từ sớm để giảm tải cho các tầng xử lý sau
     WHERE to_stop_name IS NOT NULL 
       AND dist_to > dist_from
 ),
@@ -48,7 +43,7 @@ cleaned_segments AS (
     SELECT 
         trip_id,
         
-        -- Phân nhóm thời gian (Giữ nguyên logic của bạn)
+        -- Categorize time windows
         CASE 
             WHEN dept_hour BETWEEN 7 AND 9 THEN '1. AM Peak (7-9h)'
             WHEN dept_hour BETWEEN 10 AND 15 THEN '2. Mid Day (10-15h)'
@@ -56,7 +51,7 @@ cleaned_segments AS (
             ELSE '4. Off Peak'
         END AS time_bucket,
 
-        -- Phân nhóm hành lang giao thông
+        -- Category traffic corridors, focus on CBD corridors
         CASE 
             WHEN from_stop_name LIKE '%King William%' OR to_stop_name LIKE '%King William%' THEN 'King William St'
             WHEN from_stop_name LIKE '%Grenfell%' OR to_stop_name LIKE '%Grenfell%' THEN 'Grenfell St'
@@ -68,7 +63,7 @@ cleaned_segments AS (
 
         dist_km,
         
-        -- Tính số giây di chuyển dựa trên mốc chuỗi thời gian
+        -- Calculate travel time by seconds
         (
             CAST(SPLIT(arr_str, ':')[OFFSET(0)] AS INT64) * 3600 +
             CAST(SPLIT(arr_str, ':')[OFFSET(1)] AS INT64) * 60 +
@@ -82,7 +77,6 @@ cleaned_segments AS (
     FROM raw_segments
 )
 
--- 3. Xuất kết quả phân tích cuối cùng
 SELECT 
     corridor_name,
     time_bucket,
@@ -97,7 +91,7 @@ SELECT
 FROM cleaned_segments
 WHERE travel_time_sec > 0 
   AND (SAFE_DIVIDE(dist_km, travel_time_sec) * 3600) <= 80.0
-  -- Loại ngay các bản ghi không thuộc hành lang CBD trọng điểm để giảm dung lượng GROUP BY
+  -- eliminate non-critical CBD corrdiors for optimized GROUP BY
   AND corridor_name != 'Other CBD / Non-CBD'
 GROUP BY corridor_name, time_bucket
 ORDER BY corridor_name, time_bucket;

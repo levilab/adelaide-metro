@@ -10,8 +10,6 @@ depends:
   - raw.ingest_gtfs_static
 @bruin */
 
--- CAST a string
-
 SELECT
     CAST(trip_id AS STRING)         AS trip_id, 
     CAST(stop_id AS STRING)         AS stop_id,

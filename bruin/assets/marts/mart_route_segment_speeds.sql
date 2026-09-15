@@ -10,7 +10,7 @@ depends:
 @bruin */
 
 WITH raw_segments AS (
-    -- 1. Tự JOIN và thêm bộ lọc chặn đứng các trạm trùng vị trí / trùng ID
+    -- identify stop names & departure/arrival time of each origin-destination pair. 
     SELECT 
         t.route_id,
         st1.departure_time AS dept_str,
@@ -25,13 +25,13 @@ WITH raw_segments AS (
         AND st2.stop_sequence = st1.stop_sequence + 1
     JOIN staging.stg_trips t 
         ON st1.trip_id = t.trip_id
-    -- SỬA LỖI 1: Loại bỏ tuyệt đối các bản ghi đứng yên tại một trạm
+    -- filtering out possible noise when stop id is duplicated or vehicle is not moving
     WHERE st1.stop_id != st2.stop_id 
       AND st2.shape_dist_traveled > st1.shape_dist_traveled
 ),
 
 converted_segments AS (
-    -- 2. Tính toán khoảng cách và quy đổi thời gian sang giây
+    -- identify distance between origin-destination pairs
     SELECT 
         rs.route_id,
         rs.from_stop_id,
@@ -40,7 +40,7 @@ converted_segments AS (
         s2.stop_name AS to_stop_name,
         (rs.dist_to - rs.dist_from) AS segment_distance_km,
         
-        -- Quy đổi chuỗi STRING vượt quá 24h thành số giây
+        -- convert String format to seconds
         (
             CAST(SPLIT(rs.arr_str, ':')[OFFSET(0)] AS INT64) * 3600 +
             CAST(SPLIT(rs.arr_str, ':')[OFFSET(1)] AS INT64) * 60 +
@@ -56,7 +56,6 @@ converted_segments AS (
     JOIN staging.stg_stops s2 ON rs.to_stop_id = s2.stop_id
 )
 
--- 3. Thống kê kết quả cuối cùng với công thức vận tốc chuẩn hóa
 SELECT 
     route_id,
     from_stop_id,
@@ -64,21 +63,20 @@ SELECT
     to_stop_id,
     to_stop_name,  
     COUNT(*) AS total_trips_analyzed,
-    -- Đổi tên cột hiển thị thành km cho đúng bản chất dữ liệu trong ảnh của bạn
     ROUND(AVG(segment_distance_km), 2) AS avg_segment_km,
     ROUND(AVG(travel_time_sec), 2) AS avg_time_sec,
     
-    -- SỬA LỖI 2: Công thức tính vận tốc chuẩn khi khoảng cách là KM và thời gian là GIÂY
-    -- Công thức: (Km / Giây) * 3600 giây = Km/h
+    
+    -- pace formula: (Km / second) * 3600 seconds = Km/h
     ROUND(
         SAFE_DIVIDE(AVG(segment_distance_km), AVG(travel_time_sec)) * 3600, 
         2
     ) AS avg_scheduled_speed_kmh
 
 FROM converted_segments
--- Chặn lỗi dữ liệu: Thời gian chạy giữa 2 trạm khác nhau bắt buộc phải lớn hơn 0 giây
+-- travel time between 2 stops must be positive to ensure valid calculation
 WHERE travel_time_sec > 0 
     AND (SAFE_DIVIDE(segment_distance_km, travel_time_sec) * 3600) <= 90.0
 GROUP BY route_id, from_stop_id, from_stop_name, to_stop_id, to_stop_name
-HAVING COUNT(*) > 5
+HAVING COUNT(*) > 5 
 ORDER BY avg_scheduled_speed_kmh ASC;
