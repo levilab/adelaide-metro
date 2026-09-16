@@ -47,13 +47,24 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 ## Tech Stack
 
+<p align="center">
+  <img width="100%" src="/docs/images/techstack.png" alt="Techstack diagram">
+</p>
+
 | Layer          | Tool                  | Purpose                                      |
 |----------------|-----------------------|-----------------------------------------------|
-| Orchestration  | Bruin                 | Pipeline orchestration + SQL transformations  |
-| Infrastructure | Terraform               | Provision GCS, BigQuery, service accounts |
-| Data Warehouse | BigQuery               | raw → staging → marts layers                  |
-| Dashboard      | Streamlit + pydeck     | Interactive dashboard, 3D route/stop map      |
-| Language       | Python / SQL           | Ingestion scripts + geospatial SQL transforms |
+| Orchestration | Bruin | Pipeline orchestration + SQL transformations |
+| Infrastructure | Terraform | Provision GCS, BigQuery, service accounts |
+| Data Lake | Google Cloud Storage | Raw bucket for static GTFS |
+| Data Warehouse | BigQuery | raw → staging → marts layers |
+| Streaming |  Apache Kafka | Real-time trip update events via Aiven |
+| Visualization | Streamlit + pydeck | Interactive dashboard (4 tabs) |
+| Containerization | Docker | Container images for dashboard, batch, and streaming |
+| Deployment | Google Cloud Run | Dashboard (Service) + Batch + Streaming (Jobs) |
+| CI/CD | GitHub Actions + WIF | Auto-deploy on push to main |
+| Scheduling | Cloud Scheduler | Trigger streaming jobs (1 min) + batch job (daily) |
+| Cloud | GCP Free Tier | Compute, storage, and warehouse |
+| Language | Python 3.11 | Ingestion scripts and dashboard |
 
 ### Why These Technologies?
 
