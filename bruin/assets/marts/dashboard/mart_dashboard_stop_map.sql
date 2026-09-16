@@ -1,5 +1,5 @@
 /* @bruin
-name: marts.mart_trips_per_route
+name: marts.mart_dashboard_stop_map
 type: bq.sql
 materialization:
   type: table
@@ -8,10 +8,12 @@ depends:
 @bruin */
 
 SELECT
-    route_short_name,
-    route_type,
-    COUNT(*) AS total_departures
+    stop_id,
+    stop_name,
+    stop_lat,
+    stop_lon,
+    COUNT(*) AS total_departures,
+    ANY_VALUE(route_type) AS route_type
 FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
-WHERE route_id IS NOT NULL
-GROUP BY route_id, route_short_name, route_type
+GROUP BY 1,2,3,4
 ORDER BY total_departures

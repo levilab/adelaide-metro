@@ -33,6 +33,12 @@ resource "google_bigquery_dataset" "staging" {
   delete_contents_on_destroy = true
 }
 
+resource "google_bigquery_dataset" "core" {
+  dataset_id                 = "core"
+  location                   = var.bq_location
+  delete_contents_on_destroy = true
+}
+
 resource "google_bigquery_dataset" "marts" {
   dataset_id                 = "marts"
   location                   = var.bq_location
