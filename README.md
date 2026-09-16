@@ -48,7 +48,7 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 ## Tech Stack
 
 <p align="center">
-  <img width="100%" src="/docs/images/techstack.png" alt="Techstack diagram">
+  <img width="100%" src="/docs/images/techstack.svg" alt="Techstack diagram">
 </p>
 
 | Layer          | Tool                  | Purpose                                      |
