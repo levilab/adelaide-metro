@@ -81,34 +81,28 @@ def load_data(query):
 def load_peak_by_type(project_id, route_type=None):
     rt_sql = f"AND route_type = {route_type}" if route_type is not None else ""
     return get_bq_client().query(f"""
-    SELECT CAST(SUBSTR(st.departure_time, 1, 2) AS INT64) AS hour_of_day,
-            CASE CAST(r.route_type AS INT64)
-            WHEN 3 THEN 'Bus'
-            WHEN 0 THEN 'Tram'
-            WHEN 4 THEN 'Ferry'
-            WHEN 2 THEN 'Rail'
-            WHEN 701 THEN 'Regional Bus'
-            ELSE 'Express Bus'
-        END AS route_type_name,
-           COUNT(DISTINCT t.trip_id) AS total_trips
-    FROM `{project_id}.staging.stg_stop_times` st
-    JOIN `{project_id}.staging.stg_trips` t ON st.trip_id = t.trip_id
-    JOIN `{project_id}.staging.stg_routes` r ON t.route_id = r.route_id
-    WHERE REGEXP_CONTAINS(st.departure_time, r'^\\d+:\\d{{2}}:\\d{{2}}$')
-      AND CAST(SUBSTR(st.departure_time, 1, 2) AS INT64) BETWEEN 0 AND 23
+    SELECT
+           hour_of_day,
+           route_type_name,
+           total_trips
+    FROM `{project_id}.marts.mart_dashboard_peak_by_type`
+    WHERE hour_of_day BETWEEN 0 AND 23
       {rt_sql}
-    GROUP BY hour_of_day, route_type_name ORDER BY hour_of_day
+    ORDER BY hour_of_day
     """).to_dataframe()
 
 @st.cache_data(ttl=3600)
-def load_lga_polygons(project_id):
+def load_lga_polygons(project_id, stop_id):
     df = get_bq_client().query(f"""
         SELECT 
-            lga_name AS lga, 
-            ST_ASGEOJSON(polygon_geom) AS geojson
-        FROM `{project_id}.staging.stg_lgas`
-        WHERE lga_name IS NOT NULL
-    """).to_dataframe()
+            polygon.lga,
+            polygon.geojson
+        FROM `{project_id}.marts.mart_dashboard_coverage_hubs` AS hub,
+        UNNEST(hub.connected_lga_polygons) AS polygon
+        WHERE hub.stop_id = @stop_id
+    """, job_config=bigquery.QueryJobConfig(query_parameters=[
+        bigquery.ScalarQueryParameter("stop_id", "STRING", str(stop_id))
+    ])).to_dataframe()
 
     import json
     features = []
@@ -132,7 +126,7 @@ def load_circuity_data(project_id):
             circuity_factor,
             excess_km,
             distinct_shapes_count
-        FROM `{project_id}.marts.mart_route_circuity`
+        FROM `{project_id}.marts.mart_dashboard_route_circuity`
     """).to_dataframe()
 
 @st.cache_data(ttl=3600)
@@ -143,7 +137,7 @@ def load_cbd_corridor_data(project_id):
         time_bucket,
         unique_trips,
         corridor_avg_speed_kmh
-    FROM `{project_id}.marts.mart_cbd_corridor_speed`
+    FROM `{project_id}.marts.mart_dashboard_cbd_corridor_speed`
     ORDER BY corridor_name, time_bucket
     """).to_dataframe()
 
@@ -159,7 +153,7 @@ def load_delay_data(project_id):
             avg_delay_mins,
             delay_added_mins,
             propagation_factor
-        FROM `{project_id}.marts.mart_rt_delay_propagation`
+        FROM `{project_id}.marts.mart_dashboard_delay_propagation`
         ORDER BY route_short_name, stop_sequence
     """
     ).to_dataframe()
@@ -213,18 +207,9 @@ def clean_stop_name(name):
 def load_kpi(project_id):
     return get_bq_client().query(f"""
     SELECT
-        (SELECT COUNT(*) FROM `{project_id}.marts.mart_ranked_stops`
-         WHERE stop_lat IS NOT NULL) AS total_stops,
-        (SELECT SUM(total_departures) FROM `{project_id}.marts.mart_ranked_stops`) AS total_departures,
-        (SELECT COUNT(DISTINCT route_short_name) FROM `{project_id}.staging.stg_routes`) AS total_routes,
-        (SELECT stop_name FROM `{project_id}.marts.mart_ranked_stops`
-         ORDER BY total_departures DESC LIMIT 1) AS top_stop,
-        (SELECT route_short_name FROM `{project_id}.marts.mart_trips_per_route`
-         ORDER BY total_departures DESC LIMIT 1) AS busiest_route,
-        (SELECT total_departures FROM `{project_id}.marts.mart_trips_per_route`
-         ORDER BY total_departures DESC LIMIT 1) AS busiest_route_trips,
-        (SELECT hour_of_day FROM `{project_id}.marts.mart_peak_hour_analysis`
-         ORDER BY total_departures DESC LIMIT 1) AS peak_hour
+        total_stops, total_departures, total_routes, top_stop,
+        busiest_route, busiest_route_trips, peak_hour
+    FROM `{project_id}.marts.mart_dashboard_network_kpi`
     """).to_dataframe()
 
 kpi = load_kpi(PROJECT_ID).iloc[0]
@@ -242,7 +227,7 @@ def load_network_data():
         stops_df = load_data(f"""
         SELECT stop_id, stop_name, stop_lat, stop_lon, total_departures,
                COALESCE(route_type, 3) AS route_type
-        FROM `{PROJECT_ID}.marts.mart_ranked_stops`
+        FROM `{PROJECT_ID}.marts.mart_dashboard_stop_map`
         WHERE stop_lat IS NOT NULL AND stop_lon IS NOT NULL
         """)
         stops_df["color"] = stops_df["route_type"].apply(route_type_color)
@@ -250,19 +235,18 @@ def load_network_data():
         st.session_state.stops_df = stops_df
 
         trips_df = load_data(f"""
-        SELECT r.route_short_name, r.route_long_name, r.route_type, COUNT(t.trip_id) AS total_trips
-        FROM `{PROJECT_ID}.staging.stg_trips` t
-        JOIN `{PROJECT_ID}.staging.stg_routes` r ON t.route_id = r.route_id
-        GROUP BY r.route_short_name, r.route_long_name, r.route_type
+        SELECT route_short_name, route_long_name, route_type, total_trips
+        FROM `{PROJECT_ID}.marts.mart_dashboard_route_trip_counts`
         ORDER BY total_trips DESC LIMIT 20
         """)
         trips_df["Route Type"] = trips_df["route_type"].map(ROUTE_TYPE_LABEL).fillna("Unknown")
         st.session_state.trips_df = trips_df
 
         st.session_state.peak_df = load_data(f"""
-        SELECT hour_of_day, total_departures
-        FROM `{PROJECT_ID}.marts.mart_peak_hour_analysis`
+        SELECT hour_of_day, SUM(total_departures) AS total_departures
+        FROM `{PROJECT_ID}.marts.mart_dashboard_peak_by_type`
         WHERE hour_of_day BETWEEN 0 AND 23
+        GROUP BY hour_of_day
         ORDER BY hour_of_day
         """)
 
@@ -378,36 +362,34 @@ with tab_network:
 
     with st.expander("📚 What am I looking at?", expanded=False):
         st.markdown(f"""
-        **What this shows:** 
-        Which stops let passengers travel to the most **different Local Government Areas (LGAs) without transferring**. 
-        It measures **direct spatial reach**, not how many transfers you can make.
+            **What this shows:** which stops let passengers travel directly — same trip, no transfer —
+            into the most different Local Government Areas (LGAs). This is a **one-seat-ride reach**
+            metric, not transfer-point connectivity.
 
-        This is a **one-seat-ride reach** metric — not "transfer" in the sense of switching routes
-        at a single interchange point. A stop with a high reach score means: if you board here, you
-        can ride straight through to many different areas without getting off along the way.
+            **How to read it:**
+            - **Table below** — most reliable numbers, best for comparing stops.
+            - **Default map** — top {TOP_N_DEFAULT} hubs by route count; darker color = higher reach.
+            Toggle "Show all stops" to see everything.
+            - **Click a stop** — highlighted regions are the LGAs it reaches directly. Darker fill =
+            more routes serving that region (a stronger connection, not just presence).
 
-        **How to read it:**
-        - **Table below** — most reliable numbers, best for comparing stops.
-        - **Default map** — top {TOP_N_DEFAULT} hubs by route count; darker color = higher reach.
-        Toggle "Show all stops" to see everything.
-        - **Click a stop** — arcs show its direct LGA connections. Thicker/darker arc = more
-        routes on that link (stronger connection, not just presence).
-
-        **Use case:** spotting "regional gateway" stops worth prioritizing for infrastructure
-        upgrades (shelters, real-time displays, frequency).
-        """)
+            **Use case:** if this stop were disrupted (roadworks, route changes), how many regions
+            would lose their direct one-seat link to it? A high reach count flags stops worth
+            prioritizing for reliability and infrastructure investment — one outage there ripples
+            across several areas at once, not just one.
+            """)
 
     hubs_df = load_data(f"""
         SELECT 
             stop_id, stop_name, lga, stop_lat, stop_lon, 
             route_count, connected_lgas, connected_lgas_list,
             transport_modes, top_5_routes, operators
-        FROM `{PROJECT_ID}.marts.mart_coverage_hubs` 
+        FROM `{PROJECT_ID}.marts.mart_dashboard_coverage_hubs`
         ORDER BY route_count DESC
     """)
 
     if hubs_df.empty:
-        st.warning("⚠️ No data returned from BigQuery for `marts.mart_coverage_hubs`.")
+        st.warning("⚠️ No data returned from BigQuery for `marts.mart_dashboard_coverage_hubs`.")
     else:
         # Clean & format spatial coordinates
         hubs_df = hubs_df.dropna(subset=["stop_lat", "stop_lon"]).copy()
@@ -560,7 +542,7 @@ with tab_network:
                         b = int(40 * (1 - t))
                         return [r, g, b, 130]
 
-                    lga_polygons = load_lga_polygons(PROJECT_ID)
+                    lga_polygons = load_lga_polygons(PROJECT_ID, selected_hub_row["stop_id"])
 
                     geojson_features = []
                     for feat in lga_polygons:
@@ -868,11 +850,11 @@ with tab_cbd:
     try:
         cbd_df = load_cbd_corridor_data(PROJECT_ID)
     except Exception as e:
-        st.warning(f"Could not load CBD corridor speed data. Make sure the Bruin asset `mart_cbd_corridor_speed` has been executed. Error: {e}")
+        st.warning(f"Could not load CBD corridor speed data. Make sure the Bruin asset `mart_dashboard_cbd_corridor_speed` has been executed. Error: {e}")
         cbd_df = pd.DataFrame()
 
     if cbd_df.empty:
-        st.info("No data available in `marts.mart_cbd_corridor_speed` yet.")
+        st.info("No data available in `marts.mart_dashboard_cbd_corridor_speed` yet.")
     else:
         all_corridors = list(cbd_df["corridor_name"].unique())
 
