@@ -5,7 +5,7 @@
 [![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)]()
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)]()
 
-🚀 **[Live Dashboard → ](https://adelaide-metro-162176027068.asia-east2.run.app/)**
+🚀 **[Live Dashboard → CLICK HERE](https://adelaide-metro-162176027068.asia-east2.run.app/)**
 
 ---
 
