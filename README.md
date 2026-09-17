@@ -259,10 +259,115 @@ Streamlit app queries marts directly via the BigQuery Python client, rendering 3
 
 ## Insights & Visualizations
 
-**Network Analytics** — Circuity factor by route, ranked; geodesic span methodology explained; 3D pydeck map of route shapes and stop density.
+## Insights & Visualizations
 
-**CBD Corridor Speed** — Scheduled vs. realized speed per corridor segment, volume overlay.
+The Streamlit dashboard (`dashboard/App.py`) has four tabs, backed by eight [dashboard marts](bruin/assets/marts/dashboard/README.md). Together, they help identify concentrated service, regional connectivity, indirect routes, and locations where reported delays increase.
 
-**Delay Propagation Monitoring** — Root-cause stop identification, delay cascade across downstream stops on the same trip.
+| Tab | Insights and interpretation |
+| --- | --- |
+| **Network Analytics** | Maps stops by transport mode, ranks the ten busiest stops by scheduled stop events, and compares hubs by downstream LGA reach on the same trip. High-reach hubs are candidates for closer reliability review. Counts describe the loaded timetable, not passenger demand or services operated on a selected day. |
+| **Circuity Analysis** | Compares route length with the distance from the origin to its farthest stop. Larger factors flag indirect paths for review; local loops/feeders use twice that distance as their baseline. Compare within service classes because school and feeder routes serve different purposes. |
+| **CBD Corridor Speed** | Compares scheduled speed and trip counts across named CBD corridors and time buckets. Low scheduled speed alongside high service volume highlights corridors to investigate. Speed comes from stop-to-stop distance and timetable duration, not observed vehicle movement or measured congestion. |
+| **Delay Propagation Monitoring** | Shows average delay, added delay since the previous available stop, and delay relative to the first available stop on each trip. Positive added delay indicates worsening punctuality; negative values indicate recovery. GTFS-RT times may be predictions, and these patterns do not establish the cause of a delay. |
 
+---
+
+## Steps to Reproduce
+
+### Prerequisites
+
+- [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows users)
+- [Bruin CLI](https://getbruin.com)
+- [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+- [gcloud CLI](https://cloud.google.com/sdk/docs/install)
+- GCP project with billing enabled (Free tier)
+- Python 3.11+
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/levilab/adelaide-metro.git
+cd adelaide-metro
+```
+
+### 2. Authenticate the GCP
+
+```bash
+gcloud auth application-default login
+export GOOGLE_APPLICATION_CREDENTIALS=~/.config/gcloud/application_default_credentials.json
+export GOOGLE_CLOUD_PROJECT=<GCP_PROJECT_ID>
+```
+
+### 3. Provision Infrastructure
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Fill in your project_id in terraform.tfvars
+terraform init && terraform apply
+```
+
+This creates the GCS bucket, BigQuery datasets (`raw`, `staging`, `marts`), and a service account.
+
+### 4. Configure Bruin
+
+Copy and edit `.bruin.yml`:
+
+```bash
+cp .bruin.yml.example .bruin.yml
+```
+
+```yaml
+default_environment: default
+environments:
+  default:
+    connections:
+      google_cloud_platform:
+        - name: gcp
+          project_id: <GCP_PROJECT_ID>
+          location: US
+          use_application_default_credentials: true
+```
+
+### 5. Install Python Dependencies
+
+```bash
+sudo apt install python3-venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 6. Run the Pipeline
+
+```bash
+cd bruin
+
+# Validate all assets
+bruin validate .
+
+# Run full pipeline (ingestion -> staging -> marts)
+bruin run .
+
+# Or run individual layers
+bruin run assets/ingestion/ingest_gtfs_static.py
+bruin run assets/staging/stg_stops.sql
+bruin run assets/marts/mart_stops_ranked.sql
+...
+```
+
+### 7. Run the Dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+The steps above reproduce a local dashboard backed by GCP; they do not deploy Cloud Run or configure a recurring schedule.
+
+## What Can Be Improved
+
+- **Try dbt:** Use dbt for SQL transformations, testing, and documentation, while keeping ingestion and scheduling separate.
+- **Simplify visualization:** Try Looker Studio or Tableau for standard charts and reports to reduce custom dashboard code.
+- **Improve data quality:** Add checks for missing values, duplicate records, and correct service dates.
+- **Improve realtime reliability:** Add retries for failed data loads and display the latest data update time on the dashboard.
+- **Make setup easier:** Remove hard-coded project IDs and provide example configuration files for new users.
+- 
 ---
