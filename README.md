@@ -166,7 +166,7 @@ flowchart TD
 ## Project Structure
 ```
 adelaide-metro/
-├── Dockerfile                          # Dashboard container image
+├── Dockerfile                         # Dashboard container image
 ├── .dockerignore
 ├── requirements.txt                    # Python dependencies
 ├── .github/
@@ -180,7 +180,7 @@ adelaide-metro/
 │   ├── pipeline.yml                    # Pipeline definition + daily schedule
 │   └── assets/
 │       ├── ingestion/
-│       │   ├── ingest_gtfs_static.py   # Download GTFS Protobuf -> GCS -> BigQuery
+│       │   └── ingest_gtfs_static.py   # Download GTFS Protobuf -> GCS -> BigQuery
 │       ├── staging/
 │       │   ├── stg_stops.sql
 │       │   ├── stg_routes.sql
@@ -190,18 +190,29 @@ adelaide-metro/
 │       │   ├── stg_rt_trip_updates.sql
 │       │   ├── stg_rt_vehicle_positions.sql
 │       │   └── stg_calendar.sql
+│       ├── core/
+│       │   ├── dimensions/
+│       │   │   ├── dim_stops.sql
+│       │   │   ├── dim_routes.sql
+│       │   │   └── dim_shapes.sql
+│       │   └── facts/
+│       │       ├── fact_scheduled_stop_events.sql
+│       │       ├── fact_rt_trip_updates.sql
+│       │       └── fact_rt_vehicle_positions.sql
 │       └── marts/
-│           ├── mart_cbd_corridor_speed.sql
-│           ├── mart_longest_routes.sql
-│           ├── mart_peak_hour_analysis.sql
-│           ├── mart_ranked_stops.sql
-│           ├── mart_route_circuity.sql
-│           ├── mart_transfer_hubs.sql
-│           ├── mart_route_segment_speeds.sql
-│           ├── mart_rt_delay_propagation.sql
-│           ├── mart_shape_geometries.sql
-│           ├── mart_trips_per_route.sql
-│           └── mart_trips_per_stop.sql
+│           ├── analytics/
+│           │   ├── mart_longest_routes.sql
+│           │   ├── mart_peak_hour_analysis.sql
+│           │   ├── mart_route_segment_speeds.sql
+│           │   ├── mart_shape_geometries.sql
+│           │   ├── mart_trips_per_route.sql
+│           │   └── mart_trips_per_stop.sql
+│           └── dashboard/
+│               ├── mart_cbd_corridor_speed.sql
+│               ├── mart_ranked_stops.sql
+│               ├── mart_route_circuity.sql
+│               ├── mart_rt_delay_propagation.sql
+│               └── mart_transfer_hubs.sql
 ├── dashboard/
 │   └── App.py                          # Streamlit dashboard (3 tabs)
 ├── streaming/
