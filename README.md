@@ -48,7 +48,7 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 - [Data Pipeline](#data-pipeline)
 - [Insights & Visualizations](#insights--visualizations)
 - [Steps to Reproduce](#steps-to-reproduce)
-- [About](#about)
+- [What Can Be Improved](#what-can-be-improved)
 
 ---
 
