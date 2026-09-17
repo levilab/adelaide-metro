@@ -369,5 +369,6 @@ The steps above reproduce a local dashboard backed by GCP; they do not deploy Cl
 - **Improve data quality:** Add checks for missing values, duplicate records, and correct service dates.
 - **Improve realtime reliability:** Add retries for failed data loads and display the latest data update time on the dashboard.
 - **Make setup easier:** Remove hard-coded project IDs and provide example configuration files for new users.
-- 
+
+
 ---
