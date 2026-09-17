@@ -350,15 +350,15 @@ bruin run .
 
 # Or run individual layers
 bruin run assets/ingestion/ingest_gtfs_static.py
-bruin run assets/staging/stg_stops.sql
-bruin run assets/marts/mart_stops_ranked.sql
+bruin run assets/staging/stg_shapes.sql
+bruin run assets/marts/dashboard/mart_dashboard_cbd_corridor_speed.sql
 ...
 ```
 
 ### 7. Run the Dashboard
 
 ```bash
-streamlit run dashboard/app.py
+streamlit run dashboard/App.py
 ```
 The steps above reproduce a local dashboard backed by GCP; they do not deploy Cloud Run or configure a recurring schedule.
 
