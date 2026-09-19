@@ -20,3 +20,12 @@ gtfs/
 *.zip
 ca.pem
 docs/reports/
+bruin/assets/core/dimensions/dim_vehicles.sql
+bruin/assets/core/facts/fact_rt_vehicle_positions.sql
+bruin/assets/core/facts/fact_service_alerts.sql
+bruin/assets/marts/mart_early_night_routes.sql
+bruin/assets/marts/mart_longest_routes.sql
+bruin/assets/marts/mart_peak_hour_analysis.sql
+bruin/assets/marts/mart_route_segment_speeds.sql
+bruin/assets/marts/mart_trips_per_route.sql
+bruin/assets/marts/mart_trips_per_stop.sql
