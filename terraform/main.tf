@@ -106,6 +106,55 @@ resource "google_service_account_iam_member" "bruin_act_as" {
   member             = "serviceAccount:${google_service_account.bruin.email}"
 }
 
+# ── Realtime Transform Scheduler ───────────────────────────────
+
+resource "google_project_service" "cloud_scheduler" {
+  project            = var.project_id
+  service            = "cloudscheduler.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_service_account" "rt_scheduler" {
+  account_id   = "rt-transform-scheduler"
+  display_name = "Realtime Transform Scheduler"
+}
+
+resource "google_project_iam_member" "rt_scheduler_run_invoker" {
+  project = var.project_id
+  role    = "roles/run.invoker"
+  member  = "serviceAccount:${google_service_account.rt_scheduler.email}"
+}
+
+resource "google_cloud_scheduler_job" "rt_transform" {
+  name        = var.rt_scheduler_name
+  description = "Refresh realtime staging, facts, and dashboard marts"
+  region      = var.cloud_run_region
+  schedule    = var.rt_transform_schedule
+  time_zone   = var.rt_transform_time_zone
+
+  http_target {
+    http_method = "POST"
+    uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.cloud_run_region}/jobs/${var.rt_job_name}:run"
+
+    oauth_token {
+      service_account_email = google_service_account.rt_scheduler.email
+      scope                 = "https://www.googleapis.com/auth/cloud-platform"
+    }
+  }
+
+  retry_config {
+    retry_count          = 1
+    min_backoff_duration = "30s"
+    max_backoff_duration = "60s"
+    max_doublings        = 1
+  }
+
+  depends_on = [
+    google_project_service.cloud_scheduler,
+    google_project_iam_member.rt_scheduler_run_invoker,
+  ]
+}
+
 # ── Streamlit Dashboard Service Account ───────────────────────────────────────
 resource "google_service_account" "streamlit" {
   account_id   = "streamlit-dashboard"

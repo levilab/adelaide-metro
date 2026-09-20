@@ -1,4 +1,4 @@
-name: Daily Batch Pipeline
+name: Batch and Realtime Transform Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - 'bruin/**'
       - '.github/workflows/batch.yml'
   schedule:
-    # Run 02:30 AM ACST daily (equavalent to 12:00 UTC)
+    # Run daily at 12:00 UTC (21:30 ACST / 22:30 ACDT).
     - cron: '00 12 * * *'
   workflow_dispatch:
 
@@ -17,6 +17,7 @@ env:
   REGION: asia-east2
   BUCKET: adelaide-metro-505702-raw
   BATCH_IMAGE: asia-east2-docker.pkg.dev/adelaide-metro-505702/cloud-run-source-deploy/adelaide-metro-batch
+  RT_JOB: rt-transform-job
 
 jobs:
   batch:
@@ -67,6 +68,21 @@ jobs:
             --memory 4Gi \
             --max-retries 1 \
             --task-timeout 3600
+
+      - name: Deploy realtime transform Cloud Run Job
+        if: github.event_name != 'schedule'
+        run: |
+          gcloud run jobs deploy ${{ env.RT_JOB }} \
+            --image ${{ env.BATCH_IMAGE }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --service-account ${{ secrets.WIF_SERVICE_ACCOUNT }} \
+            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }} \
+            --command bruin \
+            --args run,assets/staging/stg_rt_trip_updates.sql,--downstream \
+            --cpu 1 \
+            --memory 1Gi \
+            --max-retries 1 \
+            --task-timeout 240
 
       - name: Run batch job
         run: |

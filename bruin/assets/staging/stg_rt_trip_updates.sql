@@ -37,6 +37,10 @@ WITH ranked_updates AS (
     ) AS rn
   FROM
     `streaming.gtfs_realtime_trip_updates`
+  WHERE ingested_date >= DATE_SUB(
+    CURRENT_DATE('Australia/Adelaide'),
+    INTERVAL 1 DAY
+  )
 )
 SELECT
   ingested_date,

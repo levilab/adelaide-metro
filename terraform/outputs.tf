@@ -23,3 +23,12 @@ output "service_account_email" {
   value       = google_service_account.bruin.email
 }
 
+output "rt_scheduler_name" {
+  description = "Cloud Scheduler job that refreshes realtime marts"
+  value       = google_cloud_scheduler_job.rt_transform.name
+}
+
+output "rt_scheduler_service_account_email" {
+  description = "Service account used by Cloud Scheduler to invoke the realtime job"
+  value       = google_service_account.rt_scheduler.email
+}

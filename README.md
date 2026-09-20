@@ -105,6 +105,8 @@ flowchart TD
 
     CS1["⏰ Cloud Scheduler\nevery 1 min"]
     CS1 --> CR_PROD["☁️ Cloud Run Job\nproducer-job\n(Poll RT API every 1m)"]
+    CS_RT["⏰ Cloud Scheduler\nevery 5 min"]
+    CS_RT --> CR_RT["☁️ Cloud Run Job\nrt-transform-job\n(Bruin RT downstreams)"]
 
     A["🌐 Adelaide Metro GTFS Static\ndata.gov.au"]
     B["🗺️ GEO LGA Data\ndata.gov.au / ABS"]
@@ -130,10 +132,12 @@ flowchart TD
 
     G --> I["🔧 Bruin Staging Assets\nstg_stops · stg_routes · stg_trips\nstg_stop_times · stg_shapes · stg_calendar"]
     BQ_STREAM --> I_RT["🔧 Bruin Staging Assets\nstg_rt_trip_updates"]
+    CR_RT --> I_RT
 
     I --> J["📊 Bruin Mart Assets\nmart_cbd_corridor_speed · mart_longest_routes\nmart_peak_hour_analysis · mart_ranked_stops\nmart_route_circuity · mart_transfer_hubs\nmart_route_segment_speeds · mart_shape_geometries\nmart_trips_per_route · mart_trips_per_stop"]
     I_LGA --> J
-    I_RT --> J_RT["📊 Bruin Mart Assets\nmart_rt_delay_propagation"]
+    I_RT --> F_RT["📊 Bruin Core Fact\nfact_rt_trip_updates"]
+    F_RT --> J_RT["📊 Bruin Mart Assets\nmart_dashboard_delay_propagation"]
 
     J --> CR_DASH
     J_RT --> CR_DASH
@@ -143,7 +147,9 @@ flowchart TD
     style CR_BATCH fill:#4285F4,color:#fff,stroke:#4285F4
     style CR_PROD fill:#4285F4,color:#fff,stroke:#4285F4
     style CR_CONS fill:#4285F4,color:#fff,stroke:#4285F4
+    style CR_RT fill:#4285F4,color:#fff,stroke:#4285F4
     style CS1 fill:#34A853,color:#fff,stroke:#34A853
+    style CS_RT fill:#34A853,color:#fff,stroke:#34A853
     style RP fill:#E52B50,color:#fff,stroke:#E52B50
     style A fill:#e8f4f8,stroke:#4285F4
     style B fill:#e8f4f8,stroke:#4285F4
@@ -313,7 +319,10 @@ cp terraform.tfvars.example terraform.tfvars
 terraform init && terraform apply
 ```
 
-This creates the GCS bucket, BigQuery datasets (`raw`, `staging`, `marts`), and a service account.
+This creates the GCS bucket, BigQuery datasets (`raw`, `staging`, `core`, `marts`,
+`streaming`), service accounts, and the five-minute Cloud Scheduler trigger for
+`rt-transform-job`. GitHub Actions deploys the job image; Terraform owns the
+schedule, invocation identity, and IAM permission.
 
 ### 4. Configure Bruin
 

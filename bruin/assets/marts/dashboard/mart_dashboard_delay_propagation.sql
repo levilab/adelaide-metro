@@ -13,7 +13,8 @@ WITH raw_latest AS (
         stop_sequence,
         stop_name,
         trip_id,
-        delay_minutes
+        delay_minutes,
+        trip_update_timestamp
     FROM `adelaide-metro-505702.core.fact_rt_trip_updates`
     WHERE actual_arrival_time IS NOT NULL
       AND delay_minutes IS NOT NULL
@@ -30,6 +31,7 @@ rt_delay_base AS (
         stop_name,
         trip_id,
         delay_minutes,
+        trip_update_timestamp,
         LAG(delay_minutes) OVER (
             PARTITION BY trip_id ORDER BY stop_sequence
         ) AS prev_stop_delay_minutes,
@@ -51,7 +53,8 @@ SELECT
             WHEN origin_delay_minutes > 0 THEN delay_minutes / origin_delay_minutes
             ELSE 1.0
         END
-    ), 2) AS propagation_factor
+    ), 2) AS propagation_factor,
+    MAX(trip_update_timestamp) AS data_as_of
 FROM rt_delay_base
 GROUP BY route_short_name, stop_sequence, stop_name
 ORDER BY route_short_name, stop_sequence;

@@ -45,7 +45,6 @@ TOPICS_CONFIG = {
 
 
 def make_consumer(bootstrap_servers: str, topic_name: str) -> Consumer:
-    """Tạo Consumer riêng biệt cho từng Topic với Group ID độc lập."""
     clean_topic_name = topic_name.replace(".", "-")
     group_id = f"{CONSUMER_GROUP_PREFIX}-{clean_topic_name}"
     
@@ -223,7 +222,6 @@ def load_batch_to_bigquery(bq_client: bigquery.Client, table_name: str, rows: li
 
 
 def process_topic_consumer(topic: str, config: dict):
-    """Worker Consumer nạp TOÀN BỘ dữ liệu của mỗi đợt poll vào BigQuery."""
     consumer = make_consumer(KAFKA_BOOTSTRAP_SERVERS, topic)
     bq_client = bigquery.Client(project=GCP_PROJECT)
 

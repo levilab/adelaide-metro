@@ -152,7 +152,8 @@ def load_delay_data(project_id):
             total_trips_analyzed,
             avg_delay_mins,
             delay_added_mins,
-            propagation_factor
+            propagation_factor,
+            data_as_of
         FROM `{project_id}.marts.mart_dashboard_delay_propagation`
         ORDER BY route_short_name, stop_sequence
     """
@@ -998,6 +999,14 @@ with tab_delay:
     
     try:
         df = load_delay_data(PROJECT_ID)
+        latest_update = df["data_as_of"].dropna().max()
+        if pd.notna(latest_update):
+            latest_update = pd.to_datetime(latest_update, utc=True).tz_convert(
+                "Australia/Adelaide"
+            )
+            st.caption(
+                f"Latest realtime update: {latest_update:%d %b %Y, %H:%M:%S %Z}"
+            )
     except Exception as e:
         st.warning(f"Failed to connect to BigQuery: ({e}).")
 

@@ -32,3 +32,11 @@ route trip counts and peak marts; Bruin's dependency graph determines build orde
 Other analytical/intermediate marts remain in the parent directory, including
 `mart_shape_geometries`, which feeds circuity. Renaming asset files does not delete
 the old tables already present in BigQuery.
+
+The realtime delay path is refreshed every five minutes by the
+`rt-transform-job` Cloud Run Job. Cloud Scheduler starts Bruin at
+`stg_rt_trip_updates` with `--downstream`, which rebuilds
+`fact_rt_trip_updates` and `mart_dashboard_delay_propagation` without rerunning
+the static GTFS ingestion path. Terraform owns the scheduler, its dedicated
+service account, and the Cloud Run invocation permission; GitHub Actions only
+deploys new job images.
