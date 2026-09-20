@@ -8,6 +8,17 @@ depends:
 @bruin */
 
 -- One row per clock hour and transport type. A trip can be active in several hours.
+
+WITH stop_events AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY trip_id
+      ORDER BY stop_sequence
+    ) = 1 AS is_first_stop
+  FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
+)
+
 SELECT
     departure_hour AS hour_of_day,
     route_type,
