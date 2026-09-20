@@ -10,41 +10,53 @@ depends:
   - core.fact_scheduled_stop_events
 @bruin */
 
-WITH paired_events AS (
+WITH ordered_events AS (
   SELECT
-    cur.trip_id,
-    cur.route_id,
-    cur.service_id,
-    cur.shape_id,
-    cur.direction_id,
-    cur.route_short_name,
-    cur.route_long_name,
-    cur.route_type,
-    cur.route_type_name,
-    cur.agency_id,
-    cur.stop_sequence AS from_stop_sequence,
-    nxt.stop_sequence AS to_stop_sequence,
-    cur.stop_id AS from_stop_id,
-    cur.stop_name AS from_stop_name,
-    cur.stop_lat AS from_stop_lat,
-    cur.stop_lon AS from_stop_lon,
-    cur.lga_name AS from_lga_name,
-    nxt.stop_id AS to_stop_id,
-    nxt.stop_name AS to_stop_name,
-    nxt.stop_lat AS to_stop_lat,
-    nxt.stop_lon AS to_stop_lon,
-    nxt.lga_name AS to_lga_name,
-    cur.scheduled_departure_seconds,
-    nxt.scheduled_arrival_seconds,
-    cur.departure_hour,
-    cur.departure_time_bucket,
-    cur.shape_dist_traveled AS from_shape_dist_traveled,
-    nxt.shape_dist_traveled AS to_shape_dist_traveled
-  FROM `adelaide-metro-505702.core.fact_scheduled_stop_events` cur
-  JOIN `adelaide-metro-505702.core.fact_scheduled_stop_events` nxt
-    ON cur.trip_id = nxt.trip_id
-    AND nxt.stop_sequence = cur.stop_sequence + 1
-  WHERE cur.stop_id != nxt.stop_id
+    *,
+    LEAD(stop_id) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_stop_id,
+    LEAD(stop_name) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_stop_name,
+    LEAD(stop_lat) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_stop_lat,
+    LEAD(stop_lon) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_stop_lon,
+    LEAD(lga_name) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_lga_name,
+    LEAD(stop_sequence) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_stop_sequence,
+    LEAD(scheduled_arrival_seconds) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS scheduled_arrival_seconds,
+    LEAD(shape_dist_traveled) OVER (PARTITION BY trip_id ORDER BY stop_sequence) AS to_shape_dist_traveled
+  FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
+),
+
+paired_events AS (
+  SELECT
+    trip_id,
+    route_id,
+    service_id,
+    shape_id,
+    direction_id,
+    route_short_name,
+    route_long_name,
+    route_type,
+    route_type_name,
+    agency_id,
+    stop_sequence AS from_stop_sequence,
+    to_stop_sequence,
+    stop_id AS from_stop_id,
+    stop_name AS from_stop_name,
+    stop_lat AS from_stop_lat,
+    stop_lon AS from_stop_lon,
+    lga_name AS from_lga_name,
+    to_stop_id,
+    to_stop_name,
+    to_stop_lat,
+    to_stop_lon,
+    to_lga_name,
+    scheduled_departure_seconds,
+    scheduled_arrival_seconds,
+    departure_hour,
+    departure_time_bucket,
+    shape_dist_traveled AS from_shape_dist_traveled,
+    to_shape_dist_traveled
+  FROM ordered_events
+  WHERE to_stop_id IS NOT NULL
+    AND stop_id != to_stop_id
 )
 
 SELECT
