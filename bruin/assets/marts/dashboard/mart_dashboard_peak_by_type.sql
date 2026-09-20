@@ -15,7 +15,7 @@ WITH stop_events AS (
     ROW_NUMBER() OVER (
       PARTITION BY trip_id
       ORDER BY stop_sequence
-    ) = 1 AS is_first_stop
+    ) = 1 AS is_first_stop        -- Rank the stop by sequence, only takes the first stop 
   FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
 )
 
@@ -24,7 +24,7 @@ SELECT
     route_type,
     route_type_name,
     COUNT(DISTINCT trip_id) AS total_trips,
-    COUNTIF(is_first_stop) AS total_departures
-FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
+    COUNTIF(is_first_stop) AS total_departures      -- only count the stop where the bus departs
+FROM stop_events
 WHERE departure_hour BETWEEN 0 AND 23
 GROUP BY hour_of_day, route_type, route_type_name;
