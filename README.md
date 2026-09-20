@@ -192,27 +192,28 @@ adelaide-metro/
 │       │   └── stg_calendar.sql
 │       ├── core/
 │       │   ├── dimensions/
+│       │   │   ├── dim_lgas.sql
+│       │   │   ├── dim_services.sql
+│       │   │   ├── dim_shapes.sql
 │       │   │   ├── dim_stops.sql
 │       │   │   ├── dim_routes.sql
 │       │   │   └── dim_shapes.sql
 │       │   └── facts/
 │       │       ├── fact_scheduled_stop_events.sql
-│       │       ├── fact_rt_trip_updates.sql
-│       │       └── fact_rt_vehicle_positions.sql
+│       │       ├── fact_scheduled_route_segments.sql
+│       │       └── fact_rt_trip_updates.sql
 │       └── marts/
 │           ├── analytics/
-│           │   ├── mart_longest_routes.sql
-│           │   ├── mart_peak_hour_analysis.sql
-│           │   ├── mart_route_segment_speeds.sql
-│           │   ├── mart_shape_geometries.sql
-│           │   ├── mart_trips_per_route.sql
-│           │   └── mart_trips_per_stop.sql
+│           │   └── mart_shape_geometries.sql
 │           └── dashboard/
-│               ├── mart_cbd_corridor_speed.sql
-│               ├── mart_ranked_stops.sql
-│               ├── mart_route_circuity.sql
-│               ├── mart_rt_delay_propagation.sql
-│               └── mart_transfer_hubs.sql
+│               ├── mart_dashboard_cbd_corridor_speed.sql
+│               ├── mart_dashboard_coverage_hubs.sql
+│               ├── mart_dashboard_delay_propagation.sql
+│               ├── mart_dashboard_network_kpi.sql
+│               ├── mart_dashboard_peak_by_type.sql
+│               ├── mart_dashboard_route_circuity.sql
+│               ├── mart_dashboard_route_trip_counts.sql
+│               └── mart_dashboard_stop_map.sql
 ├── dashboard/
 │   └── App.py                          # Streamlit dashboard (3 tabs)
 ├── streaming/
@@ -248,9 +249,14 @@ adelaide-metro/
 Cleans and types raw GTFS files; groups shapes by `(shape_id, feed_version_id)` to handle schema evolution across feed updates.
 
 ### 2. Marts
-- `mart_route_circuity` — actual path length vs. geodesic span
-- `mart_cbd_corridor_speed` — realized speed per CBD segment vs. scheduled
-- `mart_delay_propagation` — delay at origin stop vs. downstream stops (window functions on `stop_sequence`)
+- `mart_dashboard_route_circuity` — actual path length vs stop max span (measure the excess kilometers a bus has to move to reach the stop)
+- `mart_dashboard_cbd_corridor_speed` — realized speed per CBD segment vs. scheduled
+- `mart_dashboard_delay_propagation` — delay at origin stop vs. downstream stops (window functions on `stop_sequence`)
+- `mart_dashboard_coverage_hubs.sql` — find all the local government areas that a specific stop can reach out to
+- `mart_dashboard_network_kpi.sql` - list all overview measures for Adelaide traffic
+- `mart_dashboard_peak_by_type.sql` - hourly traffic by route types
+- `mart_dashboard_route_trip_counts` - count total trips by routes
+- `mart_dashboard_stop_map` - coordinates for all stops displayed by map
 
 ### 3. Dashboard
 Streamlit app queries marts directly via the BigQuery Python client, rendering 3 tabs (Network Analytics, CBD Corridor Speed, Delay Propagation Monitoring) plus a 3D pydeck map for route geometry.
