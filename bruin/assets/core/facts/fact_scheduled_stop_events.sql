@@ -62,10 +62,10 @@ SELECT
     WHEN st.valid_departure_time THEN MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24)
   END AS departure_hour,
   CASE
-    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 7 AND 9 THEN '1. AM Peak (7-9h)'
-    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 10 AND 15 THEN '2. Mid Day (10-15h)'
-    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 16 AND 18 THEN '3. PM Peak (16-18h)'
-    WHEN st.valid_departure_time THEN '4. Off Peak'
+    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 7 AND 9 THEN 'AM Peak (7-9h)'
+    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 10 AND 15 THEN 'Mid Day (10-15h)'
+    WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 16 AND 18 THEN 'PM Peak (16-18h)'
+    WHEN st.valid_departure_time THEN 'Off Peak'
   END AS departure_time_bucket,
   st.shape_dist_traveled
 FROM stop_times st

@@ -78,20 +78,6 @@ def load_data(query):
     return get_bq_client().query(query).to_dataframe(create_bqstorage_client=False)
 
 @st.cache_data(ttl=3600)
-def load_peak_by_type(project_id, route_type=None):
-    rt_sql = f"AND route_type = {route_type}" if route_type is not None else ""
-    return get_bq_client().query(f"""
-    SELECT
-           hour_of_day,
-           route_type_name,
-           total_trips
-    FROM `{project_id}.marts.mart_dashboard_peak_by_type`
-    WHERE hour_of_day BETWEEN 0 AND 23
-      {rt_sql}
-    ORDER BY hour_of_day
-    """).to_dataframe()
-
-@st.cache_data(ttl=3600)
 def load_lga_polygons(project_id, stop_id):
     df = get_bq_client().query(f"""
         SELECT 
@@ -243,14 +229,6 @@ def load_network_data():
         trips_df["Route Type"] = trips_df["route_type"].map(ROUTE_TYPE_LABEL).fillna("Unknown")
         st.session_state.trips_df = trips_df
 
-        st.session_state.peak_df = load_data(f"""
-        SELECT hour_of_day, SUM(total_departures) AS total_departures
-        FROM `{PROJECT_ID}.marts.mart_dashboard_peak_by_type`
-        WHERE hour_of_day BETWEEN 0 AND 23
-        GROUP BY hour_of_day
-        ORDER BY hour_of_day
-        """)
-
 st.info(
     f"**Network Snapshot:** Adelaide public transport has **{total_stops:,} stops** across **{total_routes} routes**. "
     f"Route **{busiest_route}** is the busiest with **{busiest_route_trips:,} trips**. "
@@ -276,7 +254,6 @@ with tab_network:
         load_network_data()
     stops_df = st.session_state.stops_df
     trips_df = st.session_state.trips_df
-    peak_df  = st.session_state.peak_df
 
     # ── Transport type selector ────────────────────────────────────────────────
     TYPE_OPTIONS = {
