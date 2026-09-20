@@ -67,8 +67,7 @@ SELECT
     WHEN st.valid_departure_time AND MOD(CAST(SPLIT(st.departure_time, ':')[OFFSET(0)] AS INT64), 24) BETWEEN 16 AND 18 THEN '3. PM Peak (16-18h)'
     WHEN st.valid_departure_time THEN '4. Off Peak'
   END AS departure_time_bucket,
-  st.shape_dist_traveled,
-  st.stop_sequence = 1 AS is_first_stop
+  st.shape_dist_traveled
 FROM stop_times st
 JOIN `adelaide-metro-505702.core.dim_trips` t
   ON st.trip_id = t.trip_id

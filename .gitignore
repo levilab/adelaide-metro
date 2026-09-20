@@ -29,4 +29,5 @@ bruin/assets/marts/mart_peak_hour_analysis.sql
 bruin/assets/marts/mart_route_segment_speeds.sql
 bruin/assets/marts/mart_trips_per_route.sql
 bruin/assets/marts/mart_trips_per_stop.sql
+bruin/assets/marts/dashboard/mart_dashboard_peak_by_type.sql
 *.md
