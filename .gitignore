@@ -9,8 +9,7 @@ unused/
 service_alerts.txt
 trip_updates.txt
 vehicle_positions.txt
-*.tfstate
-*.tfstate.*
+terraform.tfstate
 *.tfvars
 .terraform.lock.hcl
 **/.terraform/
@@ -29,4 +28,5 @@ bruin/assets/marts/mart_peak_hour_analysis.sql
 bruin/assets/marts/mart_route_segment_speeds.sql
 bruin/assets/marts/mart_trips_per_route.sql
 bruin/assets/marts/mart_trips_per_stop.sql
+bruin/assets/marts/dashboard/README.md
 *.md

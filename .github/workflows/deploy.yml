@@ -68,7 +68,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 1. Streamlit Dashboard App
+      # Streamlit Dashboard App
       - name: Deploy Streamlit App to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE }} \
@@ -86,7 +86,7 @@ jobs:
             --region ${{ env.REGION }} \
             --format="value(status.url)"
 
-            # 2. GTFS Producer (Worker Pool)
+      # Producer (Worker Pool)
       - name: Deploy GTFS Producer Worker Pool
         run: |
           gcloud beta run worker-pools deploy ${{ env.SERVICE_PRODUCER }} \
@@ -98,7 +98,7 @@ jobs:
             --args "streaming/producer.py" \
             --set-env-vars "KAFKA_BOOTSTRAP_SERVERS=${{ secrets.KAFKA_BOOTSTRAP_SERVERS }},KAFKA_SECURITY_PROTOCOL=SASL_SSL,KAFKA_SASL_MECHANISM=SCRAM-SHA-256,KAFKA_SASL_USERNAME=${{ secrets.KAFKA_SASL_USERNAME }},KAFKA_SASL_PASSWORD=${{ secrets.KAFKA_SASL_PASSWORD }}"
 
-      # 3. GTFS Consumer (Worker Pool)
+      # GTFS Consumer (Worker Pool)
       - name: Deploy GTFS Consumer Worker Pool
         run: |
           gcloud beta run worker-pools deploy ${{ env.SERVICE_CONSUMER }} \

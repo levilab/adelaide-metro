@@ -119,7 +119,7 @@ def publish_event(
 
 
 def process_feed(producer: Producer, feed_name: str, config: dict):
-    """Worker loop độc lập cho từng feed dựa theo polling interval riêng."""
+    # Indepdendent worker for each feed
     logger.info(f"Started worker thread for {feed_name} (Interval: {config['interval']}s)")
 
     while True:
