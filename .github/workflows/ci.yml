@@ -20,6 +20,6 @@ jobs:
           curl -LsSf https://raw.githubusercontent.com/bruin-data/bruin/main/install.sh | sh
           echo "/home/runner/.local/bin" >> "$GITHUB_PATH"
 
-      # test fast bruin first, no GCP yet
+      # test fast bruin first, no GCP needed now
       - name: Validate Bruin pipeline
         run: bruin validate --fast bruin
