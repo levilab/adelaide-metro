@@ -8,6 +8,12 @@ materialization:
 depends:
   - staging.stg_stops
   - core.dim_lgas
+columns:
+  - name: stop_id
+    type: string
+    checks:
+      - name: not_null
+      - name: unique
 @bruin */
 
 SELECT

@@ -4,11 +4,6 @@ type: python
 connection: gcp
 materialization:
   type: table
-requirements:
-  - python-dotenv
-  - requests
-  - google-cloud-bigquery
-  - google-cloud-storage
 @bruin"""
 
 import io

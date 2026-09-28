@@ -10,6 +10,12 @@ depends:
   - staging.stg_trips
   - core.dim_routes
   - core.dim_services
+columns:
+  - name: trip_id
+    type: string
+    checks:
+      - name: not_null
+      - name: unique
 @bruin */
 
 SELECT

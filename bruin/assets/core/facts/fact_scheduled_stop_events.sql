@@ -10,6 +10,33 @@ depends:
   - staging.stg_stop_times
   - core.dim_trips
   - core.dim_stops
+columns:
+  - name: trip_id
+    type: string
+    checks:
+      - name: not_null
+
+  - name: stop_id
+    type: string
+    checks:
+      - name: not_null
+
+  - name: stop_sequence
+    type: integer
+    checks:
+      - name: not_null
+custom_checks:
+  - name: unique_trip_stop_sequence
+    description: One scheduled stop event per trip id and stop sequence
+    query:  |
+      SELECT COUNT(*)
+      FROM (
+        SELECT trip_id, stop_sequence
+        FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
+        GROUP BY trip_id, stop_sequence
+        HAVING COUNT(*) > 1
+      )
+    value: 0
 @bruin */
 
 WITH stop_times AS (

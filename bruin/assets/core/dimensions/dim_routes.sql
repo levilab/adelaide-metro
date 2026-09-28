@@ -7,6 +7,12 @@ materialization:
     - route_type
 depends:
   - staging.stg_routes
+columns:
+  - name: route_id
+    type: string
+    checks:
+      - name: not_null
+      - name: unique
 @bruin */
 
 SELECT
