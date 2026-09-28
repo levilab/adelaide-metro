@@ -31,3 +31,5 @@ bruin/assets/marts/mart_trips_per_route.sql
 bruin/assets/marts/mart_trips_per_stop.sql
 bruin/assets/marts/dashboard/README.md
 *.md
+
+logs/queries

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - "bruin/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  bruin-validate:
+    name: Bruin validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Install Bruin
+        run: |
+          curl -LsSf https://raw.githubusercontent.com/bruin-data/bruin/main/install.sh | sh
+          echo "/home/runner/.local/bin" >> "$GITHUB_PATH"
+
+      # test fast bruin first, no GCP yet
+      - name: Validate Bruin pipeline
+        run: bruin validate --fast bruin
