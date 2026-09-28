@@ -19,6 +19,7 @@ gtfs/
 *.zip
 ca.pem
 docs/reports/
+docs/learning/
 bruin/assets/core/dimensions/dim_vehicles.sql
 bruin/assets/core/facts/fact_rt_vehicle_positions.sql
 bruin/assets/core/facts/fact_service_alerts.sql

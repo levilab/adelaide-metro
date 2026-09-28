@@ -137,7 +137,10 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
                 if count % 500 == 0:
                     producer.poll(0)
 
-            producer.flush(timeout=5)
+            # flush all remaining messages in internal RAM queue
+            remaining = producer.flush(timeout=5) 
+            if remaining:
+                logger.warning("%s messages still pending", remaining)
             logger.info(f"[{feed_name}] Published {count} entities to '{topic}'")
 
         except requests.RequestException as e:
