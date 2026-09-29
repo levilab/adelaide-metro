@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "bruin/**"
+      - "terraform/**"
       - ".github/workflows/ci.yml"
 
 jobs:
@@ -23,3 +24,27 @@ jobs:
       # test fast bruin first, no GCP needed now
       - name: Validate Bruin pipeline
         run: bruin validate --fast bruin
+  
+  terraform-validate:
+    name: Terraform validation
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+    
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Check formatting
+        run: terraform fmt -check
+
+      - name: Initialize without backend
+        run: terraform init -backend=false -input=false
+
+      - name: Validate configuration
+        run: terraform validate
