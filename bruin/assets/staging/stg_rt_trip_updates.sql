@@ -18,7 +18,7 @@ WITH ranked_updates AS (
     CAST(direction_id AS INT64) AS direction_id,
     CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
     PARSE_DATE('%Y-%m-%d', start_date) AS start_date,
-    CAST(schedule_relationship AS INT64) AS schedule_relationship,
+    CAST(schedule_relationship AS STRING) AS schedule_relationship,
     
     -- Vehicle info
     CAST(vehicle_id AS STRING) AS vehicle_id,

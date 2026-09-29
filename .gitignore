@@ -32,3 +32,5 @@ bruin/assets/marts/dashboard/README.md
 *.md
 
 logs/queries
+logs/runs
+logs/*.log

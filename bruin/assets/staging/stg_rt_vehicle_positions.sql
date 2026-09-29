@@ -20,6 +20,7 @@ WITH ranked_vehicles AS (
     CAST(route_id AS STRING) AS route_id,
     CAST(direction_id AS INT64) AS direction_id,
     PARSE_DATE('%Y-%m-%d', start_date) AS start_date,
+    CAST(schedule_relationship AS STRING) AS schedule_relationship,
     
     -- Vehicle info
     CAST(vehicle_id AS STRING) AS vehicle_id,
@@ -31,6 +32,7 @@ WITH ranked_vehicles AS (
     CAST(bearing AS FLOAT64) AS bearing,
     CAST(speed AS FLOAT64) AS speed,
     CAST(vehicle_timestamp AS TIMESTAMP) AS vehicle_timestamp,
+    CAST(occupancy_status AS STRING) AS occupancy_status,
     
     -- only get the latest positions for every vehicle
     ROW_NUMBER() OVER (
@@ -50,13 +52,15 @@ SELECT
   route_id,
   direction_id,
   start_date,
+  schedule_relationship,
   vehicle_id,
   vehicle_label,
   latitude,
   longitude,
   bearing,
   speed,
-  vehicle_timestamp
+  vehicle_timestamp,
+  occupancy_status
 FROM
   ranked_vehicles
 WHERE
