@@ -127,7 +127,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
                 "route_id": trip.route_id if trip.route_id else None,
                 "direction_id": trip.direction_id if trip.HasField("direction_id") else None,
                 "start_date": gtfs_date_to_string(trip.start_date) if trip.start_date else None,
-                "schedule_relationship": str(trip.schedule_relationship) if trip.HasField("schedule_relationship") else None,
+                "schedule_relationship": gtfs_realtime_pb2.TripDescriptor.ScheduleRelationship.Name(trip.schedule_relationship) if trip.HasField("schedule_relationship") else None,
                 "vehicle_id": vehicle.id if vehicle.id else None,
                 "vehicle_label": vehicle.label if vehicle.label else None,
                 "trip_update_timestamp": epoch_to_adelaide_datetime(tu.timestamp) if tu.timestamp else None,
@@ -150,7 +150,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
             "route_id": trip.route_id if trip.route_id else None,
             "direction_id": trip.direction_id if trip.HasField("direction_id") else None,
             "start_date": gtfs_date_to_string(trip.start_date) if trip.start_date else None,
-            "schedule_relationship": str(trip.schedule_relationship) if trip.HasField("schedule_relationship") else None,
+            "schedule_relationship": gtfs_realtime_pb2.TripDescriptor.ScheduleRelationship.Name(trip.schedule_relationship) if trip.HasField("schedule_relationship") else None,
             "vehicle_id": veh.id if veh.id else None,
             "vehicle_label": veh.label if veh.label else None,
             "latitude": pos.latitude if pos.HasField("latitude") else None,
@@ -158,6 +158,7 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
             "bearing": pos.bearing if pos.HasField("bearing") else None,
             "speed": pos.speed if pos.HasField("speed") else None,
             "vehicle_timestamp": epoch_to_adelaide_datetime(vp.timestamp) if vp.timestamp else None,
+            "occupancy_status": gtfs_realtime_pb2.VehiclePosition.OccupancyStatus.Name(vp.occupancy_status) if vp.HasField("occupancy_status") else None,
         })
 
     # PARSE SERVICE ALERTS
