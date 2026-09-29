@@ -4,6 +4,36 @@ type: bq.sql
 materialization:
   type: table
   partition_by: ingested_date
+custom_checks:
+  - name: trip_updates_ingestion_is_fresh
+    description: Consumer has written Trip Updates within the last 10 minutes.
+    query: |
+      SELECT IF(
+        MAX(ingested_at) >= TIMESTAMP_SUB(
+          CURRENT_TIMESTAMP(),
+          INTERVAL 10 MINUTE
+        ),
+        0,
+        1
+      )
+      FROM
+        `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
+    value: 0
+
+  - name: trip_updates_source_feed_is_fresh
+    description: Adelaide Metro feed timestamp is within the last 10 minutes.
+    query: |
+      SELECT IF(
+        MAX(feed_timestamp) >= TIMESTAMP_SUB(
+          CURRENT_TIMESTAMP(),
+          INTERVAL 10 MINUTE
+        ),
+        0,
+        1
+      )
+      FROM
+        `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
+    value: 
 @bruin */
 
 WITH ranked_updates AS (
