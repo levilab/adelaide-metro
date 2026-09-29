@@ -170,8 +170,8 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
         desc_txt = first_translation(alert.description_text)
         url_txt = first_translation(alert.url)
         act_start = epoch_to_adelaide_datetime(min(active_starts)) if active_starts else None
-        cause_val = str(alert.cause) if alert.HasField("cause") else None
-        effect_val = str(alert.effect) if alert.HasField("effect") else None
+        cause_val = gtfs_realtime_pb2.Alert.Cause.Name(alert.cause) if alert.HasField("cause") else None
+        effect_val = gtfs_realtime_pb2.Alert.Effect.Name(alert.effect) if alert.HasField("effect") else None
 
         if alert.informed_entity:
             for item in alert.informed_entity:
