@@ -10,7 +10,8 @@ WITH ranked_vehicles AS (
   SELECT
     -- Metadata
     ingested_date,
-    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    COALESCE(fetched_date, ingested_date) AS fetched_date,
+    CAST(COALESCE(fetched_at, ingested_at) AS TIMESTAMP) AS fetched_at,
     CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
     source_gcs_uri,
     
@@ -37,14 +38,15 @@ WITH ranked_vehicles AS (
     -- only get the latest positions for every vehicle
     ROW_NUMBER() OVER (
       PARTITION BY vehicle_id
-      ORDER BY ingested_at DESC, vehicle_timestamp DESC
+      ORDER BY fetched_at DESC, vehicle_timestamp DESC
     ) AS rn
   FROM
     `streaming.gtfs_realtime_vehicle_positions`
 )
 SELECT
   ingested_date,
-  ingested_at,
+  fetched_date,
+  fetched_at,
   feed_timestamp,
   source_gcs_uri,
   entity_id,

@@ -14,6 +14,7 @@ depends:
 
 SELECT
   tu.ingested_date,
+  tu.ingested_date AS fetched_date,
   tu.entity_id,
   tu.trip_id,
   tu.route_id,

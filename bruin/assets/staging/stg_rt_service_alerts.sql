@@ -21,7 +21,8 @@ custom_checks:
 WITH ranked_alerts AS (
   SELECT
     ingested_date,
-    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    COALESCE(fetched_date, ingested_date) AS fetched_date,
+    CAST(COALESCE(fetched_at, ingested_at) AS TIMESTAMP) AS fetched_at,
     CAST(feed_timestamp AS TIMESTAMP) AS feed_timestamp,
     source_gcs_uri,
     CAST(entity_id AS STRING) AS alert_id,
@@ -57,13 +58,14 @@ WITH ranked_alerts AS (
     CAST(effect AS STRING) AS effect,
     ROW_NUMBER() OVER (
       PARTITION BY entity_id, route_id
-      ORDER BY ingested_at DESC
+      ORDER BY fetched_at DESC
     ) AS rn
   FROM
     `streaming.gtfs_realtime_service_alerts`
 )
 SELECT
   ingested_date,
+  fetched_date,
   alert_id,
   header_text,
   description_html,

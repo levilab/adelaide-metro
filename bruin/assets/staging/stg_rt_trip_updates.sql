@@ -5,15 +5,15 @@ materialization:
   type: table
   partition_by: ingested_date
 custom_checks:
-  - name: trip_updates_ingestion_is_fresh
-    description: Consumer has written recent Trip Update entities during service hours.
+  - name: trip_updates_entities_are_fresh_during_service_hours
+    description: Recent Trip Update entities were fetched during service hours.
     query: |
       SELECT IF(
         (
           CURRENT_TIME('Australia/Adelaide') >= TIME '01:45:00'
           AND CURRENT_TIME('Australia/Adelaide') < TIME '04:20:00'
         )
-        OR MAX(ingested_at) >= TIMESTAMP_SUB(
+        OR MAX(COALESCE(fetched_at, ingested_at)) >= TIMESTAMP_SUB(
           CURRENT_TIMESTAMP(),
           INTERVAL 10 MINUTE
         ),
@@ -67,9 +67,10 @@ custom_checks:
 
 WITH typed_updates AS (
   SELECT
-    -- Ingestion metadata
+    -- Fetch metadata (legacy fallback supports the rolling deployment)
     ingested_date,
-    CAST(ingested_at AS TIMESTAMP) AS ingested_at,
+    COALESCE(fetched_date, ingested_date) AS fetched_date,
+    CAST(COALESCE(fetched_at, ingested_at) AS TIMESTAMP) AS fetched_at,
 
     -- Entity and trip
     CAST(entity_id AS STRING) AS entity_id,
@@ -95,7 +96,7 @@ WITH typed_updates AS (
   FROM
     `streaming.gtfs_realtime_trip_updates`
 
-  WHERE ingested_date >= DATE_SUB(
+  WHERE COALESCE(fetched_date, ingested_date) >= DATE_SUB(
     CURRENT_DATE('Australia/Adelaide'),
     INTERVAL 1 DAY
   )
@@ -113,13 +114,14 @@ ranked_updates AS (
       ORDER BY
         trip_update_timestamp DESC,
         feed_timestamp DESC,  -- in case duplicated trip_update_timestamp due to delay from upstream 
-        ingested_at DESC -- in case crash before commit
+        fetched_at DESC -- in case crash before commit
     ) AS rn
   FROM typed_updates
 )
 
 SELECT
   ingested_date,
+  fetched_date,
   entity_id,
   trip_id,
   route_id,
