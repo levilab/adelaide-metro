@@ -5,42 +5,21 @@ materialization:
   type: table
   partition_by: ingested_date
 custom_checks:
-  - name: trip_updates_entities_are_fresh_during_service_hours
-    description: Recent Trip Update entities were fetched during service hours.
+  - name: trip_updates_successful_poll_is_fresh
+    description: Producer successfully polled Trip Updates within the last 3 minutes.
     query: |
       SELECT IF(
-        (
-          CURRENT_TIME('Australia/Adelaide') >= TIME '01:45:00'
-          AND CURRENT_TIME('Australia/Adelaide') < TIME '04:20:00'
-        )
-        OR MAX(COALESCE(fetched_at, ingested_at)) >= TIMESTAMP_SUB(
+        MAX(IF(http_success, polled_at, NULL)) >= TIMESTAMP_SUB(
           CURRENT_TIMESTAMP(),
-          INTERVAL 10 MINUTE
+          INTERVAL 3 MINUTE
         ),
         0,
         1
       )
       FROM
-        `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
-    value: 0
-
-  - name: trip_updates_source_feed_is_fresh
-    description: Adelaide Metro Trip Updates feed is fresh during service hours.
-    query: |
-      SELECT IF(
-        (
-          CURRENT_TIME('Australia/Adelaide') >= TIME '01:45:00'
-          AND CURRENT_TIME('Australia/Adelaide') < TIME '04:20:00'
-        )
-        OR MAX(feed_timestamp) >= TIMESTAMP_SUB(
-          CURRENT_TIMESTAMP(),
-          INTERVAL 10 MINUTE
-        ),
-        0,
-        1
-      )
-      FROM
-        `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
+        `adelaide-metro-505702.streaming.gtfs_feed_status`
+      WHERE
+        feed_name = 'trip_updates'
     value: 0
 
   - name: unique_trip_stop_per_service_date
