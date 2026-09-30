@@ -16,6 +16,18 @@ custom_checks:
           r'<[^>]+>'
         )
     value: 0
+  
+  - name: unique_alert_per_route
+    description: At most one latest record per alert and route.
+    query: |
+      SELECT COUNT(*)
+      FROM (
+        SELECT alert_id, route_id
+        FROM `adelaide-metro-505702.staging.stg_rt_service_alerts`
+        GROUP BY alert_id, route_id
+        HAVING COUNT(*) > 1
+      )
+    value: 0
 @bruin */
 
 WITH ranked_alerts AS (

@@ -43,6 +43,7 @@ The pipeline runs on Bruin, pulling GTFS static (updated periodically) and GTFS-
 
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
+- [Engineering Decisions](docs/engineering-decisions.md)
 - [Project Structure](#project-structure)
 - [Data Sources](#data-sources)
 - [Data Pipeline](#data-pipeline)
