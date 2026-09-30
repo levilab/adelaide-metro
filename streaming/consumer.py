@@ -64,19 +64,83 @@ FEED_STATUS_SCHEMA = [
     ),
 ]
 
+TRIP_UPDATES_SCHEMA = [
+    bigquery.SchemaField("ingested_date", "DATE"),
+    bigquery.SchemaField("ingested_at", "TIMESTAMP"),
+    bigquery.SchemaField("feed_timestamp", "TIMESTAMP"),
+    bigquery.SchemaField("source_gcs_uri", "STRING"),
+    bigquery.SchemaField("entity_id", "STRING"),
+    bigquery.SchemaField("trip_id", "STRING"),
+    bigquery.SchemaField("route_id", "STRING"),
+    bigquery.SchemaField("direction_id", "INTEGER"),
+    bigquery.SchemaField("start_date", "STRING"),
+    bigquery.SchemaField("schedule_relationship", "STRING"),
+    bigquery.SchemaField("vehicle_id", "STRING"),
+    bigquery.SchemaField("vehicle_label", "STRING"),
+    bigquery.SchemaField("trip_update_timestamp", "TIMESTAMP"),
+    bigquery.SchemaField("stop_sequence", "INTEGER"),
+    bigquery.SchemaField("stop_id", "STRING"),
+    bigquery.SchemaField("arrival_time", "TIMESTAMP"),
+    bigquery.SchemaField("fetched_date", "DATE"),
+    bigquery.SchemaField("fetched_at", "TIMESTAMP"),
+]
+
+VEHICLE_POSITIONS_SCHEMA = [
+    bigquery.SchemaField("ingested_date", "DATE"),
+    bigquery.SchemaField("ingested_at", "TIMESTAMP"),
+    bigquery.SchemaField("feed_timestamp", "TIMESTAMP"),
+    bigquery.SchemaField("source_gcs_uri", "STRING"),
+    bigquery.SchemaField("entity_id", "STRING"),
+    bigquery.SchemaField("trip_id", "STRING"),
+    bigquery.SchemaField("route_id", "STRING"),
+    bigquery.SchemaField("direction_id", "INTEGER"),
+    bigquery.SchemaField("start_date", "STRING"),
+    bigquery.SchemaField("schedule_relationship", "STRING"),
+    bigquery.SchemaField("vehicle_id", "STRING"),
+    bigquery.SchemaField("vehicle_label", "STRING"),
+    bigquery.SchemaField("latitude", "FLOAT"),
+    bigquery.SchemaField("longitude", "FLOAT"),
+    bigquery.SchemaField("bearing", "FLOAT"),
+    bigquery.SchemaField("speed", "FLOAT"),
+    bigquery.SchemaField("vehicle_timestamp", "TIMESTAMP"),
+    bigquery.SchemaField("occupancy_status", "STRING"),
+    bigquery.SchemaField("fetched_date", "DATE"),
+    bigquery.SchemaField("fetched_at", "TIMESTAMP"),
+]
+
+SERVICE_ALERTS_SCHEMA = [
+    bigquery.SchemaField("ingested_date", "DATE"),
+    bigquery.SchemaField("ingested_at", "TIMESTAMP"),
+    bigquery.SchemaField("feed_timestamp", "TIMESTAMP"),
+    bigquery.SchemaField("source_gcs_uri", "STRING"),
+    bigquery.SchemaField("entity_id", "STRING"),
+    bigquery.SchemaField("header_text", "STRING"),
+    bigquery.SchemaField("description_text", "STRING"),
+    bigquery.SchemaField("url", "STRING"),
+    bigquery.SchemaField("active_start", "TIMESTAMP"),
+    bigquery.SchemaField("cause", "STRING"),
+    bigquery.SchemaField("effect", "STRING"),
+    bigquery.SchemaField("route_id", "STRING"),
+    bigquery.SchemaField("fetched_date", "DATE"),
+    bigquery.SchemaField("fetched_at", "TIMESTAMP"),
+]
+
 # define specific config for each topic
 TOPICS_CONFIG = {
     "gtfs.vehicle_positions": {
         "table_name": "gtfs_realtime_vehicle_positions",
-        "poll_timeout": 2.0,     
+        "poll_timeout": 2.0,
+        "schema": VEHICLE_POSITIONS_SCHEMA,     
     },
     "gtfs.trip_updates": {
         "table_name": "gtfs_realtime_trip_updates",
         "poll_timeout": 3.0,
+        "schema": TRIP_UPDATES_SCHEMA,
     },
     "gtfs.service_alerts": {
         "table_name": "gtfs_realtime_service_alerts",
         "poll_timeout": 5.0,
+        "schema": SERVICE_ALERTS_SCHEMA,
     },
     "gtfs.feed_status": {
         "table_name": "gtfs_feed_status",

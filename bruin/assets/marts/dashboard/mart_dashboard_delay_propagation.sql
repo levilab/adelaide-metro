@@ -9,6 +9,7 @@ depends:
 
 WITH raw_latest AS (
     SELECT 
+        start_date,
         route_short_name,
         stop_sequence,
         stop_name,
@@ -19,24 +20,25 @@ WITH raw_latest AS (
     WHERE actual_arrival_time IS NOT NULL
       AND delay_minutes IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (
-        PARTITION BY trip_id, stop_sequence
+        PARTITION BY start_date, trip_id, stop_sequence
         ORDER BY trip_update_timestamp DESC, feed_timestamp DESC
     ) = 1
 ),
 
 rt_delay_base AS (
     SELECT 
+        start_date,
         route_short_name,
-        stop_sequence,
-        stop_name,
+    stop_sequence,
+    stop_name,
         trip_id,
         delay_minutes,
         trip_update_timestamp,
         LAG(delay_minutes) OVER (
-            PARTITION BY trip_id ORDER BY stop_sequence
+            PARTITION BY start_date, trip_id ORDER BY stop_sequence
         ) AS prev_stop_delay_minutes,
         FIRST_VALUE(delay_minutes) OVER (
-            PARTITION BY trip_id ORDER BY stop_sequence
+            PARTITION BY start_date, trip_id ORDER BY stop_sequence
         ) AS origin_delay_minutes
     FROM raw_latest
 )
@@ -45,7 +47,11 @@ SELECT
     route_short_name,
     stop_sequence,
     stop_name,
-    COUNT(DISTINCT trip_id) AS total_trips_analyzed,
+    COUNT(DISTINCT CONCAT(
+        CAST(start_date AS STRING),
+        '|',
+        trip_id
+    )) AS total_trips_analyzed,
     ROUND(AVG(delay_minutes), 2) AS avg_delay_mins,
     ROUND(AVG(delay_minutes - COALESCE(prev_stop_delay_minutes, delay_minutes)), 2) AS delay_added_mins,
     ROUND(AVG(
@@ -58,3 +64,4 @@ SELECT
 FROM rt_delay_base
 GROUP BY route_short_name, stop_sequence, stop_name
 ORDER BY route_short_name, stop_sequence;
+

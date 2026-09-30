@@ -4,6 +4,18 @@ type: bq.sql
 materialization:
   type: table
   partition_by: ingested_date
+custom_checks:
+  - name: unique_vehicle_id
+    description: At most one latest position per vehicle.
+    query: |
+      SELECT COUNT(*)
+      FROM (
+        SELECT vehicle_id
+        FROM `adelaide-metro-505702.staging.stg_rt_vehicle_positions`
+        GROUP BY vehicle_id
+        HAVING COUNT(*) > 1
+      )
+    value: 0
 @bruin */
 
 WITH ranked_vehicles AS (
