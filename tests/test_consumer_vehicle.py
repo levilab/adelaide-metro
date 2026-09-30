@@ -36,7 +36,7 @@ class TestParseVehiclePosition(unittest.TestCase):
         vehicle_position.occupancy_status = (gtfs_realtime_pb2.VehiclePosition.STANDING_ROOM_ONLY)
 
         headers = {
-            "fetch_time_adelaide": "2026-09-29T10:30:00+09:30",
+            "fetched_at": "2026-09-29T10:30:00+09:30",
             "feed_timestamp": "1780100000",
         }
 
@@ -83,7 +83,7 @@ class TestParseVehiclePosition(unittest.TestCase):
             1780100300,
         )
         self.assertEqual(
-            row["ingested_date"],
+            row["fetched_date"],
             date(2026, 9, 29),
         )
 

@@ -30,7 +30,7 @@ bruin/assets/marts/mart_trips_per_route.sql
 bruin/assets/marts/mart_trips_per_stop.sql
 bruin/assets/marts/dashboard/README.md
 *.md
-
+streaming/bigquery_migration_fetched_timestamps.sql
 logs/queries
 logs/runs
 logs/*.log

@@ -2,7 +2,42 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 
-from streaming.producer import publish_feed_status
+from google.transit import gtfs_realtime_pb2
+
+from streaming.producer import publish_event, publish_feed_status
+
+
+class TestPublishEvent(unittest.TestCase):
+
+    def test_publishes_new_and_legacy_fetch_headers(self):
+        producer = MagicMock()
+        entity = gtfs_realtime_pb2.FeedEntity()
+        entity.id = "entity-1"
+
+        publish_event(
+            producer=producer,
+            topic="gtfs.trip_updates",
+            entity=entity,
+            feed_timestamp=1_790_000_000,
+            fetched_at="2026-09-30T02:00:00+09:30",
+        )
+
+        headers = dict(
+            producer.produce.call_args.kwargs["headers"]
+        )
+
+        self.assertEqual(
+            headers["fetched_at"],
+            b"2026-09-30T02:00:00+09:30",
+        )
+        self.assertEqual(
+            headers["fetch_time_adelaide"],
+            b"2026-09-30T02:00:00+09:30",
+        )
+        self.assertEqual(
+            headers["feed_timestamp"],
+            b"1790000000",
+        )
 
 
 class TestPublishFeedStatus(unittest.TestCase):

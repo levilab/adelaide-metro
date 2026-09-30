@@ -43,7 +43,7 @@ class TestParseServiceAlert(unittest.TestCase):
         url_translation.language = "en"
 
         headers = {
-            "fetch_time_adelaide": (
+            "fetched_at": (
                 "2026-09-29T10:30:00+09:30"
             ),
             "feed_timestamp": "1780100000",

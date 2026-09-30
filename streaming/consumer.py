@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import logging
+import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -27,6 +28,42 @@ CONSUMER_GROUP_PREFIX = os.environ.get("CONSUMER_GROUP_PREFIX", "gtfs-bq-loader"
 GCP_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "adelaide-metro-505702")
 BQ_DATASET = os.environ.get("BQ_DATASET", "streaming")
 
+FEED_STATUS_SCHEMA = [
+    bigquery.SchemaField(
+        "polled_date",
+        "DATE",
+        mode="REQUIRED",
+    ),
+    bigquery.SchemaField(
+        "polled_at",
+        "TIMESTAMP",
+        mode="REQUIRED",
+    ),
+    bigquery.SchemaField(
+        "feed_name",
+        "STRING",
+        mode="REQUIRED",
+    ),
+    bigquery.SchemaField(
+        "feed_timestamp",
+        "TIMESTAMP",
+    ),
+    bigquery.SchemaField(
+        "entity_count",
+        "INTEGER",
+        mode="REQUIRED",
+    ),
+    bigquery.SchemaField(
+        "http_success",
+        "BOOLEAN",
+        mode="REQUIRED",
+    ),
+    bigquery.SchemaField(
+        "error_message",
+        "STRING",
+    ),
+]
+
 # define specific config for each topic
 TOPICS_CONFIG = {
     "gtfs.vehicle_positions": {
@@ -40,6 +77,13 @@ TOPICS_CONFIG = {
     "gtfs.service_alerts": {
         "table_name": "gtfs_realtime_service_alerts",
         "poll_timeout": 5.0,
+    },
+    "gtfs.feed_status": {
+        "table_name": "gtfs_feed_status",
+        "poll_timeout": 2.0,
+        "message_format": "json",
+        "partition_field": "polled_date",
+        "schema": FEED_STATUS_SCHEMA,
     },
 }
 
@@ -95,18 +139,46 @@ def parse_kafka_headers(headers: list) -> dict:
             parsed[k] = v.decode("utf-8") if v else None
     return parsed
 
+def parse_feed_status(value: bytes) -> dict:
+    payload = json.loads(value.decode("utf-8"))
+
+    polled_at = datetime.fromisoformat(payload["polled_at"])
+
+    if polled_at.utcoffset() is None:
+        raise ValueError("polled_at must include a timezone")
+
+    feed_timestamp = payload.get("feed_timestamp")
+
+    return {
+        "polled_date": polled_at.date(),
+        "polled_at": polled_at,
+        "feed_name": payload["feed_name"],
+        "feed_timestamp": epoch_to_adelaide_datetime(
+            feed_timestamp
+        ),
+        "entity_count": int(payload["entity_count"]),
+        "http_success": payload["http_success"],
+        "error_message": payload.get("error_message"),
+    }
 
 def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, headers: dict) -> list[dict]:
-    fetch_time_str = headers.get("fetch_time_adelaide")
-    ingested_at = datetime.fromisoformat(fetch_time_str) if fetch_time_str else datetime.now(ADELAIDE_TZ)
-    ingested_date = ingested_at.date()
+    fetched_at_str  = (
+        headers.get("fetched_at")
+        or headers.get("fetch_time_adelaide")
+    )
+    fetched_at  = datetime.fromisoformat(fetched_at_str) if fetched_at_str else datetime.now(ADELAIDE_TZ)
+    fetched_date  = fetched_at.date()
     
     feed_timestamp = int(headers.get("feed_timestamp", 0)) if headers.get("feed_timestamp") else None
     feed_dt = epoch_to_adelaide_datetime(feed_timestamp)
 
     base_info = {
-        "ingested_date": ingested_date,
-        "ingested_at": ingested_at,
+        "fetched_date": fetched_date,
+        "fetched_at": fetched_at,
+        # Keep these aliases until the raw BigQuery tables are rebuilt with
+        # fetched_date as their partition field.
+        "ingested_date": fetched_date,
+        "ingested_at": fetched_at,
         "feed_timestamp": feed_dt,
         "source_gcs_uri": "kafka_stream",
     }
@@ -202,7 +274,13 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
     return rows
 
 
-def load_batch_to_bigquery(bq_client: bigquery.Client, table_name: str, rows: list[dict]):
+def load_batch_to_bigquery(
+    bq_client: bigquery.Client,
+    table_name: str,
+    rows: list[dict],
+    partition_field: str = "ingested_date",
+    schema: list[bigquery.SchemaField] | None = None,
+):
     if not rows:
         return
 
@@ -210,11 +288,12 @@ def load_batch_to_bigquery(bq_client: bigquery.Client, table_name: str, rows: li
     table_ref = f"{GCP_PROJECT}.{BQ_DATASET}.{table_name}"
 
     job_config = bigquery.LoadJobConfig(
-        autodetect=True,
+        schema=schema,
+        autodetect=schema is None,
         write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
         time_partitioning=bigquery.TimePartitioning(
             type_=bigquery.TimePartitioningType.DAY,
-            field="ingested_date",
+            field=partition_field,
         ),
     )
     load_job = bq_client.load_table_from_dataframe(df, table_ref, job_config=job_config)
@@ -240,7 +319,16 @@ def process_topic_consumer(topic: str, config: dict):
             if msg is None:
                 if buffer_rows:
                     logger.info(f"[{topic}] End of current batch. Flushing ALL {len(buffer_rows)} rows to BigQuery...")
-                    load_batch_to_bigquery(bq_client, config["table_name"], buffer_rows)
+                    load_batch_to_bigquery(
+                        bq_client=bq_client,
+                        table_name=config["table_name"],
+                        rows=buffer_rows,
+                        partition_field=config.get(
+                            "partition_field",
+                            "ingested_date",
+                        ),
+                        schema=config.get("schema"),
+                    )
                     buffer_rows = []  # Reset buffer
                     consumer.commit(asynchronous=False)  # Commit offset after loading to BQ
                 continue
@@ -253,11 +341,17 @@ def process_topic_consumer(topic: str, config: dict):
                     raise KafkaException(msg.error())
 
             # Parse messages and append to buffer
-            headers = parse_kafka_headers(msg.headers())
-            entity = gtfs_realtime_pb2.FeedEntity()
-            entity.ParseFromString(msg.value())
+            if config.get("message_format") == "json":
+                parsed_rows = [
+                    parse_feed_status(msg.value())
+                ]
+            else:
+                headers = parse_kafka_headers(msg.headers())
+                entity = gtfs_realtime_pb2.FeedEntity()
+                entity.ParseFromString(msg.value())
 
-            parsed_rows = parse_entity_to_rows(topic, entity, headers)
+                parsed_rows = parse_entity_to_rows(topic, entity, headers)
+
             buffer_rows.extend(parsed_rows)
 
     except Exception as e:
@@ -265,7 +359,16 @@ def process_topic_consumer(topic: str, config: dict):
     finally:
         # Flush remaining buffer after stopping application.
         if buffer_rows:
-            load_batch_to_bigquery(bq_client, config["table_name"], buffer_rows)
+            load_batch_to_bigquery(
+                bq_client=bq_client,
+                table_name=config["table_name"],
+                rows=buffer_rows,
+                partition_field=config.get(
+                    "partition_field",
+                    "ingested_date",
+                ),
+                schema=config.get("schema"),
+            )
             consumer.commit(asynchronous=False)
         consumer.close()
         logger.info(f"[{topic}] Consumer worker shut down.")
@@ -273,7 +376,7 @@ def process_topic_consumer(topic: str, config: dict):
 def main():
     logger.info("Starting Multi-threaded GTFS Consumer Framework...")
 
-    # running 3 workers in parallel
+    # Run one worker for each configured topic.
     with ThreadPoolExecutor(max_workers=len(TOPICS_CONFIG)) as executor:
         for topic, config in TOPICS_CONFIG.items():
             executor.submit(process_topic_consumer, topic, config)

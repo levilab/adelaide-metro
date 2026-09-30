@@ -1,9 +1,13 @@
 import unittest
+import json
 from datetime import date
 
 from google.transit import gtfs_realtime_pb2
 
-from streaming.consumer import parse_entity_to_rows
+from streaming.consumer import (
+    parse_entity_to_rows,
+    parse_feed_status
+)
 
 class TestParseTripUpdate(unittest.TestCase):
 
@@ -28,7 +32,7 @@ class TestParseTripUpdate(unittest.TestCase):
         stop_update.arrival.time = 1780100300
 
         headers = {
-            "fetch_time_adelaide": "2026-09-29T10:30:00+09:30",
+            "fetched_at": "2026-09-29T10:30:00+09:30",
             "feed_timestamp": "1780100000",
         }
 
@@ -54,7 +58,7 @@ class TestParseTripUpdate(unittest.TestCase):
         self.assertEqual(row["vehicle_label"], "Bus 20")
         self.assertEqual(row["stop_sequence"], 1)
         self.assertEqual(row["stop_id"], "stop-30")
-        self.assertEqual(row["ingested_date"], date(2026, 9, 29))
+        self.assertEqual(row["fetched_date"], date(2026, 9, 29))
         self.assertEqual(
             int(row["arrival_time"].timestamp()),
             1780100300,
@@ -79,7 +83,7 @@ class TestParseTripUpdate(unittest.TestCase):
         second_stop.stop_id = "stop-40"
 
         headers = {
-            "fetch_time_adelaide": "2026-09-29T10:30:00+09:30",
+            "fetched_at": "2026-09-29T10:30:00+09:30",
             "feed_timestamp": "1780100000",
         }
 
@@ -105,5 +109,63 @@ class TestParseTripUpdate(unittest.TestCase):
         )
         self.assertIsNone(rows[0]["schedule_relationship"])
 
-if __name__=="__main__":
+    def test_accepts_legacy_fetch_time_header(self):
+        entity = gtfs_realtime_pb2.FeedEntity()
+        trip_update = entity.trip_update
+        trip_update.trip.trip_id = "trip-legacy"
+
+        stop_update = trip_update.stop_time_update.add()
+        stop_update.stop_sequence = 1
+        stop_update.stop_id = "stop-legacy"
+
+        rows = parse_entity_to_rows(
+            "gtfs.trip_updates",
+            entity,
+            {
+                "fetch_time_adelaide": (
+                    "2026-09-29T10:30:00+09:30"
+                ),
+                "feed_timestamp": "1780100000",
+            },
+        )
+
+        self.assertEqual(
+            rows[0]["fetched_date"],
+            date(2026, 9, 29),
+        )
+
+class TestFeedStatusParser(unittest.TestCase):
+    def test_parse_successful_feed_status_with_zero_entities(self):
+        payload = {
+            "feed_name": "trip_updates",
+            "polled_at": "2026-09-30T02:00:00+09:30",
+            "feed_timestamp": 1_790_000_000,
+            "entity_count": 0,
+            "http_success": True,
+            "error_message": None,
+        }
+
+        row = parse_feed_status(
+            json.dumps(payload).encode("utf-8")
+        )
+
+        self.assertEqual(row["feed_name"], "trip_updates")
+        self.assertEqual(row["entity_count"], 0)
+        self.assertTrue(row["http_success"])
+        self.assertIsNone(row["error_message"])
+
+        self.assertEqual(
+            row["polled_at"].isoformat(),
+            "2026-09-30T02:00:00+09:30",
+        )
+        self.assertEqual(
+            row["feed_timestamp"].timestamp(),
+            1_790_000_000,
+        )
+        self.assertEqual(
+            row["polled_date"].isoformat(),
+            "2026-09-30",
+        )
+
+if __name__== "__main__":
     unittest.main()

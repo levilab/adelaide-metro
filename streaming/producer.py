@@ -85,11 +85,11 @@ def fetch_feed(feed_name: str, url: str) -> tuple[gtfs_realtime_pb2.FeedMessage,
     response = requests.get(url, headers=HEADERS, timeout=30)
     response.raise_for_status()
 
-    fetch_time = datetime.now(ADELAIDE_TZ).isoformat()
+    fetched_at = datetime.now(ADELAIDE_TZ).isoformat()
     feed = gtfs_realtime_pb2.FeedMessage()
     feed.ParseFromString(response.content)
 
-    return feed, fetch_time
+    return feed, fetched_at
 
 
 def extract_entity_key(entity: gtfs_realtime_pb2.FeedEntity) -> str:
@@ -105,12 +105,15 @@ def publish_event(
     topic: str,
     entity: gtfs_realtime_pb2.FeedEntity,
     feed_timestamp: int,
-    fetch_time: str,
+    fetched_at: str,
 ):
     key = extract_entity_key(entity)
     payload = entity.SerializeToString() # transform to raw bytes, so any languagues can read it
     headers = [
-        ("fetch_time_adelaide", fetch_time.encode("utf-8")),
+        ("fetched_at", fetched_at.encode("utf-8")),
+        # Keep the legacy header during the rolling deployment so that the
+        # previous consumer revision can still read newly produced messages.
+        ("fetch_time_adelaide", fetched_at.encode("utf-8")),
         ("feed_timestamp", str(feed_timestamp).encode("utf-8")),
     ]
 
@@ -154,13 +157,13 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
     while True:
         start_time = time.time()
         try:
-            feed, fetch_time = fetch_feed(feed_name, config["url"])
+            feed, fetched_at = fetch_feed(feed_name, config["url"])
             feed_timestamp = feed.header.timestamp
             topic = config["topic"]
 
             count = 0
             for entity in feed.entity:
-                publish_event(producer, topic, entity, feed_timestamp, fetch_time)
+                publish_event(producer, topic, entity, feed_timestamp, fetched_at)
                 count += 1
                 # Poll  internal events from producer every 500 msgs to avoid out of memory
                 if count % 500 == 0:
@@ -169,7 +172,7 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
             publish_feed_status(
                 producer=producer,
                 feed_name=feed_name,
-                polled_at=fetch_time,
+                polled_at=fetched_at,
                 feed_timestamp=feed_timestamp,
                 entity_count=count,
                 http_success=True,
