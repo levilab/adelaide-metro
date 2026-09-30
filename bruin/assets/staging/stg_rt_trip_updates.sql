@@ -6,10 +6,14 @@ materialization:
   partition_by: ingested_date
 custom_checks:
   - name: trip_updates_ingestion_is_fresh
-    description: Consumer has written Trip Updates within the last 10 minutes.
+    description: Consumer has written recent Trip Update entities during service hours.
     query: |
       SELECT IF(
-        MAX(ingested_at) >= TIMESTAMP_SUB(
+        (
+          CURRENT_TIME('Australia/Adelaide') >= TIME '01:45:00'
+          AND CURRENT_TIME('Australia/Adelaide') < TIME '04:20:00'
+        )
+        OR MAX(ingested_at) >= TIMESTAMP_SUB(
           CURRENT_TIMESTAMP(),
           INTERVAL 10 MINUTE
         ),
@@ -21,10 +25,14 @@ custom_checks:
     value: 0
 
   - name: trip_updates_source_feed_is_fresh
-    description: Adelaide Metro feed timestamp is within the last 10 minutes.
+    description: Adelaide Metro Trip Updates feed is fresh during service hours.
     query: |
       SELECT IF(
-        MAX(feed_timestamp) >= TIMESTAMP_SUB(
+        (
+          CURRENT_TIME('Australia/Adelaide') >= TIME '01:45:00'
+          AND CURRENT_TIME('Australia/Adelaide') < TIME '04:20:00'
+        )
+        OR MAX(feed_timestamp) >= TIMESTAMP_SUB(
           CURRENT_TIMESTAMP(),
           INTERVAL 10 MINUTE
         ),

@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import logging
+import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -21,6 +22,10 @@ logger = logging.getLogger("gtfs-producer")
 
 ADELAIDE_TZ = ZoneInfo("Australia/Adelaide")
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+FEED_STATUS_TOPIC = os.environ.get(
+    "FEED_STATUS_TOPIC",
+    "gtfs.feed_status",
+)
 HEADERS = {"accept": "application/x-google-protobuf"}
 
 FEEDS_CONFIG = {
@@ -117,6 +122,30 @@ def publish_event(
         on_delivery=delivery_report,
     )
 
+def publish_feed_status(
+    producer: Producer,
+    feed_name: str,
+    polled_at: str,
+    feed_timestamp: int | None,
+    entity_count: int,
+    http_success: bool,
+    error_message: str | None = None,
+):
+    payload = {
+        "feed_name": feed_name,
+        "polled_at": polled_at,
+        "feed_timestamp": feed_timestamp,
+        "entity_count": entity_count,
+        "http_success": http_success,
+        "error_message": error_message,
+    }
+
+    producer.produce(
+        topic=FEED_STATUS_TOPIC,
+        key=feed_name.encode("utf-8"),
+        value=json.dumps(payload).encode("utf-8"),
+        on_delivery=delivery_report,
+    )
 
 def process_feed(producer: Producer, feed_name: str, config: dict):
     # Indepdendent worker for each feed
@@ -137,6 +166,14 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
                 if count % 500 == 0:
                     producer.poll(0)
 
+            publish_feed_status(
+                producer=producer,
+                feed_name=feed_name,
+                polled_at=fetch_time,
+                feed_timestamp=feed_timestamp,
+                entity_count=count,
+                http_success=True,
+            )
             # flush all remaining messages in internal RAM queue
             remaining = producer.flush(timeout=5) 
             if remaining:
@@ -145,6 +182,23 @@ def process_feed(producer: Producer, feed_name: str, config: dict):
 
         except requests.RequestException as e:
             logger.error(f"[{feed_name}] Network Error: {e}")
+
+            try:
+                publish_feed_status(
+                    producer=producer,
+                    feed_name=feed_name,
+                    polled_at=datetime.now(ADELAIDE_TZ).isoformat(),
+                    feed_timestamp=None,
+                    entity_count=0,
+                    http_success=False,
+                    error_message=str(e),
+                )
+                producer.flush(timeout=5)
+            except Exception as status_error:
+                logger.error(
+                    f"[{feed_name}] Failed to publish feed status: "
+                    f"{status_error}"
+                )
         except Exception as e:
             logger.error(f"[{feed_name}] Unexpected Error: {e}", exc_info=True)
 
