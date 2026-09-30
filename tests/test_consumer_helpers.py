@@ -32,7 +32,7 @@ class TestParseKafkaHeaders(unittest.TestCase):
     def test_decodes_kafka_header_bytes(self):
         # Arrange
         headers = [
-            ("fetch_time_adelaide", b"2026-09-29T10:30:00+09:30"),
+            ("fetched_at", b"2026-09-29T10:30:00+09:30"),
             ("feed_timestamp", b"1780000000")
         ]
         # Act
@@ -42,7 +42,7 @@ class TestParseKafkaHeaders(unittest.TestCase):
         self.assertEqual(
             result,
             {
-                    "fetch_time_adelaide": "2026-09-29T10:30:00+09:30",
+                    "fetched_at": "2026-09-29T10:30:00+09:30",
                     "feed_timestamp": "1780000000"
                 }
         )
