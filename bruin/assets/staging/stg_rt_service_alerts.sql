@@ -28,6 +28,31 @@ custom_checks:
         HAVING COUNT(*) > 1
       )
     value: 0
+
+  - name: trip_updates_source_feed_is_fresh
+    description: Latest successful poll contains a source snapshot less than 10 minutes old.
+    query: |
+      SELECT IF(
+        COALESCE(
+          (
+            SELECT feed_timestamp >= TIMESTAMP_SUB(
+              CURRENT_TIMESTAMP(),
+              INTERVAL 10 MINUTE
+            )
+            FROM
+              `adelaide-metro-505702.streaming.gtfs_feed_status`
+            WHERE
+              feed_name = 'trip_updates'
+              AND http_success = TRUE
+            ORDER BY polled_at DESC
+            LIMIT 1
+          ),
+          FALSE
+        ),
+        0,
+        1
+      )
+    value: 0
 @bruin */
 
 WITH ranked_alerts AS (

@@ -337,6 +337,19 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
 
     return rows
 
+def should_flush_batch(
+    row_count: int,
+    elapsed_seconds: float,
+    max_rows: int = 5000,
+    max_wait_seconds: float = 30.0,
+) -> bool:
+    if row_count == 0:
+        return False
+
+    return (
+        row_count >= max_rows
+        or elapsed_seconds >= max_wait_seconds
+    )
 
 def load_batch_to_bigquery(
     bq_client: bigquery.Client,
@@ -373,50 +386,68 @@ def process_topic_consumer(topic: str, config: dict):
     logger.info(f"Worker started consuming topic '{topic}'")
 
     buffer_rows = []
+    batch_started_at = None
 
     try:
         while True:
-            # Poll data from Kafka
             msg = consumer.poll(timeout=config["poll_timeout"])
 
-            # if kafka returns None (no more data) -> Flush all buffer to BQ
-            if msg is None:
-                if buffer_rows:
-                    logger.info(f"[{topic}] End of current batch. Flushing ALL {len(buffer_rows)} rows to BigQuery...")
-                    load_batch_to_bigquery(
-                        bq_client=bq_client,
-                        table_name=config["table_name"],
-                        rows=buffer_rows,
-                        partition_field=config.get(
-                            "partition_field",
-                            "ingested_date",
-                        ),
-                        schema=config.get("schema"),
-                    )
-                    buffer_rows = []  # Reset buffer
-                    consumer.commit(asynchronous=False)  # Commit offset after loading to BQ
+            if msg is not None:
+                if msg.error():
+                    if msg.error().code() != KafkaError._PARTITION_EOF:
+                        raise KafkaException(msg.error())
+                else:
+                    if config.get("message_format") == "json":
+                        parsed_rows = [
+                            parse_feed_status(msg.value())
+                        ]
+                    else:
+                        headers = parse_kafka_headers(msg.headers())
+                        entity = gtfs_realtime_pb2.FeedEntity()
+                        entity.ParseFromString(msg.value())
+
+                        parsed_rows = parse_entity_to_rows(
+                            topic, entity, headers
+                        )
+
+                    if parsed_rows and not buffer_rows:
+                        batch_started_at = time.monotonic()
+
+                    buffer_rows.extend(parsed_rows)
+
+            if not buffer_rows:
                 continue
 
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    continue
-                else:
-                    logger.error(f"[{topic}] Kafka Error: {msg.error()}")
-                    raise KafkaException(msg.error())
+            elapsed_seconds = (
+                time.monotonic() - batch_started_at
+            )
 
-            # Parse messages and append to buffer
-            if config.get("message_format") == "json":
-                parsed_rows = [
-                    parse_feed_status(msg.value())
-                ]
-            else:
-                headers = parse_kafka_headers(msg.headers())
-                entity = gtfs_realtime_pb2.FeedEntity()
-                entity.ParseFromString(msg.value())
+            if msg is None or should_flush_batch(
+                row_count=len(buffer_rows),
+                elapsed_seconds=elapsed_seconds,
+            ):
+                logger.info(
+                    "[%s] Flushing %s rows after %.1f seconds",
+                    topic,
+                    len(buffer_rows),
+                    elapsed_seconds,
+                )
 
-                parsed_rows = parse_entity_to_rows(topic, entity, headers)
+                load_batch_to_bigquery(
+                    bq_client=bq_client,
+                    table_name=config["table_name"],
+                    rows=buffer_rows,
+                    partition_field=config.get(
+                        "partition_field",
+                        "ingested_date",
+                    ),
+                    schema=config.get("schema"),
+                )
 
-            buffer_rows.extend(parsed_rows)
+                consumer.commit(asynchronous=False)
+
+                buffer_rows = []
+                batch_started_at = None
 
     except Exception as e:
         logger.error(f"[{topic}] Worker failed unexpectedly: {e}", exc_info=True)

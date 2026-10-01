@@ -34,3 +34,4 @@ logs/queries
 logs/runs
 logs/*.log
 docs/engineering-decisions.md
+docs/challenges-and-lessons.md
