@@ -2,7 +2,8 @@ import unittest
 
 from streaming.consumer import (
     gtfs_date_to_string,
-    parse_kafka_headers
+    parse_kafka_headers,
+    should_flush_batch,
 )
 
 class TestGtfsDateToString(unittest.TestCase):
@@ -65,6 +66,28 @@ class TestParseKafkaHeaders(unittest.TestCase):
         result = parse_kafka_headers([])
 
         self.assertEqual(result, {}) 
+
+class TestShouldFlushBatch(unittest.TestCase):
+
+    def test_empty_buffer_does_not_flush(self):
+        self.assertFalse(
+            should_flush_batch(0, elapsed_seconds=60)
+        )
+
+    def test_row_limit_triggers_flush(self):
+        self.assertTrue(
+            should_flush_batch(5000, elapsed_seconds=1)
+        )
+
+    def test_time_limit_triggers_flush(self):
+        self.assertTrue(
+            should_flush_batch(10, elapsed_seconds=30)
+        )
+
+    def test_below_both_limits_keeps_buffering(self):
+        self.assertFalse(
+            should_flush_batch(4999, elapsed_seconds=29.9)
+        ) 
 
 if __name__=="__main__":
     unittest.main()
