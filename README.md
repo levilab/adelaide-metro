@@ -148,9 +148,9 @@ The dashboard reads prepared BigQuery tables, called **marts**. These must alrea
 
 ## What Can Be Improved
 
-- Make project IDs configurable and automate the remaining cloud setup.
-- Filter services by date and keep old timetables for historical comparisons.
-- Handle repeated updates and worker failures, and show when data was last updated.
-- Compare actual vehicle movement with timetable-based CBD speeds.
+- **Easier setup:** Project IDs are repeated across SQL and deployment files, and some cloud resources still need manual setup. Use one shared configuration and automate those steps so another user can run the project with fewer edits.
+- **More reliable live updates:** A restart can cause the same update to be loaded again, and a failed worker can stop new data from arriving. Handle repeated records, restart failed workers, and show the last update time so users can tell whether the dashboard is current.
+- **Repeatable data loads:** Static downloads replace the current tables, and only a source-change hash is saved. Keep versioned copies of source files so a failed load can be retried with the same input and earlier results can be reproduced.
+- **Cost control:** Live workers run continuously, and repeated database loads and queries add costs. Monitor usage and tune batch sizes, refresh intervals, and storage retention to keep operating costs predictable.
 
 [Pipeline limitations →](docs/data-model.md#what-can-be-improved)

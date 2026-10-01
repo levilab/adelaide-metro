@@ -234,10 +234,8 @@ adelaide-metro/
 ## What Can Be Improved
 
 - **Configuration portability:** Parameterize project IDs across SQL, containers, and workflows so one configuration controls the target project.
-- **Timetable semantics:** Current network counts summarize the loaded feed. Add service-date filtering and `calendar_dates.txt` exceptions before presenting daily operational totals.
 - **Realtime delivery:** Warehouse loads and Kafka offset commits are separate operations, so replay can append duplicates. Trip staging deduplicates its latest records; add broader replay handling and worker recovery.
 - **Freshness:** Polling status and delay timestamps are available, but feed polling, warehouse loading, five-minute transforms, and dashboard caching each contribute latency. Add a consistent freshness indicator across tabs.
-- **Historical analysis:** Static ingestion replaces current tables and retains a source hash rather than versioned snapshots. Archive feed versions for reproducible historical comparisons.
-- **Observed performance:** CBD speed currently uses the timetable. Extend vehicle-position modeling to compare observed movement with scheduled speed.
+- **Repeatable data loads:** Static ingestion replaces current tables and retains a source hash rather than versioned snapshots. Keep versioned source files so retries and reruns can use the same input, and previous outputs can be reproduced.
 - **Deployment completeness:** Automate the remaining WIF, Kafka, repository, and API setup, and align the dashboard service account with its read-only role.
 - **Cost control:** BigQuery queries, load jobs, continuously running Worker Pools, and the dashboard's minimum instance require a project-specific cost budget; this configuration does not guarantee free-tier operation.
