@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md) · [Data model](data-model.md)
 
-This guide covers a first-time local setup backed by GCP, cloud deployment, scheduling, and validation. For an existing warehouse, the README's quick start is enough to launch the dashboard.
+This guide covers a first-time local setup backed by Google Cloud Platform (GCP), cloud deployment, scheduling, and checks. If the BigQuery database tables already exist, the README's quick start is enough to launch the dashboard.
 
 ---
 

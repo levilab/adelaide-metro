@@ -2,7 +2,11 @@
 
 [← Back to README](../README.md) · [Setup guide](setup.md)
 
-The pipeline combines the current GTFS timetable, recent realtime updates, and LGA boundaries. Static tables describe the loaded feed; realtime tables support the latest available delay analysis.
+The pipeline combines the current public transport timetable, recent live updates, and local council boundaries. Timetable tables describe scheduled services; realtime tables support the latest available delay analysis.
+
+**GTFS** (General Transit Feed Specification) is the standard format for routes, stops, and timetables. **GTFS-Realtime** carries live vehicle locations, expected arrivals, and service alerts. **LGA** means Local Government Area: an area managed by a local council.
+
+The database layers separate source data (`raw` and `streaming`), cleaned data (`staging`), shared reference and event tables (`core`), and tables prepared for the dashboard (`marts`). A **producer** sends updates to Kafka; a **consumer** reads them and loads BigQuery. Cloud Run **Worker Pools** keep these programs running continuously.
 
 ---
 

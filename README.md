@@ -1,5 +1,7 @@
 # 🚌 Adelaide Transit Pulse
 
+**Adelaide public transport analytics**
+
 ![GCP](https://img.shields.io/badge/Cloud-Google_Cloud_Platform-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
 ![BigQuery](https://img.shields.io/badge/Warehouse-BigQuery-4285F4?style=flat-square&logo=googlebigquery&logoColor=white)
 ![GCS](https://img.shields.io/badge/Lake-Cloud_Storage-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
@@ -14,15 +16,17 @@
 
 🚀 **[Live Dashboard → CLICK HERE](https://adelaide-metro-162176027068.asia-east2.run.app/)**
 
-Adelaide Metro timetables and realtime feeds become an interactive dashboard for exploring service coverage, route directness, CBD scheduled speed, and delay propagation.
+Explore Adelaide's public transport network: where scheduled services are busiest, how direct routes are, and how delays change along a trip.
 
 ---
 
 ## Problem Statement
 
-Raw transit feeds describe individual trips and stops. This project combines them with South Australian Local Government Area (LGA) boundaries to answer four questions: **where is service concentrated, how direct are routes, how does scheduled speed vary, and where do delays grow or recover?**
+Public transport data often comes as separate timetables and live updates. This project brings them together with Local Government Area (LGA) boundaries — the areas managed by local councils — to explore routes, stops, and connections across Adelaide.
 
-The pipeline combines batch ingestion and continuous Kafka transport, transforms data in BigQuery with Bruin, and serves four Streamlit tabs.
+**GTFS** (General Transit Feed Specification) is a standard format for routes, stops, and timetables. **GTFS-Realtime** adds live updates about vehicle locations, expected arrivals, and service alerts.
+
+Python downloads the data, Kafka carries live updates, and Bruin prepares BigQuery tables for four Streamlit dashboard tabs.
 
 [Architecture](#architecture) · [Dashboard](#dashboard) · [Quick Start](#quick-start) · [Setup guide](docs/setup.md) · [Data model](docs/data-model.md)
 
@@ -32,18 +36,18 @@ The pipeline combines batch ingestion and continuous Kafka transport, transforms
 
 ```mermaid
 flowchart TD
-    STATIC["🌐 Static GTFS"] --> INGEST["⚙️ Python ingestion"]
+    STATIC["🌐 Timetables\nStatic GTFS"] --> INGEST["⚙️ Python\nDownload and load"]
     INGEST --> GCS["🪣 Cloud Storage"]
     GCS --> RAW["🗄️ BigQuery · raw"]
-    LGA["🗺️ LGA boundaries"] --> GEO["⚙️ GeoPandas\nstaging.stg_lgas"]
-    API["📡 GTFS-Realtime"] --> PROD["☁️ Producer Worker Pool"]
-    PROD --> KAFKA["📨 Kafka\nEntities + feed status"]
-    KAFKA --> CONS["☁️ Consumer Worker Pool"]
+    LGA["🗺️ Council boundaries\nLGAs"] --> GEO["⚙️ GeoPandas\nPrepare map boundaries"]
+    API["📡 Live updates\nGTFS-Realtime"] --> PROD["☁️ Producer\nFetch and send updates"]
+    PROD --> KAFKA["📨 Kafka\nUpdates + polling status"]
+    KAFKA --> CONS["☁️ Consumer\nRead and load updates"]
     CONS --> STREAM["🗄️ BigQuery · streaming"]
-    RAW --> BRUIN["🔧 Bruin\nstaging → core → marts"]
+    RAW --> BRUIN["🔧 Bruin\nClean → combine → dashboard tables"]
     GEO --> BRUIN
     STREAM --> BRUIN
-    BRUIN --> APP["☁️ Streamlit Dashboard\nFour analytical tabs"]
+    BRUIN --> APP["☁️ Streamlit Dashboard\nFour tabs"]
 
     style STATIC fill:#e8f4f8,stroke:#4285F4
     style LGA fill:#e8f4f8,stroke:#4285F4
@@ -60,7 +64,7 @@ flowchart TD
     style APP fill:#4285F4,color:#fff,stroke:#4285F4
 ```
 
-GitHub Actions runs the full batch pipeline daily. Producer/consumer Worker Pools run continuously; Cloud Scheduler refreshes the trip-update delay path every five minutes. [Full architecture and refresh details →](docs/data-model.md#architecture)
+GitHub Actions runs the full pipeline daily. The producer and consumer run continuously on Cloud Run Worker Pools; Cloud Scheduler rebuilds the delay tables every five minutes. [Full architecture and update schedule →](docs/data-model.md#architecture)
 
 ---
 
@@ -68,11 +72,11 @@ GitHub Actions runs the full batch pipeline daily. Producer/consumer Worker Pool
 
 | Layer | Tools |
 | --- | --- |
-| Ingestion & streaming | Python, GeoPandas, Kafka / Aiven |
-| Storage & warehouse | Cloud Storage, BigQuery |
-| Orchestration | Bruin, Cloud Scheduler |
+| Data collection & live updates | Python, GeoPandas, Kafka / Aiven |
+| File storage & database | Cloud Storage, BigQuery |
+| Data processing & scheduling | Bruin, Cloud Scheduler |
 | Dashboard | Streamlit, Plotly, pydeck |
-| Infrastructure & delivery | Terraform, Docker, Cloud Run, GitHub Actions |
+| Cloud setup & deployment | Terraform, Docker, Cloud Run, GitHub Actions |
 
 ---
 
@@ -80,17 +84,17 @@ GitHub Actions runs the full batch pipeline daily. Producer/consumer Worker Pool
 
 | Tab | Capture | What it shows |
 | --- | --- | --- |
-| **Network Analytics** | ![Network Analytics](docs/images/streamlit_network_analytics.png) | Scheduled service concentration, busiest routes/stops, and downstream LGA reach. |
-| **Circuity Analysis** | ![Circuity Analysis](docs/images/streamlit_circuity.png) | Route shape length compared with geographic reach, by service class. |
-| **CBD Corridor Speed** | ![CBD Corridor Speed](docs/images/streamlit_CBD_speed.png) | Scheduled speed and trip volume across CBD corridors and time buckets. |
-| **Delay Propagation Monitoring** | ![Delay Propagation](docs/images/streamlit_dealy_propagation.png) | Arrival delay, added delay between available stops, and recovery along trips. |
+| **Network Analytics** | ![Network Analytics](docs/images/streamlit_network_analytics.png) | Where scheduled services are busiest, and which council areas can be reached by staying on the same trip. |
+| **Circuity Analysis** | ![Circuity Analysis](docs/images/streamlit_circuity.png) | How direct a route is: its length compared with the distance from its first stop to its farthest stop. |
+| **CBD Corridor Speed** | ![CBD Corridor Speed](docs/images/streamlit_CBD_speed.png) | Timetable-based speed and trip counts along streets in the central business district (CBD), by time of day. |
+| **Delay Propagation Monitoring** | ![Delay Propagation](docs/images/streamlit_dealy_propagation.png) | How arrival delays grow or recover as a trip moves from stop to stop. |
 
-Counts describe the loaded timetable, CBD speed is scheduled rather than observed, and realtime arrivals may be predictions. [Metric definitions →](docs/data-model.md#metric-semantics)
+Counts come from the loaded timetable. CBD speed uses scheduled travel times, and live arrival updates may be predictions. [How the measures are calculated →](docs/data-model.md#metric-semantics)
 
 <details>
 <summary>More screenshots & tech stack diagram</summary>
 
-| Spatial reach | LGA coverage |
+| Connections across council areas | Council-area map |
 | --- | --- |
 | ![Spatial Reach](docs/images/streamlit_spatial_reach.png) | ![LGA Coverage](docs/images/streamlit_spatial_reach-2.png) |
 
@@ -110,11 +114,11 @@ Counts describe the loaded timetable, CBD speed is scheduled rather than observe
 
 ```
 adelaide-metro/
-├── bruin/               # Ingestion → staging → core → marts
-├── streaming/           # Continuous Kafka producer and consumer
+├── bruin/               # Collect, clean, combine and prepare dashboard data
+├── streaming/           # Send and load live updates through Kafka
 ├── dashboard/           # Streamlit app
-├── terraform/           # GCP infrastructure and realtime scheduler
-├── .github/workflows/   # Validation, deployment, daily batch
+├── terraform/           # Google Cloud resources and update schedule
+├── .github/workflows/   # Checks, deployment and daily pipeline run
 ├── tests/               # Producer/consumer unit tests
 └── docs/                # Setup, data model, diagrams and screenshots
 ```
@@ -125,9 +129,9 @@ adelaide-metro/
 
 ## Quick Start
 
-**First-time setup:** follow [docs/setup.md](docs/setup.md) to configure GCP, Bruin, Kafka, and the initial warehouse build. SQL currently contains project IDs that must be updated for your own project.
+**First-time setup:** follow [docs/setup.md](docs/setup.md) to configure Google Cloud Platform (GCP), Bruin, and Kafka, then build the database tables. SQL currently contains project IDs that must be updated for your own project.
 
-**With an existing warehouse:** from the repository root, using Bash/WSL and Python 3.11:
+**With the database tables already built:** run these commands from the project folder using Bash (or WSL on Windows) and Python 3.11:
 
 ```bash
 python -m venv .venv
@@ -138,15 +142,15 @@ export GOOGLE_CLOUD_PROJECT="your-project-id"
 streamlit run dashboard/App.py
 ```
 
-The dashboard needs the mart tables already built in that project. [Deployment, schedules, and validation →](docs/setup.md#deployment--scheduling)
+The dashboard reads prepared BigQuery tables, called **marts**. These must already exist in your project. [Deployment, schedules, and checks →](docs/setup.md#deployment--scheduling)
 
 ---
 
 ## What Can Be Improved
 
-- Parameterize project IDs and automate the remaining cloud setup.
-- Add service-date filtering and versioned static feeds for historical analysis.
-- Improve realtime replay handling, worker recovery, and freshness indicators.
-- Compare observed vehicle movement with scheduled CBD speeds.
+- Make project IDs configurable and automate the remaining cloud setup.
+- Filter services by date and keep old timetables for historical comparisons.
+- Handle repeated updates and worker failures, and show when data was last updated.
+- Compare actual vehicle movement with timetable-based CBD speeds.
 
 [Pipeline limitations →](docs/data-model.md#what-can-be-improved)
