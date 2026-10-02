@@ -11,6 +11,11 @@ import pandas as pd
 from confluent_kafka import Consumer, KafkaError, KafkaException
 from google.cloud import bigquery
 from google.transit import gtfs_realtime_pb2
+from google.api_core.exceptions import (
+    InternalServerError,
+    ServiceUnavailable,
+    GatewayTimeout,
+)
 
 load_dotenv()
 
@@ -450,23 +455,39 @@ def process_topic_consumer(topic: str, config: dict):
                 batch_started_at = None
 
     except Exception as e:
-        logger.error(f"[{topic}] Worker failed unexpectedly: {e}", exc_info=True)
+        logger.exception(
+            "[%s] Consumer worker failed",
+            topic,
+        )
+        raise
     finally:
-        # Flush remaining buffer after stopping application.
-        if buffer_rows:
-            load_batch_to_bigquery(
-                bq_client=bq_client,
-                table_name=config["table_name"],
-                rows=buffer_rows,
-                partition_field=config.get(
-                    "partition_field",
-                    "ingested_date",
-                ),
-                schema=config.get("schema"),
-            )
-            consumer.commit(asynchronous=False)
         consumer.close()
-        logger.info(f"[{topic}] Consumer worker shut down.")
+        logger.info(
+            "[%s] Consumer connection closed",
+            topic,
+        )
+
+def run_topic_worker(topic: str, config: dict):
+    while True:
+        try:
+            process_topic_consumer(topic, config)
+
+        except (
+            InternalServerError,
+            ServiceUnavailable,
+            GatewayTimeout,
+        ):
+            logger.warning(
+                "[%s] Temporary BigQuery failure. "
+                "Restarting consumer in 5 seconds.",
+                topic,
+            )
+            time.sleep(5)
+
+        else:
+            raise RuntimeError(
+                f"[{topic}] Consumer returned unexpectedly"
+            )
 
 def main():
     logger.info("Starting Multi-threaded GTFS Consumer Framework...")
@@ -474,7 +495,7 @@ def main():
     # Run one worker for each configured topic.
     with ThreadPoolExecutor(max_workers=len(TOPICS_CONFIG)) as executor:
         for topic, config in TOPICS_CONFIG.items():
-            executor.submit(process_topic_consumer, topic, config)
+            executor.submit(run_topic_worker, topic, config)
 
     try:
         while True:
