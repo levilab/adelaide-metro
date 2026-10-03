@@ -36,10 +36,7 @@ rt_delay_base AS (
         trip_update_timestamp,
         LAG(delay_minutes) OVER (
             PARTITION BY start_date, trip_id ORDER BY stop_sequence
-        ) AS prev_stop_delay_minutes,
-        FIRST_VALUE(delay_minutes) OVER (
-            PARTITION BY start_date, trip_id ORDER BY stop_sequence
-        ) AS origin_delay_minutes
+        ) AS prev_stop_delay_minutes
     FROM raw_latest
 )
 
@@ -52,16 +49,10 @@ SELECT
         '|',
         trip_id
     )) AS total_trips_analyzed,
-    ROUND(AVG(delay_minutes), 2) AS avg_delay_mins,
-    ROUND(AVG(delay_minutes - COALESCE(prev_stop_delay_minutes, delay_minutes)), 2) AS delay_added_mins,
-    ROUND(AVG(
-        CASE 
-            WHEN origin_delay_minutes > 0 THEN delay_minutes / origin_delay_minutes
-            ELSE 1.0
-        END
-    ), 2) AS propagation_factor,
+    -- Decimal aggregation keeps two-decimal rounding stable across query plans.
+    CAST(ROUND(AVG(CAST(delay_minutes AS NUMERIC)), 2) AS FLOAT64) AS avg_delay_mins,
+    CAST(ROUND(AVG(CAST(delay_minutes - COALESCE(prev_stop_delay_minutes, delay_minutes) AS NUMERIC)), 2) AS FLOAT64) AS delay_added_mins,
     MAX(trip_update_timestamp) AS data_as_of
 FROM rt_delay_base
 GROUP BY route_short_name, stop_sequence, stop_name
 ORDER BY route_short_name, stop_sequence;
-
