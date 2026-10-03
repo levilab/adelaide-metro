@@ -4,13 +4,22 @@ type: bq.sql
 materialization:
   type: table
 depends:
-  - marts.mart_shape_geometries
+  - core.dim_shapes
   - core.dim_routes
   - core.dim_trips
   - core.fact_scheduled_stop_events
 @bruin */
 
-WITH shape_representative_trips AS (
+WITH shape_distances AS (
+  SELECT
+    shape_id,
+    max_shape_dist_traveled * 1000.0 AS actual_distance_m
+  FROM `adelaide-metro-505702.core.dim_shapes`
+  WHERE shape_id IS NOT NULL
+    AND max_shape_dist_traveled IS NOT NULL
+),
+
+shape_representative_trips AS (
   SELECT
     shape_id,
     route_id,
@@ -76,7 +85,7 @@ classified_shapes AS (
         THEN 'Local Loop / Feeder'
       ELSE 'Regular Commuter'
     END AS service_type
-  FROM `adelaide-metro-505702.marts.mart_shape_geometries` sg
+  FROM shape_distances sg
   INNER JOIN shape_max_span ms
     ON sg.shape_id = ms.shape_id
   INNER JOIN `adelaide-metro-505702.core.dim_routes` r

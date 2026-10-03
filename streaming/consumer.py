@@ -90,62 +90,12 @@ TRIP_UPDATES_SCHEMA = [
     bigquery.SchemaField("fetched_at", "TIMESTAMP"),
 ]
 
-VEHICLE_POSITIONS_SCHEMA = [
-    bigquery.SchemaField("ingested_date", "DATE"),
-    bigquery.SchemaField("ingested_at", "TIMESTAMP"),
-    bigquery.SchemaField("feed_timestamp", "TIMESTAMP"),
-    bigquery.SchemaField("source_gcs_uri", "STRING"),
-    bigquery.SchemaField("entity_id", "STRING"),
-    bigquery.SchemaField("trip_id", "STRING"),
-    bigquery.SchemaField("route_id", "STRING"),
-    bigquery.SchemaField("direction_id", "INTEGER"),
-    bigquery.SchemaField("start_date", "STRING"),
-    bigquery.SchemaField("schedule_relationship", "STRING"),
-    bigquery.SchemaField("vehicle_id", "STRING"),
-    bigquery.SchemaField("vehicle_label", "STRING"),
-    bigquery.SchemaField("latitude", "FLOAT"),
-    bigquery.SchemaField("longitude", "FLOAT"),
-    bigquery.SchemaField("bearing", "FLOAT"),
-    bigquery.SchemaField("speed", "FLOAT"),
-    bigquery.SchemaField("vehicle_timestamp", "TIMESTAMP"),
-    bigquery.SchemaField("occupancy_status", "STRING"),
-    bigquery.SchemaField("fetched_date", "DATE"),
-    bigquery.SchemaField("fetched_at", "TIMESTAMP"),
-]
-
-SERVICE_ALERTS_SCHEMA = [
-    bigquery.SchemaField("ingested_date", "DATE"),
-    bigquery.SchemaField("ingested_at", "TIMESTAMP"),
-    bigquery.SchemaField("feed_timestamp", "TIMESTAMP"),
-    bigquery.SchemaField("source_gcs_uri", "STRING"),
-    bigquery.SchemaField("entity_id", "STRING"),
-    bigquery.SchemaField("header_text", "STRING"),
-    bigquery.SchemaField("description_text", "STRING"),
-    bigquery.SchemaField("url", "STRING"),
-    bigquery.SchemaField("active_start", "TIMESTAMP"),
-    bigquery.SchemaField("cause", "STRING"),
-    bigquery.SchemaField("effect", "STRING"),
-    bigquery.SchemaField("route_id", "STRING"),
-    bigquery.SchemaField("fetched_date", "DATE"),
-    bigquery.SchemaField("fetched_at", "TIMESTAMP"),
-]
-
 # define specific config for each topic
 TOPICS_CONFIG = {
-    "gtfs.vehicle_positions": {
-        "table_name": "gtfs_realtime_vehicle_positions",
-        "poll_timeout": 2.0,
-        "schema": VEHICLE_POSITIONS_SCHEMA,     
-    },
     "gtfs.trip_updates": {
         "table_name": "gtfs_realtime_trip_updates",
         "poll_timeout": 3.0,
         "schema": TRIP_UPDATES_SCHEMA,
-    },
-    "gtfs.service_alerts": {
-        "table_name": "gtfs_realtime_service_alerts",
-        "poll_timeout": 5.0,
-        "schema": SERVICE_ALERTS_SCHEMA,
     },
     "gtfs.feed_status": {
         "table_name": "gtfs_feed_status",
@@ -193,12 +143,6 @@ def gtfs_date_to_string(date_value: str):
     if not date_value:
         return None
     return f"{date_value[:4]}-{date_value[4:6]}-{date_value[6:8]}"
-
-
-def first_translation(translated_string):
-    if not translated_string or not translated_string.translation:
-        return None
-    return translated_string.translation[0].text or None
 
 
 def parse_kafka_headers(headers: list) -> dict:
@@ -275,69 +219,6 @@ def parse_entity_to_rows(topic: str, entity: gtfs_realtime_pb2.FeedEntity, heade
                 "stop_sequence": stop_update.stop_sequence if stop_update.HasField("stop_sequence") else None,
                 "stop_id": stop_update.stop_id if stop_update.stop_id else None,
                 "arrival_time": epoch_to_adelaide_datetime(stop_update.arrival.time) if stop_update.HasField("arrival") and stop_update.arrival.time else None,
-            })
-
-    # PARSE VEHICLE POSITIONS
-    elif topic == "gtfs.vehicle_positions" and entity.HasField("vehicle"):
-        vp = entity.vehicle
-        trip = vp.trip
-        pos = vp.position
-        veh = vp.vehicle
-
-        rows.append({
-            **base_info,
-            "entity_id": entity.id,
-            "trip_id": trip.trip_id if trip.trip_id else None,
-            "route_id": trip.route_id if trip.route_id else None,
-            "direction_id": trip.direction_id if trip.HasField("direction_id") else None,
-            "start_date": gtfs_date_to_string(trip.start_date) if trip.start_date else None,
-            "schedule_relationship": gtfs_realtime_pb2.TripDescriptor.ScheduleRelationship.Name(trip.schedule_relationship) if trip.HasField("schedule_relationship") else None,
-            "vehicle_id": veh.id if veh.id else None,
-            "vehicle_label": veh.label if veh.label else None,
-            "latitude": pos.latitude if pos.HasField("latitude") else None,
-            "longitude": pos.longitude if pos.HasField("longitude") else None,
-            "bearing": pos.bearing if pos.HasField("bearing") else None,
-            "speed": pos.speed if pos.HasField("speed") else None,
-            "vehicle_timestamp": epoch_to_adelaide_datetime(vp.timestamp) if vp.timestamp else None,
-            "occupancy_status": gtfs_realtime_pb2.VehiclePosition.OccupancyStatus.Name(vp.occupancy_status) if vp.HasField("occupancy_status") else None,
-        })
-
-    # PARSE SERVICE ALERTS
-    elif topic == "gtfs.service_alerts" and entity.HasField("alert"):
-        alert = entity.alert
-        active_starts = [period.start for period in alert.active_period if period.start]
-
-        header_txt = first_translation(alert.header_text)
-        desc_txt = first_translation(alert.description_text)
-        url_txt = first_translation(alert.url)
-        act_start = epoch_to_adelaide_datetime(min(active_starts)) if active_starts else None
-        cause_val = gtfs_realtime_pb2.Alert.Cause.Name(alert.cause) if alert.HasField("cause") else None
-        effect_val = gtfs_realtime_pb2.Alert.Effect.Name(alert.effect) if alert.HasField("effect") else None
-
-        if alert.informed_entity:
-            for item in alert.informed_entity:
-                rows.append({
-                    **base_info,
-                    "entity_id": entity.id,
-                    "header_text": header_txt,
-                    "description_text": desc_txt,
-                    "url": url_txt,
-                    "active_start": act_start,
-                    "cause": cause_val,
-                    "effect": effect_val,
-                    "route_id": item.route_id if item.route_id else None,
-                })
-        else:
-            rows.append({
-                **base_info,
-                "entity_id": entity.id,
-                "header_text": header_txt,
-                "description_text": desc_txt,
-                "url": url_txt,
-                "active_start": act_start,
-                "cause": cause_val,
-                "effect": effect_val,
-                "route_id": None,
             })
 
     return rows

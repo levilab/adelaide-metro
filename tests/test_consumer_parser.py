@@ -5,6 +5,7 @@ from datetime import date
 from google.transit import gtfs_realtime_pb2
 
 from streaming.consumer import (
+    TRIP_UPDATES_SCHEMA,
     parse_entity_to_rows,
     parse_feed_status
 )
@@ -47,6 +48,7 @@ class TestParseTripUpdate(unittest.TestCase):
         self.assertEqual(len(rows), 1)
 
         row = rows[0]
+        self.assertEqual(set(row), {field.name for field in TRIP_UPDATES_SCHEMA})
 
         self.assertEqual(row["entity_id"], "entity-1")
         self.assertEqual(row["trip_id"], "trip-100")
