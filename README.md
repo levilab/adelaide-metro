@@ -16,19 +16,19 @@
 
 🚀 **[Live Dashboard → CLICK HERE](https://adelaide-metro-162176027068.asia-east2.run.app/)**
 
-Explore Adelaide's public transport network: where scheduled services are busiest, how direct routes are, and how delays change along a trip.
+Explore Adelaide's public transport network: where scheduled services are busiest, how long routes are, and how delays change along a trip.
 
 ---
 
 ## Problem Statement
 
-Public transport data often comes as separate timetables and live updates. This project brings them together with Local Government Area (LGA) boundaries — the areas managed by local councils — to explore routes, stops, and connections across Adelaide.
+Public transport data often comes as separate timetables and live updates. This project brings them together with Local Government Area (LGA) boundaries — the areas managed by local councils — to explore routes, stops, and scheduled service across Adelaide.
 
 **GTFS** (General Transit Feed Specification) is a standard format for routes, stops, and timetables. **GTFS-Realtime** adds live updates about vehicle locations, expected arrivals, and service alerts.
 
 Python downloads the data, Kafka carries trip updates and polling status, and Bruin prepares BigQuery tables for four Streamlit dashboard tabs. Vehicle-position and service-alert feeds are outside the current analytical scope.
 
-[Architecture](#architecture) · [Dashboard](#dashboard) · [Quick Start](#quick-start) · [Setup guide](docs/setup.md) · [Data model](docs/data-model.md)
+[Architecture](#architecture) · [Dashboard](#dashboard) · [Quick Start](#quick-start) · [Limitations](#limitations)
 
 ---
 
@@ -64,7 +64,9 @@ flowchart TD
     style APP fill:#4285F4,color:#fff,stroke:#4285F4
 ```
 
-GitHub Actions runs the full pipeline daily. The producer and consumer run continuously on Cloud Run Worker Pools; Cloud Scheduler rebuilds the delay tables every five minutes. [Full architecture and update schedule →](docs/data-model.md#architecture)
+- **Batch:** Python loads timetables and council boundaries; Bruin builds BigQuery dimensions, facts and dashboard tables daily.
+- **Realtime:** Cloud Run workers send trip updates through Kafka to BigQuery. Polling runs every minute; transformations run every five minutes.
+- **Dashboard:** Streamlit reads prepared tables for four views. Model definitions live in [core](bruin/assets/core) and [marts](bruin/assets/marts/dashboard).
 
 ---
 
@@ -84,29 +86,12 @@ GitHub Actions runs the full pipeline daily. The producer and consumer run conti
 
 | Tab | Capture | What it shows |
 | --- | --- | --- |
-| **Network Analytics** | ![Network Analytics](docs/images/streamlit_network_analytics.png) | Where scheduled services are busiest, and which council areas can be reached by staying on the same trip. |
-| **Circuity Analysis** | ![Circuity Analysis](docs/images/streamlit_circuity.png) | How direct a route is: its length compared with the distance from its first stop to its farthest stop. |
-| **CBD Corridor Speed** | ![CBD Corridor Speed](docs/images/streamlit_CBD_speed.png) | Timetable-based speed and trip counts along streets in the central business district (CBD), by time of day. |
-| **Delay Propagation Monitoring** | ![Delay Propagation](docs/images/streamlit_dealy_propagation.png) | How arrival delays grow or recover as a trip moves from stop to stop. |
+| **Network Analytics** | ![Network Analytics](docs/images/network-analytics.png) | Explore stops by council area and transport type, starting with Bus; compare areas by stops, routes and scheduled visits. |
+| **Route Lengths** | ![Route Lengths](docs/images/route-lengths.png) | Compare average, shortest and longest mapped route lengths in kilometres. Filter by transport type or search by route/destination. |
+| **Scheduled CBD Speed** | ![Scheduled CBD Speed](docs/images/scheduled-cbd-speed.png) | Timetable-based speed and trip counts for corridors assigned from stop names, by time of day. |
+| **Realtime Arrival Delay** | ![Realtime Arrival Delay](docs/images/realtime-arrival-delay.png) | Feed-reported arrival delay against the timetable, plus changes between available stop updates. |
 
-Counts come from the loaded timetable. CBD speed uses scheduled travel times, and live arrival updates may be predictions. [How the measures are calculated →](docs/data-model.md#metric-semantics)
-
-<details>
-<summary>More screenshots & tech stack diagram</summary>
-
-| Connections across council areas | Council-area map |
-| --- | --- |
-| ![Spatial Reach](docs/images/streamlit_spatial_reach.png) | ![LGA Coverage](docs/images/streamlit_spatial_reach-2.png) |
-
-| Aiven Kafka | Topics |
-| --- | --- |
-| ![Aiven Kafka](docs/images/aiven.png) | ![Kafka Topics](docs/images/topics.png) |
-
-<p align="center">
-  <img width="100%" src="docs/images/techstack.svg" alt="Techstack diagram">
-</p>
-
-</details>
+Screenshots show the deployed dashboard as of 3 October 2026. Live delay values change with the feed.
 
 ---
 
@@ -120,18 +105,22 @@ adelaide-metro/
 ├── terraform/           # Google Cloud resources and update schedule
 ├── .github/workflows/   # Checks, deployment and daily pipeline run
 ├── tests/               # Producer/consumer unit tests
-└── docs/                # Setup, data model, diagrams and screenshots
+└── docs/images/         # Dashboard screenshots
 ```
-
-[Detailed directory tree →](docs/data-model.md#project-structure)
 
 ---
 
 ## Quick Start
 
-**First-time setup:** follow [docs/setup.md](docs/setup.md) to configure Google Cloud Platform (GCP), Bruin, and Kafka, then build the database tables. SQL currently contains project IDs that must be updated for your own project.
+Requires Python 3.11, Bruin, Google Cloud credentials and a Kafka broker.
 
-**With the database tables already built:** run these commands from the project folder using Bash (or WSL on Windows) and Python 3.11:
+- Set up cloud resources using [Terraform](terraform/main.tf).
+- Update project IDs in SQL, the [batch Dockerfile](bruin/Dockerfile) and [workflows](.github/workflows).
+- Configure Bruin's `gcp` connection and Kafka credentials for the [producer](streaming/producer.py) and [consumer](streaming/consumer.py).
+- Start realtime ingestion, then build the BigQuery tables with `bruin run bruin`.
+- Configure GitHub secrets from the [deployment workflow](.github/workflows/deploy.yml) for cloud deployment.
+
+With BigQuery tables populated, run the dashboard locally from Bash or WSL:
 
 ```bash
 python -m venv .venv
@@ -142,15 +131,13 @@ export GOOGLE_CLOUD_PROJECT="your-project-id"
 streamlit run dashboard/App.py
 ```
 
-The dashboard reads prepared BigQuery tables, called **marts**. These must already exist in your project. [Deployment, schedules, and checks →](docs/setup.md#deployment--scheduling)
+The [CI workflow](.github/workflows/ci.yml) validates Bruin, Terraform and Python unit tests on pull requests.
 
 ---
 
-## What Can Be Improved
+## Limitations
 
-- **Easier setup:** Project IDs are repeated across SQL and deployment files, and some cloud resources still need manual setup. Use one shared configuration and automate those steps so another user can run the project with fewer edits.
-- **More reliable live updates:** A restart can cause the same update to be loaded again, and a failed worker can stop new data from arriving. Handle repeated records, restart failed workers, and show the last update time so users can tell whether the dashboard is current.
-- **Repeatable data loads:** Static downloads replace the current tables, and only a source-change hash is saved. Keep versioned copies of source files so a failed load can be retried with the same input and earlier results can be reproduced.
-- **Cost control:** Live workers run continuously, and repeated database loads and queries add costs. Monitor usage and tune batch sizes, refresh intervals, and storage retention to keep operating costs predictable.
-
-[Pipeline limitations →](docs/data-model.md#what-can-be-improved)
+- **Manual setup:** Project IDs are repeated across files; Kafka and parts of cloud deployment require manual configuration.
+- **Delivery guarantees:** Kafka-to-BigQuery loading is at least once. Raw records can repeat; staging deduplicates updates, and some failures require intervention.
+- **Historical replay:** Static ingestion replaces current data without keeping source versions, limiting reproducible backfills.
+- **Freshness and cost:** Scheduled refreshes and caching add latency. Continuous workers and recurring BigQuery queries incur operating costs.

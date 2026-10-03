@@ -7,13 +7,17 @@ materialization:
     - shape_id
 depends:
   - staging.stg_shapes
+columns:
+  - name: shape_id
+    type: string
+    checks:
+      - name: not_null
+      - name: unique
 @bruin */
 
 WITH shape_points AS (
   SELECT
     shape_id,
-    shape_pt_lat,
-    shape_pt_lon,
     shape_dist_traveled
   FROM `adelaide-metro-505702.staging.stg_shapes`
   WHERE shape_id IS NOT NULL
@@ -23,8 +27,6 @@ WITH shape_points AS (
 
 SELECT
   shape_id,
-  COUNT(*) AS shape_point_count,
-  MIN(shape_dist_traveled) AS min_shape_dist_traveled,
   MAX(shape_dist_traveled) AS max_shape_dist_traveled
 FROM shape_points
 GROUP BY shape_id

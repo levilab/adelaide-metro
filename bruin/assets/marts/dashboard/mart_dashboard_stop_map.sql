@@ -12,8 +12,8 @@ SELECT
     stop_name,
     stop_lat,
     stop_lon,
-    COUNT(*) AS total_departures,
-    ANY_VALUE(route_type) AS route_type
+    route_type,
+    COUNT(*) AS total_departures
 FROM `adelaide-metro-505702.core.fact_scheduled_stop_events`
-GROUP BY 1,2,3,4
+GROUP BY stop_id, stop_name, stop_lat, stop_lon, route_type
 ORDER BY total_departures

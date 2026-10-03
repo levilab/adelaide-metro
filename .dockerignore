@@ -24,4 +24,5 @@ vehicle_positions.txt
 .aws/
 .codex/
 .agents/
-
+tests/check_realtime_cloud.py
+tests/test_dashboard_refresh.py
