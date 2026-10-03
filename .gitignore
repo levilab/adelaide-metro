@@ -27,5 +27,7 @@ streaming/bigquery_migration_fetched_timestamps.sql
 logs/queries
 logs/runs
 logs/*.log
-docs/engineering-decisions.md
-docs/challenges-and-lessons.md
+tests/check_realtime_cloud.py
+tests/test_dashboard_refresh.py
+docs/**/*.md
+.gcloudignore

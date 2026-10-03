@@ -5,16 +5,10 @@ import pandas as pd
 import pydeck as pdk
 import plotly.express as px
 import plotly.graph_objects as go
-import requests
 from google.cloud import bigquery
-from datetime import datetime
-import pytz
 import re
 from dotenv import load_dotenv
-import time
 load_dotenv()
-
-_BROWSER_UA = {"User-Agent": "Mozilla/5.0 (compatible; adelaide-transit-pulse/1.0)"}
 
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT"]
 
@@ -23,13 +17,6 @@ st.set_page_config(
     page_icon="🚌",
     layout="wide",
     )
-
-@st.cache_data(ttl=3600)
-def load_csv_url(url):
-    import io
-    resp = requests.get(url, headers=_BROWSER_UA, timeout=30)
-    resp.raise_for_status()
-    return pd.read_csv(io.StringIO(resp.content.decode("utf-8-sig")))
 
 # ── Adelaide Theme ──────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -145,32 +132,7 @@ def load_delay_data(project_id):
     """
     ).to_dataframe()
 
-@st.cache_data(ttl=3600)
-def format_gtfs_time(t):
-    """Convert GTFS time (e.g. 25:30:00) to readable format (e.g. 01:30 +1day)."""
-    if not t or ":" not in str(t):
-        return t
-    parts = str(t).split(":")
-    if len(parts) >= 2:
-        hours = int(parts[0])
-        if hours >= 24:
-            # Convert 24:10:00 -> 00:10:00 (Next day)
-            hours -= 24
-            return f"{hours:02d}:{parts[1]} (+1d)"
-        return f"{parts[0]}:{parts[1]}"
-    return time_str
-
 ROUTE_TYPE_LABEL = {0: "Tram", 2: "Rail", 3: "Bus", 4: "Ferry",  701: "Regional Bus", 712: "Express Bus"}
-COLOR_MAP = {"Tram": "#00c864", 
-            "Bus": "#ff3232", 
-            "Ferry": "#0078ff",
-            "Rail": "#b400ff", 
-            "Regional Bus": "#c81e1e",
-            "Express Bus": "#ff7800",
-            }
-
-adelaide_tz = pytz.timezone("Australia/Adelaide")
-visible_types = [0, 3, 4, 2]
 
 def route_type_color(rt):
     return {
@@ -972,7 +934,7 @@ with tab_cbd:
 with tab_delay:
     st.subheader("Corridor Delay & Propagation Analytics")
     st.caption("Track how delays start at one stop and build up across the route.")
-    count = st_autorefresh(interval=60000, limit=100, key="delay_tab_autorefresh")
+    st_autorefresh(interval=300000, key="delay_tab_autorefresh")
     
     try:
         df = load_delay_data(PROJECT_ID)
@@ -1003,7 +965,7 @@ with tab_delay:
         
         # Place Refresh here and clear cache if needed
         if st.button("🔄 Refresh Data"):
-            st.cache_data.clear()
+            load_delay_data.clear()
             st.rerun()
 
     # Filtering by selected route
@@ -1211,5 +1173,3 @@ with tab_delay:
                 hide_index=True,
                 width='stretch',
             )
-    time.sleep(60)
-    st.rerun()

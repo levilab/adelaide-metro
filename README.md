@@ -26,7 +26,7 @@ Public transport data often comes as separate timetables and live updates. This 
 
 **GTFS** (General Transit Feed Specification) is a standard format for routes, stops, and timetables. **GTFS-Realtime** adds live updates about vehicle locations, expected arrivals, and service alerts.
 
-Python downloads the data, Kafka carries live updates, and Bruin prepares BigQuery tables for four Streamlit dashboard tabs.
+Python downloads the data, Kafka carries trip updates and polling status, and Bruin prepares BigQuery tables for four Streamlit dashboard tabs. Vehicle-position and service-alert feeds are outside the current analytical scope.
 
 [Architecture](#architecture) · [Dashboard](#dashboard) · [Quick Start](#quick-start) · [Setup guide](docs/setup.md) · [Data model](docs/data-model.md)
 

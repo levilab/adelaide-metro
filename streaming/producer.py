@@ -29,20 +29,10 @@ FEED_STATUS_TOPIC = os.environ.get(
 HEADERS = {"accept": "application/x-google-protobuf"}
 
 FEEDS_CONFIG = {
-    "vehicle_positions": {
-        "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions",
-        "topic": "gtfs.vehicle_positions",
-        "interval": 15,  # 15 secs
-    },
     "trip_updates": {
         "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/trip_updates",
         "topic": "gtfs.trip_updates",
         "interval": 60,  # 60 secs
-    },
-    "service_alerts": {
-        "url": "https://gtfs.adelaidemetro.com.au/v1/realtime/service_alerts",
-        "topic": "gtfs.service_alerts",
-        "interval": 300,  # 300 secs
     },
 }
 
@@ -93,9 +83,7 @@ def fetch_feed(feed_name: str, url: str) -> tuple[gtfs_realtime_pb2.FeedMessage,
 
 
 def extract_entity_key(entity: gtfs_realtime_pb2.FeedEntity) -> str:
-    if entity.HasField("vehicle") and entity.vehicle.vehicle.id:
-        return f"vehicle_{entity.vehicle.vehicle.id}"
-    elif entity.HasField("trip_update") and entity.trip_update.trip.trip_id:
+    if entity.HasField("trip_update") and entity.trip_update.trip.trip_id:
         return f"trip_{entity.trip_update.trip.trip_id}"
     return entity.id
 

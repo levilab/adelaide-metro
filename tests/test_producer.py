@@ -13,6 +13,7 @@ class TestPublishEvent(unittest.TestCase):
         producer = MagicMock()
         entity = gtfs_realtime_pb2.FeedEntity()
         entity.id = "entity-1"
+        entity.trip_update.trip.trip_id = "trip-100"
 
         publish_event(
             producer=producer,
@@ -25,6 +26,7 @@ class TestPublishEvent(unittest.TestCase):
         headers = dict(
             producer.produce.call_args.kwargs["headers"]
         )
+        self.assertEqual(producer.produce.call_args.kwargs["key"], b"trip_trip-100")
 
         self.assertEqual(
             headers["fetched_at"],

@@ -13,3 +13,15 @@ __pycache__/
 *.py[cod]
 *.zip
 adelaide-metro-505702-0645266fa951.json
+unused/
+gtfs/
+docs/learning/
+docs/reports/
+*.geojson
+service_alerts.txt
+trip_updates.txt
+vehicle_positions.txt
+.aws/
+.codex/
+.agents/
+
