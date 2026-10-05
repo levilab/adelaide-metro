@@ -27,6 +27,12 @@ variable "rt_job_name" {
   default     = "rt-transform-job"
 }
 
+variable "enable_rt_scheduler" {
+  description = "Opt in to recurring realtime transforms and their Cloud Run/BigQuery costs"
+  type        = bool
+  default     = false
+}
+
 variable "rt_scheduler_name" {
   description = "Name of the Cloud Scheduler job that invokes the realtime transform"
   type        = string

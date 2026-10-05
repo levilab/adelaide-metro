@@ -126,6 +126,8 @@ resource "google_project_iam_member" "rt_scheduler_run_invoker" {
 }
 
 resource "google_cloud_scheduler_job" "rt_transform" {
+  count = var.enable_rt_scheduler ? 1 : 0
+
   name        = var.rt_scheduler_name
   description = "Refresh realtime staging, facts, and dashboard marts"
   region      = var.cloud_run_region
@@ -153,6 +155,11 @@ resource "google_cloud_scheduler_job" "rt_transform" {
     google_project_service.cloud_scheduler,
     google_project_iam_member.rt_scheduler_run_invoker,
   ]
+}
+
+moved {
+  from = google_cloud_scheduler_job.rt_transform
+  to   = google_cloud_scheduler_job.rt_transform[0]
 }
 
 # ── Streamlit Dashboard Service Account ───────────────────────────────────────

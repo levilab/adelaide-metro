@@ -1,3 +1,10 @@
 name: adelaide-transit-pipeline
+variables:
+  rt_demo_mode:
+    type: boolean
+    default: true
+  rt_demo_date:
+    type: string
+    default: "2026-10-05"
 default_connections:
   google_cloud_platform: gcp

@@ -5,12 +5,16 @@ on:
     branches:
       - main
     paths:
-      - 'dashboard/**'
-      - 'streaming/**'
-      - 'Dockerfile'
-      - 'requirements.txt'
-      - '.github/workflows/deploy.yml'
+      - "dashboard/**"
+      - "Dockerfile"
+      - "requirements.txt"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
+    inputs:
+      deploy_workers:
+        description: "Start both realtime workers continuously (incurs ongoing costs)"
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy
@@ -41,18 +45,16 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-      
+
       - name: Set up gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
-        with:
-          install_components: 'beta'
 
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
-      
+
       - name: Create ca.pem file
         run: echo "${{ secrets.APP_CA_PEM }}" > ca.pem
-        
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -76,9 +78,9 @@ jobs:
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
             --allow-unauthenticated \
-            --min-instances=1 \
+            --min-instances=0 \
             --max-instances=1 \
-            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}
+            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},DASHBOARD_MODE=demo
 
       - name: Show service URL
         run: |
@@ -88,8 +90,9 @@ jobs:
 
       # Producer (Worker Pool)
       - name: Deploy GTFS Producer Worker Pool
+        if: github.event_name == 'workflow_dispatch' && inputs.deploy_workers
         run: |
-          gcloud beta run worker-pools deploy ${{ env.SERVICE_PRODUCER }} \
+          gcloud run worker-pools deploy ${{ env.SERVICE_PRODUCER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
@@ -100,8 +103,9 @@ jobs:
 
       # GTFS Consumer (Worker Pool)
       - name: Deploy GTFS Consumer Worker Pool
+        if: github.event_name == 'workflow_dispatch' && inputs.deploy_workers
         run: |
-          gcloud beta run worker-pools deploy ${{ env.SERVICE_CONSUMER }} \
+          gcloud run worker-pools deploy ${{ env.SERVICE_CONSUMER }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
             --service-account bruin-pipeline@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \

@@ -25,7 +25,7 @@ output "service_account_email" {
 
 output "rt_scheduler_name" {
   description = "Cloud Scheduler job that refreshes realtime marts"
-  value       = google_cloud_scheduler_job.rt_transform.name
+  value       = try(google_cloud_scheduler_job.rt_transform[0].name, null)
 }
 
 output "rt_scheduler_service_account_email" {

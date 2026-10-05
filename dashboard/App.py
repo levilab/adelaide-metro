@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT"]
+DEMO_MODE = os.environ.get("DASHBOARD_MODE", "demo").lower() == "demo"
 
 st.set_page_config(
     page_title="Adelaide Metro - Network Analytics",
@@ -54,6 +55,8 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 st.markdown("Adelaide public transport network — routes, stops, and peak hours.")
+if DEMO_MODE:
+    st.info("Demo dataset — live collection is paused. Charts use saved data; the arrival-delay tab shows its source timestamp.")
 
 @st.cache_resource
 def get_bq_client():
@@ -84,7 +87,7 @@ def load_cbd_corridor_data(project_id):
     ORDER BY corridor_name, time_bucket
     """).to_dataframe()
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600 if DEMO_MODE else 300)
 def load_delay_data(project_id):
     # initilize BigQuery Client
     return get_bq_client().query(f"""
@@ -164,7 +167,7 @@ col4.metric("Peak Hour", f"{peak_hour:02d}:00")
 st.divider()
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab_network, tab_lengths, tab_cbd, tab_delay = st.tabs(["Network Analytics", "Route Lengths", "Scheduled CBD Speed", "Realtime Arrival Delay"])
+tab_network, tab_lengths, tab_cbd, tab_delay = st.tabs(["Network Analytics", "Route Lengths", "Scheduled CBD Speed", "Arrival Delay (Demo)" if DEMO_MODE else "Realtime Arrival Delay"])
 
 with tab_network:
     with st.spinner("Loading network data..."):
@@ -480,9 +483,10 @@ with tab_cbd:
     st.divider()
 
 with tab_delay:
-    st.subheader("Realtime Arrival Delay")
+    st.subheader("Arrival Delay — Saved Demo" if DEMO_MODE else "Realtime Arrival Delay")
     st.caption("Latest available arrival update per trip/stop, compared with the timetable and pooled by route name and stop sequence. Route variants may differ; updates may be predictions, not observed arrivals.")
-    st_autorefresh(interval=300000, key="delay_tab_autorefresh")
+    if not DEMO_MODE:
+        st_autorefresh(interval=300000, key="delay_tab_autorefresh")
     
     try:
         df = load_delay_data(PROJECT_ID)
@@ -492,7 +496,7 @@ with tab_delay:
                 "Australia/Adelaide"
             )
             st.caption(
-                f"Latest realtime update: {latest_update:%d %b %Y, %H:%M:%S %Z}"
+                f"{'Saved data as of' if DEMO_MODE else 'Latest realtime update'}: {latest_update:%d %b %Y, %H:%M:%S %Z}"
             )
     except Exception as e:
         st.warning(f"Failed to connect to BigQuery: ({e}).")

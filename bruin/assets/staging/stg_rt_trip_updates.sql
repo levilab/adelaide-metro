@@ -8,6 +8,9 @@ custom_checks:
   - name: trip_updates_successful_poll_is_fresh
     description: Producer successfully polled Trip Updates within the last 3 minutes.
     query: |
+      {% if var.rt_demo_mode %}
+      SELECT 0
+      {% else %}
       SELECT IF(
         MAX(IF(http_success, polled_at, NULL)) >= TIMESTAMP_SUB(
           CURRENT_TIMESTAMP(),
@@ -20,11 +23,15 @@ custom_checks:
         `adelaide-metro-505702.streaming.gtfs_feed_status`
       WHERE
         feed_name = 'trip_updates'
+      {% endif %}
     value: 0
 
   - name: trip_updates_source_feed_is_fresh
     description: Latest successful poll contains a source snapshot less than 10 minutes old.
     query: |
+      {% if var.rt_demo_mode %}
+      SELECT 0
+      {% else %}
       SELECT IF(
         COALESCE(
           (
@@ -45,6 +52,19 @@ custom_checks:
         0,
         1
       )
+      {% endif %}
+    value: 0
+
+  - name: demo_source_has_rows
+    description: The selected demo day must contain source trip updates.
+    query: |
+      {% if var.rt_demo_mode %}
+      SELECT IF(COUNT(*) > 0, 0, 1)
+      FROM `adelaide-metro-505702.streaming.gtfs_realtime_trip_updates`
+      WHERE ingested_date = DATE('{{ var.rt_demo_date }}')
+      {% else %}
+      SELECT 0
+      {% endif %}
     value: 0
 
   - name: unique_trip_stop_per_service_date
@@ -100,10 +120,14 @@ WITH typed_updates AS (
   FROM
     `streaming.gtfs_realtime_trip_updates`
 
+  {% if var.rt_demo_mode %}
+  WHERE ingested_date = DATE('{{ var.rt_demo_date }}')
+  {% else %}
   WHERE COALESCE(fetched_date, ingested_date) >= DATE_SUB(
     CURRENT_DATE('Australia/Adelaide'),
     INTERVAL 1 DAY
   )
+  {% endif %}
 ),
 
 ranked_updates AS (
