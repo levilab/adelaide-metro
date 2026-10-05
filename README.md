@@ -133,18 +133,6 @@ streamlit run dashboard/App.py
 
 The [CI workflow](.github/workflows/ci.yml) validates Bruin, Terraform and Python unit tests on pull requests.
 
-### Operating costs and manual runs
-
-The dashboard can scale to zero and reads the last prepared BigQuery tables. Its data does not update while ingestion and transforms are stopped. Cloud Run requests, BigQuery queries, and stored data can still incur charges.
-
-- The batch workflow runs only through **Run workflow** in GitHub Actions. It rebuilds and executes the batch job; creating the realtime transform job requires selecting `deploy_realtime_transform`.
-- Dashboard deployment does not start realtime workers. To start both workers, manually run the deploy workflow with `deploy_workers` selected. Stop or delete them after the demo.
-- Terraform defaults `enable_rt_scheduler` to `false`, so applying it does not recreate the realtime schedule. Enable it only after deploying a realtime transform job, and disable it again after use.
-- Source trip updates retain only the latest collected day, **5 October 2026** (501,409 rows, approximately 74 MiB logical data). Dashboard tables remain saved from their last successful refresh; their source timestamp can differ from the retained raw sample.
-- The dashboard defaults to `DASHBOARD_MODE=demo`, labels saved data, and disables automatic refresh. Set `DASHBOARD_MODE=live` only when live collection and transforms are active.
-- Realtime staging defaults to `rt_demo_mode=true` and `rt_demo_date=2026-10-05`. It checks that the saved sample exists and retains deduplication checks, while skipping live freshness checks. Rebuild only the realtime assets with `bruin run bruin/assets/staging/stg_rt_trip_updates.sql --downstream`. To select a different saved day, add `--var rt_demo_date=YYYY-MM-DD`; to restore the live rolling window and freshness checks, add `--var rt_demo_mode=false`.
-- Removed container images are rebuilt by the manual workflows. Keep the dashboard's current image when cleaning Artifact Registry.
-
 ---
 
 ## Limitations

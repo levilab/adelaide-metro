@@ -11,6 +11,7 @@ load_dotenv()
 
 PROJECT_ID = os.environ["GOOGLE_CLOUD_PROJECT"]
 DEMO_MODE = os.environ.get("DASHBOARD_MODE", "demo").lower() == "demo"
+BQ_MAX_QUERY_BYTES = int(os.environ.get("BQ_MAX_QUERY_BYTES", str(100 * 1024 * 1024)))
 
 st.set_page_config(
     page_title="Adelaide Metro - Network Analytics",
@@ -60,7 +61,12 @@ if DEMO_MODE:
 
 @st.cache_resource
 def get_bq_client():
-    return bigquery.Client(project=PROJECT_ID)
+    return bigquery.Client(
+        project=PROJECT_ID,
+        default_query_job_config=bigquery.QueryJobConfig(
+            maximum_bytes_billed=BQ_MAX_QUERY_BYTES,
+        ),
+    )
 
 @st.cache_data(ttl=3600)
 def load_data(query):

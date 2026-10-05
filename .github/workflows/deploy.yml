@@ -80,7 +80,7 @@ jobs:
             --allow-unauthenticated \
             --min-instances=0 \
             --max-instances=1 \
-            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},DASHBOARD_MODE=demo
+            --set-env-vars GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},DASHBOARD_MODE=demo,BQ_MAX_QUERY_BYTES=104857600
 
       - name: Show service URL
         run: |
