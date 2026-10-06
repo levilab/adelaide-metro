@@ -31,3 +31,5 @@ tests/check_realtime_cloud.py
 tests/test_dashboard_refresh.py
 docs/**/*.md
 .gcloudignore
+docs/**/*.docx
+bruin/README.md
